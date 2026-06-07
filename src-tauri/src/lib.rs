@@ -1,3 +1,6 @@
+mod db;
+
+use db::{get_db_path, DbState};
 use tauri::{
     image::Image,
     menu::{Menu, MenuItem},
@@ -10,6 +13,10 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
+            let db_path = get_db_path();
+            let db_state = DbState::new(db_path).expect("Failed to initialize database");
+            app.manage(db_state);
+
             // Setup system tray
             let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let show_item = MenuItem::with_id(app, "show", "Show Window", true, None::<&str>)?;
