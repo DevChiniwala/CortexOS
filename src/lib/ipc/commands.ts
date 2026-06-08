@@ -1,0 +1,329 @@
+// ============================================================================
+// CortexOS IPC Commands — Typed Tauri invoke wrappers
+// Single source of truth for all frontend → backend communication.
+// ============================================================================
+
+import { invoke as tauriInvoke, Channel } from "@tauri-apps/api/core";
+import type {
+  Company,
+  NewCompany,
+  Contact,
+  ContactWithCompany,
+  NewContact,
+  Prompt,
+  PromptType,
+  ScoringConfig,
+  CompanyScore,
+  CompanyWithScore,
+  StreamEvent,
+  ResearchResult,
+  AdjacentResult,
+  OnboardingStatus,
+  Job,
+  JobLog,
+  Settings,
+  ResearchDepth,
+  ApolloKeyStatus,
+} from "../types";
+
+// ============================================================================
+// Runtime detection
+// ============================================================================
+
+type TauriWindow = Window & { __TAURI_INTERNALS__?: unknown };
+
+export function isTauriRuntime(): boolean {
+  return typeof window !== "undefined" && "__TAURI_INTERNALS__" in (window as TauriWindow);
+}
+
+function invoke<T>(command: string, args?: Record<string, unknown>): Promise<T> {
+  if (isTauriRuntime()) {
+    return tauriInvoke<T>(command, args);
+  }
+  const fallback = browserFallback<T>(command);
+  if (fallback.handled) return Promise.resolve(fallback.value);
+  return Promise.reject(new Error(`Tauri backend unavailable for command: ${command}`));
+}
+
+function browserFallback<T>(
+  command: string
+): { handled: true; value: T } | { handled: false; value?: never } {
+  const now = Date.now();
+  switch (command) {
+    case "get_all_leads":
+    case "get_leads_with_scores":
+    case "get_unscored_leads":
+    case "get_all_people":
+    case "get_people_for_lead":
+    case "get_jobs_active":
+    case "get_jobs_recent":
+    case "get_job_logs_cmd":
+      return { handled: true, value: [] as T };
+    case "get_lead":
+    case "get_person":
+    case "get_prompt_by_type":
+    case "get_active_scoring_config":
+    case "get_lead_score":
+    case "get_job_by_id":
+      return { handled: true, value: null as T };
+    case "get_adjacent_leads":
+    case "get_adjacent_people":
+      return {
+        handled: true,
+        value: { prevLead: null, nextLead: null, currentIndex: 0, total: 0 } as T,
+      };
+    case "get_settings":
+      return {
+        handled: true,
+        value: {
+          useChrome: false,
+          orchestrationEnabled: false,
+          defaultResearchDepth: "light",
+          apolloEnabled: false,
+          apolloMaxContacts: 10,
+          deepJobConcurrency: 1,
+          dailyBudgetUsdCents: null,
+          updatedAt: now,
+        } as T,
+      };
+    case "get_onboarding_status":
+      return {
+        handled: true,
+        value: {
+          hasCompanyOverview: true,
+          hasLead: false,
+          hasResearchedLead: false,
+          hasScoredLead: false,
+          hasResearchedPerson: false,
+          hasConversationTopics: false,
+        } as T,
+      };
+    case "get_apollo_key_status":
+      return { handled: true, value: { configured: false, source: "none" } as T };
+    default:
+      return { handled: false };
+  }
+}
+
+// ============================================================================
+// Company Commands
+// ============================================================================
+
+export async function getCompany(id: number): Promise<Company | null> {
+  return invoke("get_lead", { id });
+}
+
+export async function getAllCompanies(): Promise<Company[]> {
+  return invoke("get_all_leads");
+}
+
+export async function getCompaniesWithScores(): Promise<CompanyWithScore[]> {
+  return invoke("get_leads_with_scores");
+}
+
+export async function getAdjacentCompanies(currentId: number): Promise<AdjacentResult> {
+  return invoke("get_adjacent_leads", { currentId });
+}
+
+export async function insertCompany(data: NewCompany): Promise<number> {
+  return invoke("insert_lead", { data });
+}
+
+export async function updateCompanyUserStatus(companyId: number, status: string): Promise<void> {
+  return invoke("update_lead_user_status", { leadId: companyId, status });
+}
+
+export async function deleteCompanies(companyIds: number[]): Promise<number> {
+  return invoke("delete_leads", { leadIds: companyIds });
+}
+
+// ============================================================================
+// Contact Commands
+// ============================================================================
+
+export async function getContact(id: number): Promise<ContactWithCompany | null> {
+  return invoke("get_person", { id });
+}
+
+export async function getContactsForCompany(companyId: number): Promise<Contact[]> {
+  return invoke("get_people_for_lead", { leadId: companyId });
+}
+
+export async function getAllContacts(): Promise<ContactWithCompany[]> {
+  return invoke("get_all_people");
+}
+
+export async function getAdjacentContacts(currentId: number): Promise<AdjacentResult> {
+  return invoke("get_adjacent_people", { currentId });
+}
+
+export async function insertContact(data: NewContact): Promise<number> {
+  return invoke("insert_person", { data });
+}
+
+export async function updateContactUserStatus(contactId: number, status: string): Promise<void> {
+  return invoke("update_person_user_status", { personId: contactId, status });
+}
+
+export async function deleteContacts(contactIds: number[]): Promise<number> {
+  return invoke("delete_people", { personIds: contactIds });
+}
+
+// ============================================================================
+// Prompt Commands
+// ============================================================================
+
+export async function getPromptByType(promptType: PromptType): Promise<Prompt | null> {
+  return invoke("get_prompt_by_type", { promptType });
+}
+
+export async function savePromptByType(promptType: PromptType, content: string): Promise<number> {
+  return invoke("save_prompt_by_type", { promptType, content });
+}
+
+// ============================================================================
+// Scoring Commands
+// ============================================================================
+
+export async function getActiveScoringConfig(): Promise<ScoringConfig | null> {
+  return invoke("get_active_scoring_config");
+}
+
+export async function saveScoringConfig(
+  name: string,
+  requiredCharacteristics: string,
+  demandSignifiers: string,
+  tierHotMin: number,
+  tierWarmMin: number,
+  tierNurtureMin: number,
+  id?: number
+): Promise<number> {
+  return invoke("save_scoring_config", {
+    name,
+    requiredCharacteristics,
+    demandSignifiers,
+    tierHotMin,
+    tierWarmMin,
+    tierNurtureMin,
+    id,
+  });
+}
+
+export async function getCompanyScore(companyId: number): Promise<CompanyScore | null> {
+  return invoke("get_lead_score", { leadId: companyId });
+}
+
+export async function getUnscoredCompanies(): Promise<Company[]> {
+  return invoke("get_unscored_leads");
+}
+
+// ============================================================================
+// Research Commands
+// ============================================================================
+
+export async function startCompanyResearch(
+  companyId: number,
+  onEvent: (event: StreamEvent) => void,
+  customPrompt?: string,
+  researchDepth?: ResearchDepth
+): Promise<ResearchResult> {
+  const channel = new Channel<StreamEvent>();
+  channel.onmessage = onEvent;
+  return invoke("start_research", {
+    leadId: companyId,
+    customPrompt,
+    researchDepth,
+    onEvent: channel,
+  });
+}
+
+export async function startContactResearch(
+  contactId: number,
+  onEvent: (event: StreamEvent) => void,
+  customPrompt?: string
+): Promise<ResearchResult> {
+  const channel = new Channel<StreamEvent>();
+  channel.onmessage = onEvent;
+  return invoke("start_person_research", { personId: contactId, customPrompt, onEvent: channel });
+}
+
+export async function startScoring(
+  companyId: number,
+  onEvent: (event: StreamEvent) => void
+): Promise<ResearchResult> {
+  const channel = new Channel<StreamEvent>();
+  channel.onmessage = onEvent;
+  return invoke("start_scoring", { leadId: companyId, onEvent: channel });
+}
+
+export async function startConversationGeneration(
+  contactId: number,
+  onEvent: (event: StreamEvent) => void
+): Promise<ResearchResult> {
+  const channel = new Channel<StreamEvent>();
+  channel.onmessage = onEvent;
+  return invoke("start_conversation_generation", { personId: contactId, onEvent: channel });
+}
+
+// ============================================================================
+// Job Commands
+// ============================================================================
+
+export async function killJob(jobId: string): Promise<void> {
+  return invoke("kill_job", { jobId });
+}
+
+export async function getJobsActive(): Promise<Job[]> {
+  return invoke("get_jobs_active");
+}
+
+export async function getJobsRecent(limit?: number): Promise<Job[]> {
+  return invoke("get_jobs_recent", { limit });
+}
+
+export async function getJobById(jobId: string): Promise<Job | null> {
+  return invoke("get_job_by_id", { jobId });
+}
+
+export async function getJobLogs(
+  jobId: string,
+  afterSequence?: number,
+  limit?: number
+): Promise<JobLog[]> {
+  return invoke("get_job_logs_cmd", { jobId, afterSequence, limit });
+}
+
+// ============================================================================
+// Settings Commands
+// ============================================================================
+
+export async function getSettings(): Promise<Settings> {
+  return invoke("get_settings");
+}
+
+export async function updateSettings(useChrome: boolean): Promise<void> {
+  return invoke("update_settings", { useChrome });
+}
+
+export async function updateOrchestrationSettings(settings: {
+  orchestrationEnabled: boolean;
+  defaultResearchDepth: ResearchDepth;
+  apolloEnabled: boolean;
+  apolloMaxContacts: number;
+  deepJobConcurrency: number;
+  dailyBudgetUsdCents: number | null;
+}): Promise<void> {
+  return invoke("update_orchestration_settings", settings);
+}
+
+export async function getApolloKeyStatus(): Promise<ApolloKeyStatus> {
+  return invoke("get_apollo_key_status");
+}
+
+// ============================================================================
+// Onboarding Commands
+// ============================================================================
+
+export async function getOnboardingStatus(): Promise<OnboardingStatus> {
+  return invoke("get_onboarding_status");
+}
