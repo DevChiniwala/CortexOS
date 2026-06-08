@@ -3,8 +3,8 @@ import {
   getSettings,
   updateOrchestrationSettings,
   updateSettings as updateSettingsCmd,
-  type ResearchDepth,
 } from "@/lib/ipc/commands";
+import type { ResearchDepth } from "@/lib/types";
 
 export const LOCKED_MODEL_LABEL = "Opus 4.7 · xhigh";
 

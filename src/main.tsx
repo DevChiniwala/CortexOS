@@ -5,7 +5,7 @@ import { enableMapSet } from "immer";
 import { open } from "@tauri-apps/plugin-shell";
 import App from "./App";
 import "./globals.css";
-import { isTauriRuntime } from "@/lib/tauri/commands";
+import { isTauriRuntime } from "@/lib/ipc/commands";
 
 // Enable Immer MapSet plugin for Zustand stores that use Map/Set
 enableMapSet();
