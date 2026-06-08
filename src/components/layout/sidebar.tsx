@@ -1,69 +1,91 @@
-import { NavLink } from "react-router-dom";
-import { 
-  IconLayoutDashboard, 
-  IconRobot, 
-  IconBrain, 
-  IconActivity, 
-  IconRoute, 
-  IconFlask, 
-  IconChartBar, 
-  IconTerminal2, 
-  IconShieldCheck 
-} from "@tabler/icons-react";
+import * as React from "react"
+import { NavLink } from "react-router-dom"
+import { IconBuilding, IconUsers, IconBrain, IconSettings, IconWaveSine, IconTerminal2, IconNetwork, IconHierarchy } from "@tabler/icons-react"
+import { cn } from "@/lib/utils"
+
+const MAIN_NAV = [
+  { icon: IconTerminal2, label: "Dashboard", path: "/dashboard" },
+  { icon: IconBuilding, label: "Companies", path: "/companies" },
+  { icon: IconUsers, label: "Contacts", path: "/contacts" },
+  { icon: IconWaveSine, label: "Signals", path: "/signals" },
+]
+
+const SYSTEM_NAV = [
+  { icon: IconBrain, label: "Agents", path: "/agents" },
+  { icon: IconNetwork, label: "Memory Graph", path: "/memory" },
+  { icon: IconHierarchy, label: "Flow Builder", path: "/flow" },
+  { icon: IconSettings, label: "Settings", path: "/settings" },
+]
 
 export function Sidebar() {
-  const navItems = [
-    { label: "Dashboard", icon: <IconLayoutDashboard size={18} />, path: "/dashboard" },
-    { label: "Cortex Agents", icon: <IconRobot size={18} />, path: "/agents" },
-    { label: "Cortex Memory", icon: <IconBrain size={18} />, path: "/memory" },
-    { label: "Cortex Signals", icon: <IconActivity size={18} />, path: "/signals" },
-    { label: "Cortex Flow", icon: <IconRoute size={18} />, path: "/flow" },
-    { label: "Cortex Labs", icon: <IconFlask size={18} />, path: "/labs" },
-    { label: "Cortex Intelligence", icon: <IconChartBar size={18} />, path: "/intelligence" },
-    { label: "Cortex Stream", icon: <IconTerminal2 size={18} />, path: "/stream" },
-    { label: "Cortex Verify", icon: <IconShieldCheck size={18} />, path: "/verify" },
-  ];
-
   return (
-    <aside className="w-64 h-screen shrink-0 border-r border-[var(--color-line)] bg-[var(--color-surface)] flex flex-col">
-      <div className="h-14 flex items-center px-6 border-b border-[var(--color-line)]">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded bg-[var(--color-primary)] flex items-center justify-center font-bold text-black text-xs">C</div>
-          <span className="font-display font-semibold tracking-tight text-lg">CortexOS</span>
+    <aside className="w-[280px] h-screen bg-surface border-r border-line flex flex-col pt-6 pb-4">
+      <div className="px-6 mb-8 flex items-center gap-3">
+        <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/30">
+          <IconBrain className="text-primary w-5 h-5" />
+        </div>
+        <h2 className="text-xl font-display font-semibold text-ink tracking-tight">CortexOS</h2>
+      </div>
+
+      <div className="flex-1 px-4 space-y-8">
+        <div>
+          <div className="px-2 mb-2 text-xs font-mono text-ink-3 uppercase tracking-wider">Intelligence</div>
+          <nav className="space-y-1">
+            {MAIN_NAV.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-ink-2 hover:bg-surface-hover hover:text-ink"
+                  )
+                }
+              >
+                <item.icon className="w-5 h-5" />
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+
+        <div>
+          <div className="px-2 mb-2 text-xs font-mono text-ink-3 uppercase tracking-wider">System Core</div>
+          <nav className="space-y-1">
+            {SYSTEM_NAV.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-ink-2 hover:bg-surface-hover hover:text-ink"
+                  )
+                }
+              >
+                <item.icon className="w-5 h-5" />
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
         </div>
       </div>
-      
-      <div className="flex-1 overflow-y-auto py-4 px-3 flex flex-col gap-1">
-        <div className="px-3 mb-2 text-xs font-mono text-[var(--color-ink-3)] uppercase tracking-wider">Workspace</div>
-        {navItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-sm font-medium ${
-                isActive 
-                  ? "bg-[var(--color-line)] text-white" 
-                  : "text-[var(--color-ink-2)] hover:bg-[var(--color-line-hover)] hover:text-white"
-              }`
-            }
-          >
-            {item.icon}
-            {item.label}
-          </NavLink>
-        ))}
-      </div>
 
-      <div className="p-4 border-t border-[var(--color-line)] flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[var(--color-line)] flex items-center justify-center">
-            <span className="text-xs font-medium">OP</span>
+      <div className="px-6 mt-auto">
+        <div className="flex items-center gap-3 py-3 px-4 rounded-xl bg-surface-hover border border-line cursor-pointer hover:border-line-hover transition-colors">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-flame flex items-center justify-center text-white font-medium text-sm">
+            D
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-medium">Operator - Host</span>
-            <span className="text-xs text-[var(--color-ink-3)]">Modify User</span>
+            <span className="text-sm font-medium text-ink leading-tight">Dev</span>
+            <span className="text-xs text-ink-3">Admin</span>
           </div>
         </div>
       </div>
     </aside>
-  );
+  )
 }
