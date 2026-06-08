@@ -1,8 +1,14 @@
+mod commands;
 mod core;
 mod db;
 mod events;
+mod hive;
 mod jobs;
 mod logging;
+mod memory;
+mod orchestration;
+mod prompts;
+mod signals;
 
 use db::{get_db_path, DbState};
 use tauri::{
@@ -18,6 +24,7 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
+        .invoke_handler(commands::generate_handlers())
         .setup(|app| {
             let db_path = get_db_path();
             let db_state = DbState::new(db_path).expect("Failed to initialize database");
