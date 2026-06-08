@@ -1,73 +1,49 @@
 use serde::Serialize;
 use tauri::{AppHandle, Emitter};
 
+/// Cortex Nexus: Centralized Event System for IPC
+/// Handles all real-time communication between the Rust core and the React frontend.
+
+// ============================================================================
+// Entity Events
+// ============================================================================
+
 #[derive(Clone, Serialize)]
-pub struct LeadUpdatedPayload {
+#[serde(rename_all = "camelCase")]
+pub struct EntityUpdatedPayload {
+    pub entity_type: String, // "agent", "memory", "signal", "flow"
     pub id: i64,
 }
 
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct PersonUpdatedPayload {
-    pub id: i64,
-    pub lead_id: Option<i64>,
-}
-
-#[derive(Clone, Serialize)]
-pub struct LeadScoredPayload {
-    pub lead_id: i64,
-}
-
-#[derive(Clone, Serialize)]
-pub struct PeopleBulkCreatedPayload {
-    pub lead_id: i64,
-}
-
-#[derive(Clone, Serialize)]
-pub struct LeadCreatedPayload {
-    pub id: i64,
-}
-
-#[derive(Clone, Serialize)]
-pub struct LeadDeletedPayload {
+pub struct EntityDeletedPayload {
+    pub entity_type: String,
     pub ids: Vec<i64>,
 }
 
-#[derive(Clone, Serialize)]
-pub struct PersonDeletedPayload {
-    pub ids: Vec<i64>,
+pub fn emit_entity_updated(app: &AppHandle, entity_type: &str, id: i64) {
+    let _ = app.emit(
+        "nexus:entity-updated",
+        EntityUpdatedPayload {
+            entity_type: entity_type.to_string(),
+            id,
+        },
+    );
 }
 
-pub fn emit_lead_updated(app: &AppHandle, id: i64) {
-    let _ = app.emit("lead-updated", LeadUpdatedPayload { id });
-}
-
-pub fn emit_person_updated(app: &AppHandle, id: i64, lead_id: Option<i64>) {
-    let _ = app.emit("person-updated", PersonUpdatedPayload { id, lead_id });
-}
-
-pub fn emit_lead_scored(app: &AppHandle, lead_id: i64) {
-    let _ = app.emit("lead-scored", LeadScoredPayload { lead_id });
-}
-
-pub fn emit_people_bulk_created(app: &AppHandle, lead_id: i64) {
-    let _ = app.emit("people-bulk-created", PeopleBulkCreatedPayload { lead_id });
-}
-
-pub fn emit_lead_created(app: &AppHandle, id: i64) {
-    let _ = app.emit("lead-created", LeadCreatedPayload { id });
-}
-
-pub fn emit_lead_deleted(app: &AppHandle, ids: Vec<i64>) {
-    let _ = app.emit("lead-deleted", LeadDeletedPayload { ids });
-}
-
-pub fn emit_person_deleted(app: &AppHandle, ids: Vec<i64>) {
-    let _ = app.emit("person-deleted", PersonDeletedPayload { ids });
+pub fn emit_entity_deleted(app: &AppHandle, entity_type: &str, ids: Vec<i64>) {
+    let _ = app.emit(
+        "nexus:entity-deleted",
+        EntityDeletedPayload {
+            entity_type: entity_type.to_string(),
+            ids,
+        },
+    );
 }
 
 // ============================================================================
-// Job Events
+// Job / Workflow Events
 // ============================================================================
 
 #[derive(Clone, Serialize)]
@@ -91,8 +67,7 @@ pub struct JobLogsAppendedPayload {
 pub struct JobCreatedPayload {
     pub job_id: String,
     pub job_type: String,
-    pub entity_id: i64,
-    pub entity_label: String,
+    pub target_id: Option<i64>,
 }
 
 pub fn emit_job_status_changed(
@@ -102,7 +77,7 @@ pub fn emit_job_status_changed(
     exit_code: Option<i32>,
 ) {
     let _ = app.emit(
-        "job-status-changed",
+        "nexus:job-status-changed",
         JobStatusChangedPayload {
             job_id,
             status,
@@ -113,7 +88,7 @@ pub fn emit_job_status_changed(
 
 pub fn emit_job_logs_appended(app: &AppHandle, job_id: String, count: i64, last_sequence: i64) {
     let _ = app.emit(
-        "job-logs-appended",
+        "nexus:job-logs-appended",
         JobLogsAppendedPayload {
             job_id,
             count,
@@ -126,16 +101,14 @@ pub fn emit_job_created(
     app: &AppHandle,
     job_id: String,
     job_type: String,
-    entity_id: i64,
-    entity_label: String,
+    target_id: Option<i64>,
 ) {
     let _ = app.emit(
-        "job-created",
+        "nexus:job-created",
         JobCreatedPayload {
             job_id,
             job_type,
-            entity_id,
-            entity_label,
+            target_id,
         },
     );
 }

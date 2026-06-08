@@ -1,4 +1,8 @@
+mod core;
 mod db;
+mod events;
+mod jobs;
+mod logging;
 
 use db::{get_db_path, DbState};
 use tauri::{
@@ -10,6 +14,8 @@ use tauri::{
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    logging::init_logging();
+
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
