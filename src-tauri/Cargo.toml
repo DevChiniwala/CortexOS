@@ -5,7 +5,7 @@ edition = "2021"
 description = "Lead research and signal scoring system"
 authors = [""]
 license = "Apache-2.0"
-repository = "https://github.com/DivyamTalwar/Augur"
+repository = "https://github.com/DevChiniwala/CortexOS"
 default-run = "cortex-core"
 
 [lib]
