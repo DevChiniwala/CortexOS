@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./sidebar";
 import { IconSearch } from "@tabler/icons-react";
+import { StreamPanelLayout } from "../stream/stream-panel-layout";
 
 export function MainShell() {
   return (
@@ -25,8 +26,14 @@ export function MainShell() {
         </header>
         
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto scroll-stable bg-bg">
-          <Outlet />
+        <div className="flex-1 overflow-hidden bg-bg relative">
+          <StreamPanelLayout>
+            <div className="h-full overflow-y-auto p-6 scroll-stable">
+              <div className="max-w-[1400px] mx-auto w-full h-full">
+                <Outlet />
+              </div>
+            </div>
+          </StreamPanelLayout>
         </div>
       </main>
     </div>
