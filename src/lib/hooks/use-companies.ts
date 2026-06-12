@@ -9,12 +9,15 @@ import {
   updateCompanyUserStatus,
   deleteCompanies,
 } from "@/lib/ipc";
-import type { NewCompany } from "@/lib/types";
+import { queryKeys, STALE_TIME_ENTITY } from "@/lib/sync";
+import { optimisticDelete } from "@/lib/sync/optimistic";
+import type { NewCompany, CompanyWithScore } from "@/lib/types";
 
 export function useCompanies() {
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ["company", "list"],
+    queryKey: queryKeys.companies.all,
     queryFn: getCompaniesWithScores,
+    staleTime: STALE_TIME_ENTITY,
   });
 
   return {
@@ -26,25 +29,25 @@ export function useCompanies() {
 
 export function useCompanyDetail(companyId: number) {
   const companyQuery = useQuery({
-    queryKey: ["company", companyId],
+    queryKey: queryKeys.companies.detail(companyId),
     queryFn: () => getCompany(companyId),
     enabled: !!companyId,
   });
 
   const scoreQuery = useQuery({
-    queryKey: ["company-score", companyId],
+    queryKey: queryKeys.companies.score(companyId),
     queryFn: () => getCompanyScore(companyId),
     enabled: !!companyId,
   });
 
   const contactsQuery = useQuery({
-    queryKey: ["contact", "list", { companyId }],
+    queryKey: queryKeys.contacts.forCompany(companyId),
     queryFn: () => getContactsForCompany(companyId),
     enabled: !!companyId,
   });
 
   const adjacentQuery = useQuery({
-    queryKey: ["company-adjacent", companyId],
+    queryKey: queryKeys.companies.adjacent(companyId),
     queryFn: () => getAdjacentCompanies(companyId),
     enabled: !!companyId,
   });
@@ -81,23 +84,55 @@ export function useCompanyMutations() {
   const insertCompanyMutation = useMutation({
     mutationFn: (data: NewCompany) => insertCompany(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["company", "list"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
     },
   });
 
   const updateCompanyStatusMutation = useMutation({
     mutationFn: ({ companyId, status }: { companyId: number; status: string }) =>
       updateCompanyUserStatus(companyId, status),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["company", variables.companyId] });
-      queryClient.invalidateQueries({ queryKey: ["company", "list"] });
+    // Optimistic update: immediately reflect status change in the list
+    onMutate: async ({ companyId, status }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.companies.all });
+      const previous = queryClient.getQueryData<CompanyWithScore[]>(queryKeys.companies.all);
+
+      if (previous) {
+        queryClient.setQueryData<CompanyWithScore[]>(
+          queryKeys.companies.all,
+          previous.map((c) =>
+            c.id === companyId ? { ...c, userStatus: status } : c
+          )
+        );
+      }
+
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(queryKeys.companies.all, context.previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
     },
   });
 
   const deleteCompaniesMutation = useMutation({
     mutationFn: (companyIds: number[]) => deleteCompanies(companyIds),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["company", "list"] });
+    // Optimistic delete: remove from list immediately
+    onMutate: async (companyIds) => {
+      const rollback = optimisticDelete<CompanyWithScore>(
+        queryClient,
+        [...queryKeys.companies.all],
+        companyIds
+      );
+      return { rollback };
+    },
+    onError: (_err, _vars, context) => {
+      context?.rollback.rollback();
+    },
+    onSettled: (_data, _err, _vars, context) => {
+      context?.rollback.settle();
     },
   });
 

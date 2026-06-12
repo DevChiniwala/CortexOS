@@ -1,16 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getJobsActive, getJobsRecent, getJobById, killJob } from "@/lib/ipc";
+import { queryKeys, STALE_TIME_REALTIME } from "@/lib/sync";
+import type { Job } from "@/lib/types";
 
 export function useJobs() {
   const activeQuery = useQuery({
-    queryKey: ["jobs", "active"],
+    queryKey: queryKeys.jobs.active,
     queryFn: getJobsActive,
+    staleTime: STALE_TIME_REALTIME,
     refetchInterval: 2000, // Poll active jobs
   });
 
   const recentQuery = useQuery({
-    queryKey: ["jobs", "recent"],
+    queryKey: queryKeys.jobs.recent,
     queryFn: () => getJobsRecent(10),
+    staleTime: STALE_TIME_REALTIME,
   });
 
   return {
@@ -26,7 +30,7 @@ export function useJobs() {
 
 export function useJobDetail(jobId: string) {
   const { data, isLoading, refetch, error } = useQuery({
-    queryKey: ["job", jobId],
+    queryKey: queryKeys.jobs.detail(jobId),
     queryFn: () => getJobById(jobId),
     enabled: !!jobId,
   });
@@ -44,9 +48,27 @@ export function useJobMutations() {
 
   const cancelJobMutation = useMutation({
     mutationFn: (jobId: string) => killJob(jobId),
-    onSuccess: (_, jobId) => {
-      queryClient.invalidateQueries({ queryKey: ["jobs", "active"] });
-      queryClient.invalidateQueries({ queryKey: ["job", jobId] });
+    // Optimistic: mark job as cancelled immediately in the active list
+    onMutate: async (jobId) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.jobs.active });
+      const previous = queryClient.getQueryData<Job[]>(queryKeys.jobs.active);
+
+      if (previous) {
+        queryClient.setQueryData<Job[]>(
+          queryKeys.jobs.active,
+          previous.filter((j) => j.id !== jobId)
+        );
+      }
+      return { previous };
+    },
+    onError: (_err, _jobId, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(queryKeys.jobs.active, context.previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.active });
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.recent });
     },
   });
 

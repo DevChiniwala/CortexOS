@@ -2,8 +2,9 @@ import * as React from "react"
 import { Routes, Route, Navigate } from "react-router-dom"
 import { MainShell } from "./components/layout/main-shell"
 import { CommandPalette } from "./components/command-palette"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { QueryClientProvider } from "@tanstack/react-query"
 import { setupEventBridge } from "./lib/ipc/event-bridge"
+import { createQueryClient, warmCache } from "./lib/sync"
 
 // Pages
 import Dashboard from "./pages/dashboard"
@@ -13,13 +14,18 @@ import Agents from "./pages/agents"
 import MemoryGraph from "./pages/memory"
 import Signals from "./pages/signals"
 import Flow from "./pages/flow"
+import Settings from "./pages/settings"
 
-const queryClient = new QueryClient()
+const queryClient = createQueryClient()
 
 export default function App() {
   React.useEffect(() => {
     // Setup Tauri IPC event listeners
     const unlisten = setupEventBridge(queryClient)
+
+    // Pre-fetch critical data for instant UI
+    warmCache(queryClient)
+
     return () => {
       unlisten.then(fn => fn())
     }
@@ -38,7 +44,7 @@ export default function App() {
           <Route path="agents" element={<Agents />} />
           <Route path="memory" element={<MemoryGraph />} />
           <Route path="flow" element={<Flow />} />
-          <Route path="settings" element={<div className="p-8 text-ink">Settings (Coming soon)</div>} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </QueryClientProvider>

@@ -13,7 +13,7 @@ interface DataTableProps<T> {
   emptyMessage?: string
 }
 
-export function DataTable<T extends { id: number | string }>({ 
+export const DataTable = React.memo(function DataTable<T extends { id: number | string }>({ 
   data, 
   columns, 
   onRowClick,
@@ -66,4 +66,4 @@ export function DataTable<T extends { id: number | string }>({
       </div>
     </div>
   )
-}
+})

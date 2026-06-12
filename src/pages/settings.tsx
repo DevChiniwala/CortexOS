@@ -1,0 +1,127 @@
+import * as React from "react"
+import { useSettingsStore } from "@/lib/store/settings-store"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { IconBrandChrome, IconBrain, IconShieldCheck } from "@tabler/icons-react"
+import { motion } from "motion/react"
+
+export default function Settings() {
+  const {
+    useChrome,
+    orchestrationEnabled,
+    defaultResearchDepth,
+    isInitialized,
+    loadSettings,
+    setUseChrome,
+    updateOrchestration,
+  } = useSettingsStore()
+
+  React.useEffect(() => {
+    if (!isInitialized) loadSettings()
+  }, [isInitialized, loadSettings])
+
+  return (
+    <div className="flex flex-col gap-8 p-8 max-w-4xl mx-auto w-full">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-display font-semibold tracking-tight text-ink">Settings</h1>
+        <p className="text-ink-3">Configure CortexOS behavior and integrations</p>
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col gap-6"
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <IconBrandChrome className="w-5 h-5 text-primary" />
+              Browser Integration
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-ink">Use Chrome for Research</p>
+                <p className="text-xs text-ink-3 mt-1">Enable headless Chrome for deeper web scraping during research</p>
+              </div>
+              <button
+                onClick={() => setUseChrome(!useChrome)}
+                className={`relative w-11 h-6 rounded-full transition-colors ${useChrome ? "bg-primary" : "bg-line"}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${useChrome ? "translate-x-5" : ""}`} />
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <IconBrain className="w-5 h-5 text-primary" />
+              Agent Orchestration
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-ink">Enable Autonomous Orchestration</p>
+                <p className="text-xs text-ink-3 mt-1">Allow CortexOS to automatically schedule and run research agents</p>
+              </div>
+              <button
+                onClick={() => updateOrchestration({ orchestrationEnabled: !orchestrationEnabled })}
+                className={`relative w-11 h-6 rounded-full transition-colors ${orchestrationEnabled ? "bg-primary" : "bg-line"}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${orchestrationEnabled ? "translate-x-5" : ""}`} />
+              </button>
+            </div>
+
+            <div>
+              <p className="text-sm font-medium text-ink mb-3">Default Research Depth</p>
+              <div className="flex gap-3">
+                {(["light", "standard", "deep"] as const).map((depth) => (
+                  <button
+                    key={depth}
+                    onClick={() => updateOrchestration({ defaultResearchDepth: depth })}
+                    className={`px-4 py-2 rounded-lg border text-sm font-medium capitalize transition-colors ${
+                      defaultResearchDepth === depth
+                        ? "bg-primary/10 border-primary/40 text-primary"
+                        : "border-line text-ink-3 hover:text-ink-2 hover:border-line-hover"
+                    }`}
+                  >
+                    {depth}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <IconShieldCheck className="w-5 h-5 text-primary" />
+              System
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-4 text-sm">
+              <div className="flex justify-between">
+                <span className="text-ink-2">Version</span>
+                <Badge variant="secondary">v0.2.1</Badge>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-ink-2">Runtime</span>
+                <span className="text-ink font-mono text-xs">Tauri 2 + React 19</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-ink-2">Database</span>
+                <span className="text-ink font-mono text-xs">SQLite (local)</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  )
+}

@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { enableMapSet } from "immer";
 import { open } from "@tauri-apps/plugin-shell";
+
+import { ErrorBoundary } from "./components/error-boundary";
 import App from "./App";
 import "./globals.css";
 import { isTauriRuntime } from "@/lib/ipc/commands";
@@ -27,8 +29,10 @@ document.addEventListener("click", (e) => {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ErrorBoundary>
   </StrictMode>
 );

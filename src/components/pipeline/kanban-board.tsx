@@ -120,7 +120,7 @@ const COLUMNS = [
   { id: "contacted", title: "Contacted" },
 ]
 
-export function KanbanBoard({ companies, onStatusChange }: KanbanBoardProps) {
+export const KanbanBoard = React.memo(function KanbanBoard({ companies, onStatusChange }: KanbanBoardProps) {
   return (
     <div className="flex gap-4 overflow-x-auto pb-4 h-full">
       {COLUMNS.map(column => (
@@ -134,4 +134,4 @@ export function KanbanBoard({ companies, onStatusChange }: KanbanBoardProps) {
       ))}
     </div>
   )
-}
+})
