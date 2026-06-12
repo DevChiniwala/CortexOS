@@ -1,11 +1,13 @@
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./sidebar";
 import { IconSearch } from "@tabler/icons-react";
+import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
 import { StreamPanelLayout } from "../stream/stream-panel-layout";
 
 export function MainShell() {
   return (
-    <div className="flex h-screen overflow-hidden bg-bg text-ink">
+    <div className="flex h-screen w-full overflow-hidden bg-bg text-ink selection:bg-primary/30">
+      <OnboardingWizard />
       <Sidebar />
       <main className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
