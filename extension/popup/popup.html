@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CortexOS Companion</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 320px;
+      min-height: 200px;
+      background: #0f0f14;
+      color: #e0e0e6;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 13px;
+    }
+
+    .popup-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: linear-gradient(135deg, rgba(255, 140, 50, 0.08), transparent);
+    }
+
+    .popup-header h1 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .popup-header .logo {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #ff8c32, #ff6b1a);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .status-section {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-label {
+      color: #888;
+      font-size: 12px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .status-badge.connected {
+      background: rgba(34, 197, 94, 0.12);
+      color: #22c55e;
+    }
+
+    .status-badge.disconnected {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .status-dot.green { background: #22c55e; }
+    .status-dot.red { background: #ef4444; }
+
+    .action-section {
+      padding: 0 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      color: #e0e0e6;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 140, 50, 0.1);
+      border-color: rgba(255, 140, 50, 0.3);
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, rgba(255, 140, 50, 0.2), rgba(255, 100, 20, 0.15));
+      border-color: rgba(255, 140, 50, 0.4);
+      color: #ff8c32;
+    }
+
+    .capture-count {
+      text-align: center;
+      padding: 12px 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 11px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="popup-header">
+    <div class="logo">C</div>
+    <h1>CortexOS Companion</h1>
+  </div>
+
+  <div class="status-section">
+    <div class="status-row">
+      <span class="status-label">Desktop App</span>
+      <span id="status-badge" class="status-badge disconnected">
+        <span id="status-dot" class="status-dot red"></span>
+        <span id="status-text">Disconnected</span>
+      </span>
+    </div>
+    <div class="status-row">
+      <span class="status-label">Current Page</span>
+      <span id="page-type" class="status-label">—</span>
+    </div>
+  </div>
+
+  <div class="action-section">
+    <button id="btn-capture" class="action-btn primary">⚡ Capture This Page</button>
+    <button id="btn-open-app" class="action-btn">Open CortexOS</button>
+  </div>
+
+  <div class="capture-count">
+    <span id="capture-count-text">0 captures this session</span>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

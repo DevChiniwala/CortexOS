@@ -1,0 +1,67 @@
+/* CortexOS Companion — Content Script Overlay Styles */
+
+#cortex-overlay-notification {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, rgba(20, 20, 28, 0.95), rgba(30, 30, 42, 0.95));
+  border: 1px solid rgba(255, 140, 50, 0.4);
+  border-radius: 12px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  backdrop-filter: blur(16px);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  animation: cortex-slide-in 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cortex-overlay-icon {
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 140, 50, 0.15);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.cortex-overlay-text {
+  color: #e0e0e6;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+#cortex-overlay-notification.cortex-overlay-fade-out {
+  animation: cortex-slide-out 0.4s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+
+@keyframes cortex-slide-in {
+  from {
+    transform: translateY(20px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes cortex-slide-out {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(10px) scale(0.95);
+    opacity: 0;
+  }
+}
