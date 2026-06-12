@@ -25,13 +25,13 @@
     ],
     "security": {
       "csp": "default-src 'self'; script-src 'self'; connect-src 'self' ipc: https://api.apollo.io; img-src 'self' data: asset: https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:"
-    },
+    }
+  },
+  "plugins": {
     "updater": {
-      "active": true,
       "endpoints": [
         "https://github.com/DevChiniwala/CortexOS/releases/latest/download/latest.json"
       ],
-      "dialog": true,
       "pubkey": ""
     }
   },
