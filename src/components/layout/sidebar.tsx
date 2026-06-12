@@ -21,8 +21,8 @@ export function Sidebar() {
   return (
     <aside className="w-[280px] h-screen bg-surface border-r border-line flex flex-col pt-6 pb-4">
       <div className="px-6 mb-8 flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/30">
-          <IconBrain className="text-primary w-5 h-5" />
+        <div className="w-8 h-8 flex items-center justify-center">
+          <img src="/logo.png" alt="CortexOS Logo" className="w-full h-full object-contain" />
         </div>
         <h2 className="text-xl font-display font-semibold text-ink tracking-tight">CortexOS</h2>
       </div>

@@ -8,7 +8,7 @@ const STEPS = [
   {
     title: "Welcome to CortexOS",
     description: "The autonomous intelligence platform for deep web research and outbound pipeline generation. Let's get you set up.",
-    icon: <IconBrain className="w-12 h-12 text-primary" />,
+    icon: <img src="/logo.png" alt="CortexOS Logo" className="w-12 h-12 object-contain" />,
   },
   {
     title: "Define Your Targets",

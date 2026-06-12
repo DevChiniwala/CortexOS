@@ -34,14 +34,14 @@
     .popup-header .logo {
       width: 24px;
       height: 24px;
-      background: linear-gradient(135deg, #ff8c32, #ff6b1a);
-      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-      color: white;
+    }
+    .popup-header .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
     .status-section {
@@ -134,7 +134,9 @@
 </head>
 <body>
   <div class="popup-header">
-    <div class="logo">C</div>
+    <div class="logo">
+      <img src="../icons/cortex-128.png" alt="CortexOS Logo" />
+    </div>
     <h1>CortexOS Companion</h1>
   </div>
 
