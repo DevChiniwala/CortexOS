@@ -1,5 +1,6 @@
 import { listen } from "@tauri-apps/api/event";
 import { QueryClient } from "@tanstack/react-query";
+import { isTauriRuntime } from "./commands";
 
 // ============================================================================
 // Cortex Nexus Event Bridge
@@ -38,6 +39,10 @@ export interface JobCreatedPayload {
  * Initializes listeners for all backend events to keep frontend state synchronized.
  */
 export async function setupEventBridge(queryClient: QueryClient) {
+  if (!isTauriRuntime()) {
+    console.warn("[Event Bridge] Tauri runtime not detected, skipping event bridge setup.");
+    return () => {};
+  }
   try {
     // Listen for entity updates (invalidates specific entity queries)
     const unlistenEntityUpdated = await listen<EntityUpdatedPayload>(

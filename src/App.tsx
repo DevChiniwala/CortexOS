@@ -9,7 +9,9 @@ import { createQueryClient, warmCache } from "./lib/sync"
 // Pages
 import Dashboard from "./pages/dashboard"
 import Companies from "./pages/companies"
+import CompanyDetail from "./pages/company-detail"
 import Contacts from "./pages/contacts"
+import ContactDetail from "./pages/contact-detail"
 import Agents from "./pages/agents"
 import MemoryGraph from "./pages/memory"
 import Signals from "./pages/signals"
@@ -39,7 +41,9 @@ export default function App() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="companies" element={<Companies />} />
+          <Route path="companies/:id" element={<CompanyDetail />} />
           <Route path="contacts" element={<Contacts />} />
+          <Route path="contacts/:id" element={<ContactDetail />} />
           <Route path="signals" element={<Signals />} />
           <Route path="agents" element={<Agents />} />
           <Route path="memory" element={<MemoryGraph />} />

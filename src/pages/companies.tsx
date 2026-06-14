@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useNavigate } from "react-router-dom"
 import { useCompanies, useCompanyMutations } from "@/lib/hooks"
 import { EmptyState } from "@/components/ui/empty-state"
 import { IconBuilding, IconPlus, IconLayoutList, IconLayoutKanban } from "@tabler/icons-react"
@@ -8,11 +9,14 @@ import { KanbanBoard } from "@/components/pipeline/kanban-board"
 import { DataTable } from "@/components/ui/data-table"
 import { motion } from "motion/react"
 import { CompanyWithScore } from "@/lib/types"
+import { AddCompanyModal } from "@/components/modals/add-company-modal"
 
 export default function Companies() {
+  const navigate = useNavigate()
   const { companies, isLoading } = useCompanies()
   const { updateCompanyStatus } = useCompanyMutations()
   const [view, setView] = React.useState<"list" | "board">("list")
+  const [isAddModalOpen, setIsAddModalOpen] = React.useState(false)
 
   const handleStatusChange = async (companyId: number, status: string) => {
     try {
@@ -78,7 +82,7 @@ export default function Companies() {
               <IconLayoutKanban className="w-4 h-4" />
             </button>
           </div>
-          <Button>
+          <Button onClick={() => setIsAddModalOpen(true)}>
             <IconPlus className="w-4 h-4 mr-2" />
             Add Company
           </Button>
@@ -102,9 +106,11 @@ export default function Companies() {
         ) : view === "board" ? (
           <KanbanBoard companies={companies} onStatusChange={handleStatusChange} />
         ) : (
-          <DataTable data={companies} columns={columns} />
+          <DataTable data={companies} columns={columns} onRowClick={(row) => navigate(`/companies/${row.id}`)} />
         )}
       </motion.div>
+
+      <AddCompanyModal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
     </div>
   )
 }

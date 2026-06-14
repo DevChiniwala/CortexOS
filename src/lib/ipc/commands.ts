@@ -4,6 +4,7 @@
 // ============================================================================
 
 import { invoke as tauriInvoke, Channel } from "@tauri-apps/api/core";
+import * as LocalStore from "../local-store";
 import type {
   Company,
   NewCompany,
@@ -40,20 +41,24 @@ function invoke<T>(command: string, args?: Record<string, unknown>): Promise<T> 
   if (isTauriRuntime()) {
     return tauriInvoke<T>(command, args);
   }
-  const fallback = browserFallback<T>(command);
+  const fallback = browserFallback<T>(command, args);
   if (fallback.handled) return Promise.resolve(fallback.value);
   return Promise.reject(new Error(`Tauri backend unavailable for command: ${command}`));
 }
 
 function browserFallback<T>(
-  command: string
+  command: string,
+  args?: Record<string, unknown>
 ): { handled: true; value: T } | { handled: false; value?: never } {
   const now = Date.now();
   switch (command) {
     case "get_all_leads":
+      return { handled: true, value: LocalStore.localGetCompanies() as T };
     case "get_leads_with_scores":
-    case "get_unscored_leads":
+      return { handled: true, value: LocalStore.localGetCompanies() as T };
     case "get_all_people":
+      return { handled: true, value: LocalStore.localGetContacts() as T };
+    case "get_unscored_leads":
     case "get_people_for_lead":
     case "get_jobs_active":
     case "get_jobs_recent":
@@ -100,6 +105,23 @@ function browserFallback<T>(
       };
     case "get_apollo_key_status":
       return { handled: true, value: { configured: false, source: "none" } as T };
+    case "insert_lead":
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return { handled: true, value: LocalStore.localInsertCompany((args as any)?.data) as T };
+    case "insert_person":
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return { handled: true, value: LocalStore.localInsertContact((args as any)?.data) as T };
+    case "update_lead_user_status":
+    case "update_person_user_status":
+    case "update_settings":
+    case "update_orchestration_settings":
+      return { handled: true, value: undefined as T };
+    case "delete_leads":
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return { handled: true, value: LocalStore.localDeleteCompanies((args as any)?.leadIds) as T };
+    case "delete_people":
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return { handled: true, value: LocalStore.localDeleteContacts((args as any)?.personIds) as T };
     default:
       return { handled: false };
   }
