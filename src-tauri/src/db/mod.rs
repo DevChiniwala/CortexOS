@@ -1,3 +1,4 @@
+pub mod queries;
 pub mod schema;
 
 use rusqlite::{Connection, Result as SqliteResult};
@@ -79,23 +80,108 @@ fn init_schema(conn: &Connection) -> SqliteResult<()> {
             created_at INTEGER NOT NULL
         );
 
+        CREATE TABLE IF NOT EXISTS signals (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            lead_id INTEGER NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+            signal_type TEXT NOT NULL,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL DEFAULT '',
+            confidence REAL NOT NULL DEFAULT 0.5,
+            source TEXT NOT NULL DEFAULT 'unknown',
+            detected_at INTEGER NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS jobs (
+            id TEXT PRIMARY KEY,
+            job_type TEXT NOT NULL,
+            entity_id INTEGER NOT NULL,
+            entity_label TEXT NOT NULL DEFAULT '',
+            status TEXT NOT NULL DEFAULT 'queued',
+            prompt TEXT NOT NULL DEFAULT '',
+            model TEXT,
+            working_dir TEXT NOT NULL DEFAULT '',
+            output_path TEXT,
+            exit_code INTEGER,
+            error_message TEXT,
+            created_at INTEGER NOT NULL,
+            started_at INTEGER,
+            completed_at INTEGER,
+            pid INTEGER
+        );
+
+        CREATE TABLE IF NOT EXISTS job_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            job_id TEXT NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
+            log_type TEXT NOT NULL DEFAULT 'info',
+            content TEXT NOT NULL DEFAULT '',
+            tool_name TEXT,
+            timestamp INTEGER NOT NULL,
+            sequence INTEGER NOT NULL DEFAULT 0,
+            source TEXT NOT NULL DEFAULT 'internal'
+        );
+
+        CREATE TABLE IF NOT EXISTS scoring_configs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            is_active INTEGER NOT NULL DEFAULT 0,
+            required_characteristics TEXT NOT NULL DEFAULT '[]',
+            demand_signifiers TEXT NOT NULL DEFAULT '[]',
+            tier_hot_min REAL NOT NULL DEFAULT 80.0,
+            tier_warm_min REAL NOT NULL DEFAULT 50.0,
+            tier_nurture_min REAL NOT NULL DEFAULT 20.0,
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS company_scores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            lead_id INTEGER NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+            config_id INTEGER NOT NULL REFERENCES scoring_configs(id) ON DELETE CASCADE,
+            passes_requirements INTEGER NOT NULL DEFAULT 0,
+            requirement_results TEXT NOT NULL DEFAULT '[]',
+            total_score REAL NOT NULL DEFAULT 0.0,
+            score_breakdown TEXT NOT NULL DEFAULT '[]',
+            tier TEXT NOT NULL DEFAULT 'nurture',
+            scoring_notes TEXT,
+            scored_at INTEGER,
+            created_at INTEGER NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS prompts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            prompt_type TEXT NOT NULL UNIQUE,
+            content TEXT NOT NULL DEFAULT '',
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL
+        );
+
         CREATE TABLE IF NOT EXISTS settings (
             id INTEGER PRIMARY KEY CHECK (id = 1),
             use_chrome INTEGER NOT NULL DEFAULT 0,
             orchestration_enabled INTEGER NOT NULL DEFAULT 1,
             default_research_depth TEXT NOT NULL DEFAULT 'light',
+            apollo_enabled INTEGER NOT NULL DEFAULT 0,
+            apollo_max_contacts INTEGER NOT NULL DEFAULT 10,
             deep_job_concurrency INTEGER NOT NULL DEFAULT 1,
+            daily_budget_usd_cents INTEGER,
             updated_at INTEGER NOT NULL
         );
 
         INSERT OR IGNORE INTO settings (
             id, use_chrome, orchestration_enabled, default_research_depth,
-            deep_job_concurrency, updated_at
+            apollo_enabled, apollo_max_contacts, deep_job_concurrency,
+            daily_budget_usd_cents, updated_at
         )
-        VALUES (1, 0, 1, 'light', 1, strftime('%s', 'now') * 1000);
+        VALUES (1, 0, 1, 'light', 0, 10, 1, NULL, strftime('%s', 'now') * 1000);
 
         CREATE INDEX IF NOT EXISTS idx_people_lead_id ON people(lead_id);
         CREATE INDEX IF NOT EXISTS idx_memory_entity ON memory(entity_type, entity_id);
+        CREATE INDEX IF NOT EXISTS idx_signals_lead_id ON signals(lead_id);
+        CREATE INDEX IF NOT EXISTS idx_signals_detected_at ON signals(detected_at);
+        CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
+        CREATE INDEX IF NOT EXISTS idx_jobs_created_at ON jobs(created_at);
+        CREATE INDEX IF NOT EXISTS idx_job_logs_job_id ON job_logs(job_id);
+        CREATE INDEX IF NOT EXISTS idx_company_scores_lead_id ON company_scores(lead_id);
         "#,
     )?;
 
