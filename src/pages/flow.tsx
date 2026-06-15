@@ -1,21 +1,90 @@
 import * as React from "react"
-import { IconHierarchy } from "@tabler/icons-react"
-import { EmptyState } from "@/components/ui/empty-state"
+import { FlowCanvas } from "@/components/flow/flow-canvas"
+import { IconGitBranch, IconPlus, IconSearch, IconTrendingUp, IconMessage2, IconUsers, IconBrain, IconMail, IconPlayerPlay } from "@tabler/icons-react"
+import { Button } from "@/components/ui/button"
+import { useFlowStore } from "@/lib/store/flow-store"
 
-export default function Flow() {
+const NODE_TYPES = [
+  { id: "find-leads", label: "Find ICP Leads", icon: "users", color: "blue", description: "Search CRM/Apollo for specific personas" },
+  { id: "research", label: "Deep Research", icon: "search", color: "orange", description: "Extract funding, tech stack, and news" },
+  { id: "score", label: "Signal Scorer", icon: "trending-up", color: "yellow", description: "Evaluate against Tier 1 ICP heuristics" },
+  { id: "generate", label: "Generate Draft", icon: "message", color: "green", description: "Write personalized email sequences" },
+  { id: "send", label: "Send Outreach", icon: "mail", color: "blue", description: "Dispatch via email API" },
+  { id: "custom", label: "Custom Prompt", icon: "brain", color: "orange", description: "Run an arbitrary LLM prompt" },
+]
+
+export default function FlowBuilder() {
+  const { addNode, nodes } = useFlowStore()
+
+  const handleAddNode = (template: typeof NODE_TYPES[0]) => {
+    // Determine spawn position (centerish, slightly offset based on node count)
+    const offset = nodes.length * 20
+    const newNode = {
+      id: `${template.id}-${Date.now()}`,
+      type: "cortexNode",
+      position: { x: 400 + offset, y: 150 + offset },
+      data: {
+        label: template.label,
+        icon: template.icon,
+        color: template.color,
+        description: template.description
+      }
+    }
+    addNode(newNode)
+  }
+
   return (
-    <div className="flex flex-col gap-8 p-8 max-w-7xl mx-auto w-full h-full">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-display font-semibold tracking-tight text-ink">Cortex Flow</h1>
-        <p className="text-ink-3">Build autonomous intelligence pipelines</p>
+    <div className="flex flex-col h-[calc(100vh-2rem)] w-full max-w-[1600px] mx-auto p-8 pb-0 gap-6">
+      <div className="flex items-center justify-between shrink-0">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <IconGitBranch className="w-8 h-8 text-primary" />
+            <h1 className="text-3xl font-display font-semibold tracking-tight text-ink">Orchestration Flow</h1>
+          </div>
+          <p className="text-ink-3">Visually design and automate agent pipelines</p>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          <Button variant="secondary">
+            Save Pipeline
+          </Button>
+          <Button>
+            <IconPlayerPlay className="w-4 h-4 mr-2" /> Run Pipeline
+          </Button>
+        </div>
       </div>
 
-      <div className="flex-1 min-h-[500px]">
-        <EmptyState
-          icon={<IconHierarchy size={32} />}
-          title="Workflow Builder"
-          description="Visual pipeline construction is coming soon to CortexOS."
-        />
+      <div className="flex flex-1 gap-6 min-h-0 pb-8">
+        
+        {/* Left Sidebar Palette */}
+        <div className="w-72 shrink-0 flex flex-col gap-4">
+          <div className="flex items-center justify-between border-b border-line pb-2">
+            <h3 className="font-medium text-ink">Node Palette</h3>
+            <span className="text-xs text-ink-3 font-mono">{NODE_TYPES.length} blocks</span>
+          </div>
+          
+          <div className="flex flex-col gap-3 overflow-y-auto pr-2 pb-8">
+            {NODE_TYPES.map(template => (
+              <button
+                key={template.id}
+                onClick={() => handleAddNode(template)}
+                className="group flex flex-col items-start gap-1 p-3 rounded-xl border border-line bg-surface/50 hover:bg-surface hover:border-primary/50 text-left transition-all"
+              >
+                <div className="flex items-center gap-2">
+                  <IconPlus className="w-4 h-4 text-ink-3 group-hover:text-primary transition-colors" />
+                  <span className="text-sm font-semibold text-ink">{template.label}</span>
+                </div>
+                <p className="text-xs text-ink-3 pl-6 line-clamp-2">{template.description}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Main Canvas Area */}
+        <div className="flex-1 relative">
+          <FlowCanvas />
+        </div>
+
       </div>
     </div>
   )
