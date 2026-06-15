@@ -1,117 +1,131 @@
-import * as React from "react"
-import { IconBuilding, IconUsers, IconBrain, IconWaveSine } from "@tabler/icons-react"
-import { StatCard } from "@/components/ui/stat-card"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { useCompanies, useContacts, useJobs } from "@/lib/hooks"
+import { useCompanies, useContacts, useSignals } from "@/lib/hooks"
+import { Sparkline } from "@/components/ui/sparkline"
+import { FunnelChart } from "@/components/dashboard/funnel-chart"
+import { ActivityFeed } from "@/components/dashboard/activity-feed"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { IconBuilding, IconUsers, IconRadar, IconChartBar } from "@tabler/icons-react"
 import { motion } from "motion/react"
 
 export default function Dashboard() {
   const { companies } = useCompanies()
   const { contacts } = useContacts()
-  const { activeJobs } = useJobs()
+  const { signals } = useSignals()
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
+  // Generate some fake sparkline data that trends up
+  const generateSparkData = (base: number, volatility: number = 0.2) => {
+    let current = base
+    return Array.from({ length: 20 }, () => {
+      current = current + (Math.random() - 0.3) * base * volatility
+      return Math.max(0, current)
+    })
   }
 
-  const item: import("motion/react").Variants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
-  }
+  const stats = [
+    { 
+      label: "Total Accounts", 
+      value: companies.length, 
+      icon: <IconBuilding className="w-5 h-5" />, 
+      color: "#FF5500", // Primary
+      sparkline: generateSparkData(companies.length || 10, 0.1) 
+    },
+    { 
+      label: "Discovered Contacts", 
+      value: contacts.length, 
+      icon: <IconUsers className="w-5 h-5" />, 
+      color: "#00AEEF", // Info
+      sparkline: generateSparkData(contacts.length || 20, 0.15) 
+    },
+    { 
+      label: "Buying Signals", 
+      value: signals.length, 
+      icon: <IconRadar className="w-5 h-5" />, 
+      color: "#00D084", // Success
+      sparkline: generateSparkData(signals.length || 5, 0.3) 
+    },
+    { 
+      label: "Qualified ICP", 
+      value: companies.filter(c => c.userStatus === 'qualified').length, 
+      icon: <IconChartBar className="w-5 h-5" />, 
+      color: "#FFB020", // Warning
+      sparkline: generateSparkData(3, 0.4) 
+    },
+  ]
 
   return (
-    <div className="flex flex-col gap-8 p-8 max-w-7xl mx-auto w-full">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-display font-semibold tracking-tight text-ink">Dashboard</h1>
-        <p className="text-ink-3">CortexOS Intelligence Overview</p>
+    <div className="flex flex-col gap-8 p-8 max-w-7xl mx-auto w-full h-full overflow-y-auto custom-scrollbar">
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-display font-semibold tracking-tight text-ink">Command Center</h1>
+          <p className="text-ink-3">System status and intelligence overview</p>
+        </div>
       </div>
 
-      <motion.div 
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-      >
-        <motion.div variants={item}>
-          <StatCard
-            title="Total Companies"
-            value={companies.length}
-            icon={<IconBuilding size={20} />}
-            trend={{ value: 12, label: "from last week", isPositive: true }}
-          />
-        </motion.div>
-        
-        <motion.div variants={item}>
-          <StatCard
-            title="Total Contacts"
-            value={contacts.length}
-            icon={<IconUsers size={20} />}
-            trend={{ value: 4, label: "from last week", isPositive: true }}
-          />
-        </motion.div>
+      {/* KPI Stat Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+          >
+            <Card className="hover:border-primary/50 transition-colors h-full flex flex-col justify-between">
+              <CardContent className="p-5 flex flex-col gap-4">
+                <div className="flex justify-between items-start">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-medium text-ink-3">{stat.label}</span>
+                    <span className="text-3xl font-display font-semibold tracking-tight text-ink">
+                      {stat.value}
+                    </span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-surface-hover" style={{ color: stat.color }}>
+                    {stat.icon}
+                  </div>
+                </div>
+                
+                <div className="h-10 mt-auto opacity-70">
+                  <Sparkline 
+                    data={stat.sparkline} 
+                    color={stat.color} 
+                    width={200} 
+                    height={40} 
+                    strokeWidth={2}
+                    className="w-full h-full"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
 
-        <motion.div variants={item}>
-          <StatCard
-            title="Active Agents"
-            value={activeJobs.length}
-            icon={<IconBrain size={20} />}
-          />
-        </motion.div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Col: Funnel */}
+        <div className="lg:col-span-2 flex flex-col gap-6">
+          <Card className="h-[400px]">
+            <CardHeader>
+              <CardTitle>Pipeline Velocity</CardTitle>
+              <CardDescription>Conversion rates through the orchestration flow</CardDescription>
+            </CardHeader>
+            <CardContent className="h-[300px]">
+              <FunnelChart />
+            </CardContent>
+          </Card>
+        </div>
 
-        <motion.div variants={item}>
-          <StatCard
-            title="Strong Signals"
-            value={34}
-            icon={<IconWaveSine size={20} />}
-            trend={{ value: 2, label: "from yesterday", isPositive: false }}
-          />
-        </motion.div>
-      </motion.div>
-
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, type: "spring" as const, stiffness: 300, damping: 24 }}
-        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
-      >
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Recent Intelligence Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* Activity feed placeholder */}
-              <div className="text-sm text-ink-3">No recent activity found. Connect an agent to begin.</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>System Health</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-ink-2">Cortex Nexus</span>
-                <span className="text-success flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-success animate-pulse"/> Online</span>
-              </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-ink-2">Job Queue</span>
-                <span className="text-ink">Idle</span>
-              </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-ink-2">Memory Graph</span>
-                <span className="text-ink">Syncing</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+        {/* Right Col: Activity Feed */}
+        <div className="flex flex-col gap-6">
+          <Card className="h-[400px]">
+            <CardHeader className="pb-4">
+              <CardTitle>Live Activity</CardTitle>
+              <CardDescription>System events and agent logs</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ActivityFeed />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 }
