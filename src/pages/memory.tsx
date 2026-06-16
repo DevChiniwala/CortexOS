@@ -28,6 +28,8 @@ export default function MemoryGraph() {
       })
     })
 
+    const companyIds = new Set(companies.map(c => `c-${c.id}`))
+
     // 2. Add Contacts and link to Companies
     contacts.forEach(contact => {
       const contactId = `p-${contact.id}`
@@ -39,7 +41,7 @@ export default function MemoryGraph() {
         data: contact
       })
 
-      if (contact.companyId) {
+      if (contact.companyId && companyIds.has(`c-${contact.companyId}`)) {
         links.push({
           source: contactId,
           target: `c-${contact.companyId}`,
@@ -59,11 +61,13 @@ export default function MemoryGraph() {
         data: signal
       })
 
-      links.push({
-        source: signalId,
-        target: `c-${signal.companyId}`,
-        label: "detected_for"
-      })
+      if (companyIds.has(`c-${signal.companyId}`)) {
+        links.push({
+          source: signalId,
+          target: `c-${signal.companyId}`,
+          label: "detected_for"
+        })
+      }
     })
 
     return { nodes, links }

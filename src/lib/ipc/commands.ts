@@ -37,7 +37,7 @@ export function isTauriRuntime(): boolean {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in (window as TauriWindow);
 }
 
-function invoke<T>(command: string, args?: Record<string, unknown>): Promise<T> {
+export function invoke<T>(command: string, args?: Record<string, unknown>): Promise<T> {
   if (isTauriRuntime()) {
     return tauriInvoke<T>(command, args);
   }

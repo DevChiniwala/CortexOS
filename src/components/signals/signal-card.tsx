@@ -1,6 +1,6 @@
 import { Signal } from "@/lib/local-store"
 import { Badge } from "@/components/ui/badge"
-import { IconTrendingUp, IconBriefcase, IconCode, IconUsers, IconRocket, IconHandshake, IconExternalLink } from "@tabler/icons-react"
+import { IconTrendingUp, IconBriefcase, IconCode, IconUsers, IconRocket, IconBuilding, IconExternalLink } from "@tabler/icons-react"
 import { formatDistanceToNow } from "date-fns"
 
 interface SignalCardProps {
@@ -16,7 +16,7 @@ export function SignalCard({ signal, onClick }: SignalCardProps) {
       case "tech_adoption": return { icon: <IconCode className="w-4 h-4" />, color: "text-primary", bg: "bg-primary/10", label: "Tech Stack" }
       case "leadership_change": return { icon: <IconBriefcase className="w-4 h-4" />, color: "text-warning", bg: "bg-warning/10", label: "Leadership" }
       case "expansion": return { icon: <IconRocket className="w-4 h-4" />, color: "text-primary", bg: "bg-primary/10", label: "Expansion" }
-      case "partnership": return { icon: <IconHandshake className="w-4 h-4" />, color: "text-info", bg: "bg-info/10", label: "Partnership" }
+      case "partnership": return { icon: <IconBuilding className="w-4 h-4" />, color: "text-info", bg: "bg-info/10", label: "Partnership" }
       default: return { icon: <IconTrendingUp className="w-4 h-4" />, color: "text-ink-2", bg: "bg-surface-hover", label: "General" }
     }
   }
