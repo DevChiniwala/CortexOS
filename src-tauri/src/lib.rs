@@ -30,6 +30,10 @@ pub fn run() {
             let db_state = DbState::new(db_path).expect("Failed to initialize database");
             app.manage(db_state);
 
+            // Start Orchestration Engine
+            let tx = orchestration::start_orchestrator(app.handle().clone());
+            app.manage(orchestration::OrchestrationEngine::new(tx));
+
             // Setup system tray
             let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let show_item = MenuItem::with_id(app, "show", "Show Window", true, None::<&str>)?;
