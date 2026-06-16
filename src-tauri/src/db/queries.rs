@@ -690,3 +690,35 @@ fn map_job_row(row: &rusqlite::Row) -> Result<JobRow, rusqlite::Error> {
         pid: row.get(14)?,
     })
 }
+
+pub fn get_jobs_by_status(conn: &Connection, status: &str, limit: i64) -> Result<Vec<JobRow>, String> {
+    let mut stmt = conn
+        .prepare("SELECT * FROM jobs WHERE status = ?1 ORDER BY created_at ASC LIMIT ?2")
+        .map_err(|e| e.to_string())?;
+
+    let rows = stmt
+        .query_map(rusqlite::params![status, limit], |row| {
+            Ok(JobRow {
+                id: row.get(0)?,
+                job_type: row.get(1)?,
+                entity_id: row.get(2)?,
+                entity_label: row.get(3)?,
+                status: row.get(4)?,
+                prompt: row.get(5)?,
+                model: row.get(6)?,
+                working_dir: row.get(7)?,
+                output_path: row.get(8)?,
+                exit_code: row.get(9)?,
+                error_message: row.get(10)?,
+                created_at: row.get(11)?,
+                started_at: row.get(12)?,
+                completed_at: row.get(13)?,
+                pid: row.get(14)?,
+            })
+        })
+        .map_err(|e| e.to_string())?
+        .filter_map(Result::ok)
+        .collect();
+
+    Ok(rows)
+}
