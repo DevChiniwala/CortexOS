@@ -90,16 +90,47 @@ pub fn start_orchestrator(app_handle: AppHandle) -> mpsc::Sender<String> {
                                     continue;
                                 }
 
-                                // Here we would actually spawn the Agent worker tasks
-                                // For Day 25, we just simulate work
                                 tokio::spawn(async move {
-                                    // Simulate work
-                                    sleep(Duration::from_secs(3)).await;
+                                    use crate::agents::{researcher::ResearcherAgent, copywriter::CopywriterAgent};
+                                    use crate::orchestration::agent::{Agent, AgentContext};
+                                    use std::collections::HashMap;
+
+                                    let mut context = AgentContext {
+                                        job_id: job.id.clone(),
+                                        working_dir: PathBuf::from(&job.working_dir),
+                                        memory: HashMap::new(),
+                                    };
+
+                                    // In a full app, this comes from the Settings table
+                                    let api_key = "dummy_key_for_now".to_string(); 
+                                    let model = job.model.clone().unwrap_or_else(|| "claude-3-opus-20240229".to_string());
+
+                                    let result = match job.job_type.as_str() {
+                                        "research_company" | "research_person" => {
+                                            let agent = ResearcherAgent::new(api_key, model);
+                                            agent.execute(&mut context, &job.prompt).await
+                                        }
+                                        "generate_copy" | "generate_conversation" => {
+                                            let agent = CopywriterAgent::new(api_key, model);
+                                            agent.execute(&mut context, &job.prompt).await
+                                        }
+                                        _ => {
+                                            sleep(Duration::from_secs(1)).await;
+                                            Ok("Simulated generic job".to_string())
+                                        }
+                                    };
                                     
-                                    // In a real system we would use the worker connection to update status
                                     let thread_conn = Connection::open(get_db_path()).unwrap();
-                                    let _ = queries::update_job_status(&thread_conn, &job.id, "completed", Some(0));
-                                    info!("Completed job: {}", job.id);
+                                    match result {
+                                        Ok(output) => {
+                                            let _ = queries::update_job_status(&thread_conn, &job.id, "completed", Some(0));
+                                            info!("Completed job {}: {}", job.id, output);
+                                        }
+                                        Err(e) => {
+                                            let _ = queries::update_job_status(&thread_conn, &job.id, "failed", Some(1));
+                                            error!("Job {} failed: {}", job.id, e);
+                                        }
+                                    }
                                 });
                             }
                         }
