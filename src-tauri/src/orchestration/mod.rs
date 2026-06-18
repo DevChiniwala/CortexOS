@@ -1,5 +1,6 @@
 pub mod agent;
 pub mod memory;
+pub mod daemon;
 
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -65,6 +66,9 @@ pub fn start_orchestrator(app_handle: AppHandle) -> mpsc::Sender<String> {
 
     let db_path = get_db_path();
 
+    // Start background verification daemon
+    daemon::start_verification_daemon();
+
     tokio::spawn(async move {
         info!("Orchestration Engine started");
         
@@ -112,6 +116,11 @@ pub fn start_orchestrator(app_handle: AppHandle) -> mpsc::Sender<String> {
                                         }
                                         "generate_copy" | "generate_conversation" => {
                                             let agent = CopywriterAgent::new(api_key, model);
+                                            agent.execute(&mut context, &job.prompt).await
+                                        }
+                                        "verify_data" => {
+                                            use crate::agents::data_verifier::DataVerifierAgent;
+                                            let agent = DataVerifierAgent::new(api_key, model);
                                             agent.execute(&mut context, &job.prompt).await
                                         }
                                         _ => {
