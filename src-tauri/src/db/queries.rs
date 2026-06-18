@@ -722,3 +722,14 @@ pub fn get_jobs_by_status(conn: &Connection, status: &str, limit: i64) -> Result
 
     Ok(rows)
 }
+
+pub fn mark_lead_verified(conn: &Connection, lead_id: i64) -> Result<(), String> {
+    let now = chrono::Utc::now().timestamp_millis();
+    conn.execute(
+        "UPDATE leads SET researched_at = ?1 WHERE id = ?2",
+        rusqlite::params![now, lead_id],
+    )
+    .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
