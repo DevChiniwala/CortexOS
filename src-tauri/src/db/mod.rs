@@ -174,6 +174,21 @@ fn init_schema(conn: &Connection) -> SqliteResult<()> {
         )
         VALUES (1, 0, 1, 'light', 0, 10, 1, NULL, strftime('%s', 'now') * 1000);
 
+        CREATE TABLE IF NOT EXISTS battlecards (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            lead_id INTEGER NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+            signal_id INTEGER REFERENCES signals(id) ON DELETE SET NULL,
+            competitor_name TEXT NOT NULL,
+            overview TEXT NOT NULL DEFAULT '',
+            strengths TEXT NOT NULL DEFAULT '[]',
+            weaknesses TEXT NOT NULL DEFAULT '[]',
+            talk_tracks TEXT NOT NULL DEFAULT '[]',
+            kill_criteria TEXT NOT NULL DEFAULT '[]',
+            recommended_approach TEXT NOT NULL DEFAULT '',
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL
+        );
+
         CREATE INDEX IF NOT EXISTS idx_people_lead_id ON people(lead_id);
         CREATE INDEX IF NOT EXISTS idx_memory_entity ON memory(entity_type, entity_id);
         CREATE INDEX IF NOT EXISTS idx_signals_lead_id ON signals(lead_id);
@@ -182,6 +197,8 @@ fn init_schema(conn: &Connection) -> SqliteResult<()> {
         CREATE INDEX IF NOT EXISTS idx_jobs_created_at ON jobs(created_at);
         CREATE INDEX IF NOT EXISTS idx_job_logs_job_id ON job_logs(job_id);
         CREATE INDEX IF NOT EXISTS idx_company_scores_lead_id ON company_scores(lead_id);
+        CREATE INDEX IF NOT EXISTS idx_battlecards_lead_id ON battlecards(lead_id);
+        CREATE INDEX IF NOT EXISTS idx_battlecards_signal_id ON battlecards(signal_id);
         "#,
     )?;
 

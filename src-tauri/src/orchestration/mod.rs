@@ -123,6 +123,11 @@ pub fn start_orchestrator(app_handle: AppHandle) -> mpsc::Sender<String> {
                                             let agent = DataVerifierAgent::new(api_key, model);
                                             agent.execute(&mut context, &job.prompt).await
                                         }
+                                        "generate_battlecard" => {
+                                            use crate::agents::strategist::StrategistAgent;
+                                            let agent = StrategistAgent::new(api_key, model);
+                                            agent.execute(&mut context, &job.prompt).await
+                                        }
                                         _ => {
                                             sleep(Duration::from_secs(1)).await;
                                             Ok("Simulated generic job".to_string())

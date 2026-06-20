@@ -247,3 +247,24 @@ pub struct AdjacentResult {
     pub current_index: i64,
     pub total: i64,
 }
+
+// ============================================================================
+// Battlecard
+// ============================================================================
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BattlecardRow {
+    pub id: i64,
+    pub lead_id: i64,
+    pub signal_id: Option<i64>,
+    pub competitor_name: String,
+    pub overview: String,
+    pub strengths: String,        // JSON array
+    pub weaknesses: String,       // JSON array
+    pub talk_tracks: String,      // JSON array of {objection, response}
+    pub kill_criteria: String,    // JSON array
+    pub recommended_approach: String,
+    pub created_at: i64,
+    pub updated_at: i64,
+}

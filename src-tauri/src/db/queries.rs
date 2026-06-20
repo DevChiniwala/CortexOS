@@ -733,3 +733,87 @@ pub fn mark_lead_verified(conn: &Connection, lead_id: i64) -> Result<(), String>
 
     Ok(())
 }
+
+pub fn insert_battlecard(
+    conn: &Connection,
+    lead_id: i64,
+    signal_id: Option<i64>,
+    competitor_name: &str,
+    overview: &str,
+    strengths: &str,
+    weaknesses: &str,
+    talk_tracks: &str,
+    kill_criteria: &str,
+    recommended_approach: &str,
+) -> Result<i64, String> {
+    let now = chrono::Utc::now().timestamp_millis();
+    conn.execute(
+        "INSERT INTO battlecards (lead_id, signal_id, competitor_name, overview, strengths, weaknesses, talk_tracks, kill_criteria, recommended_approach, created_at, updated_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
+        rusqlite::params![
+            lead_id, signal_id, competitor_name, overview, strengths, weaknesses,
+            talk_tracks, kill_criteria, recommended_approach, now, now
+        ],
+    )
+    .map_err(|e| e.to_string())?;
+    Ok(conn.last_insert_rowid())
+}
+
+pub fn get_battlecards_for_lead(conn: &Connection, lead_id: i64) -> Result<Vec<BattlecardRow>, String> {
+    let mut stmt = conn
+        .prepare("SELECT id, lead_id, signal_id, competitor_name, overview, strengths, weaknesses, talk_tracks, kill_criteria, recommended_approach, created_at, updated_at FROM battlecards WHERE lead_id = ?1 ORDER BY created_at DESC")
+        .map_err(|e| e.to_string())?;
+
+    let rows = stmt
+        .query_map(rusqlite::params![lead_id], |row| {
+            Ok(BattlecardRow {
+                id: row.get(0)?,
+                lead_id: row.get(1)?,
+                signal_id: row.get(2)?,
+                competitor_name: row.get(3)?,
+                overview: row.get(4)?,
+                strengths: row.get(5)?,
+                weaknesses: row.get(6)?,
+                talk_tracks: row.get(7)?,
+                kill_criteria: row.get(8)?,
+                recommended_approach: row.get(9)?,
+                created_at: row.get(10)?,
+                updated_at: row.get(11)?,
+            })
+        })
+        .map_err(|e| e.to_string())?
+        .filter_map(Result::ok)
+        .collect();
+
+    Ok(rows)
+}
+
+pub fn get_battlecard_by_signal(conn: &Connection, signal_id: i64) -> Result<Option<BattlecardRow>, String> {
+    let mut stmt = conn
+        .prepare("SELECT id, lead_id, signal_id, competitor_name, overview, strengths, weaknesses, talk_tracks, kill_criteria, recommended_approach, created_at, updated_at FROM battlecards WHERE signal_id = ?1 LIMIT 1")
+        .map_err(|e| e.to_string())?;
+
+    let mut rows = stmt
+        .query_map(rusqlite::params![signal_id], |row| {
+            Ok(BattlecardRow {
+                id: row.get(0)?,
+                lead_id: row.get(1)?,
+                signal_id: row.get(2)?,
+                competitor_name: row.get(3)?,
+                overview: row.get(4)?,
+                strengths: row.get(5)?,
+                weaknesses: row.get(6)?,
+                talk_tracks: row.get(7)?,
+                kill_criteria: row.get(8)?,
+                recommended_approach: row.get(9)?,
+                created_at: row.get(10)?,
+                updated_at: row.get(11)?,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+
+    match rows.next() {
+        Some(Ok(row)) => Ok(Some(row)),
+        _ => Ok(None),
+    }
+}
