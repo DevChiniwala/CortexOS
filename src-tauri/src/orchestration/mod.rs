@@ -1,6 +1,7 @@
 pub mod agent;
 pub mod memory;
 pub mod daemon;
+pub mod flow_engine;
 
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
