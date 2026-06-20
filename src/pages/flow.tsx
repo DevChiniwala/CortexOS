@@ -1,10 +1,11 @@
 import * as React from "react"
 import { FlowCanvas } from "@/components/flow/flow-canvas"
-import { IconGitBranch, IconPlus, IconSearch, IconTrendingUp, IconMessage2, IconUsers, IconBrain, IconMail, IconPlayerPlay } from "@tabler/icons-react"
+import { IconGitBranch, IconPlus, IconSearch, IconTrendingUp, IconMessage2, IconUsers, IconBrain, IconMail, IconPlayerPlay, IconRadar } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { useFlowStore } from "@/lib/store/flow-store"
 
 const NODE_TYPES = [
+  { id: "trigger-signal", label: "Signal Trigger", icon: "radar", color: "purple", description: "Trigger when a specific signal type is detected" },
   { id: "find-leads", label: "Find ICP Leads", icon: "users", color: "blue", description: "Search CRM/Apollo for specific personas" },
   { id: "research", label: "Deep Research", icon: "search", color: "orange", description: "Extract funding, tech stack, and news" },
   { id: "score", label: "Signal Scorer", icon: "trending-up", color: "yellow", description: "Evaluate against Tier 1 ICP heuristics" },
