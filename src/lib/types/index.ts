@@ -280,6 +280,24 @@ export interface ApolloKeyStatus {
 }
 
 // ============================================================================
+// Signal Types
+// ============================================================================
+
+export type SignalType = "hiring_surge" | "funding_round" | "tech_adoption" | "leadership_change" | "expansion" | "partnership" | "intent_data" | "competitor_detected"
+
+export interface Signal {
+  id: string
+  companyName: string
+  companyId: number
+  type: SignalType
+  title: string
+  description: string
+  confidence: number
+  source: string
+  detectedAt: string
+}
+
+// ============================================================================
 // Onboarding
 // ============================================================================
 

@@ -180,17 +180,7 @@ export function localAddActivity(type: string, message: string): void {
 // Signals (mock)
 // ============================================================================
 
-export interface Signal {
-  id: string
-  companyName: string
-  companyId: number
-  type: "hiring_surge" | "funding_round" | "tech_adoption" | "leadership_change" | "expansion" | "partnership"
-  title: string
-  description: string
-  confidence: number
-  source: string
-  detectedAt: string
-}
+import type { Signal } from "@/lib/types"
 
 export function localGetSignals(): Signal[] {
   return read<Signal[]>(KEYS.signals, [])

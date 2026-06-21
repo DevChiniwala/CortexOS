@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { StreamTerminal } from "@/components/stream/stream-terminal"
 import { useStream, useCompanies } from "@/lib/hooks"
-import { IconBrain, IconSearch, IconTrendingUp, IconMessage2, IconPlayerPlay, IconChevronRight, IconCircleCheck, IconClock, IconSend } from "@tabler/icons-react"
+import { IconBrain, IconSearch, IconTrendingUp, IconMessage2, IconPlayerPlay, IconChevronRight, IconCircleCheck, IconClock, IconSend, IconRadar } from "@tabler/icons-react"
 import { motion, AnimatePresence } from "motion/react"
 
 const AVAILABLE_AGENTS = [
@@ -51,6 +51,17 @@ const AVAILABLE_AGENTS = [
     bgColor: "bg-info/10",
     borderColor: "border-info/30",
     workers: 3,
+  },
+  {
+    id: "signals",
+    name: "Intent Radar",
+    description: "Continuously monitors target accounts for hiring surges, funding events, and tech stack changes.",
+    detail: "4 concurrent spiders scraping LinkedIn, Crunchbase, BuiltWith, and Bombora Intent data.",
+    icon: <IconRadar className="w-5 h-5" />,
+    color: "text-purple-500",
+    bgColor: "bg-purple-500/10",
+    borderColor: "border-purple-500/30",
+    workers: 4,
   }
 ]
 

@@ -105,11 +105,30 @@ function getOutreachSteps(targetName: string): SimStep[] {
   ];
 }
 
+function getSignalMonitorSteps(targetName: string): SimStep[] {
+  return [
+    { type: "system", delay: 300, content: `[CORTEX] Initializing signal_monitor for ${targetName}...` },
+    { type: "thinking", delay: 1000, content: `Starting continuous intent monitoring for ${targetName}. Deploying headless browser spiders to track real-time changes.` },
+    { type: "tool_use", delay: 800, content: `Calling scraper: Scan Greenhouse/Lever boards for new GTM role postings.`, toolName: "scraper" },
+    { type: "info", delay: 1500, content: `[Spider Worker] Found 12 new roles opened in the last 48 hours across Sales and RevOps.` },
+    { type: "tool_result", delay: 1000, content: `Hiring surge detected. Confidence: 94%.` },
+    { type: "tool_use", delay: 800, content: `Calling intent_api: Query Bombora for topic surges related to 'Autonomous Pipeline'.`, toolName: "intent_api" },
+    { type: "tool_result", delay: 1500, content: `Intent score for 'Autonomous Pipeline' increased by 45% week-over-week.` },
+    { type: "tool_use", delay: 1000, content: `Calling linkedin_api: Check for leadership changes in the buying committee.`, toolName: "linkedin_api" },
+    { type: "tool_result", delay: 1200, content: `New CRO appointed 5 days ago.` },
+    { type: "thinking", delay: 1500, content: `Aggregating signals. Found 3 distinct buying signals (Hiring Surge, Intent Spike, Leadership Change). Overlapping signals increase conversion probability by 3.4x.` },
+    { type: "info", delay: 800, content: `[Mesh Router] Moving ${targetName} to center of Intent Mesh. Triggering Conversation Engine.` },
+    { type: "assistant", delay: 1000, content: `Signal monitoring complete. Detected high-intent cluster for ${targetName}. Signals persisted to Event Stream and pushed to Intent Mesh UI.` },
+    { type: "system", delay: 500, content: `[CORTEX] signal_monitor sleeping...` },
+  ];
+}
+
 function getSimulationSteps(jobType: string, targetName: string): SimStep[] {
   switch (jobType) {
     case "scoring": return getScoringSteps(targetName);
     case "conversation": return getConversationSteps(targetName);
     case "outreach": return getOutreachSteps(targetName);
+    case "signals": return getSignalMonitorSteps(targetName);
     default: return getResearchSteps(targetName);
   }
 }

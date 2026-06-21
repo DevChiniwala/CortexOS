@@ -1,5 +1,6 @@
 import * as React from "react"
-import { localGetSignals, localAddSignal, type Signal } from "../local-store"
+import { localGetSignals, localAddSignal } from "../local-store"
+import type { Signal } from "@/lib/types"
 
 // Generate some seed data if empty
 function ensureSeedData() {
@@ -7,40 +8,58 @@ function ensureSeedData() {
   if (existing.length === 0) {
     const seedSignals: Omit<Signal, "id" | "detectedAt">[] = [
       {
-        companyName: "Acme Corp",
-        companyId: 101,
-        type: "hiring_surge",
-        title: "Engineering Hiring Surge",
-        description: "Opened 15 new engineering roles in the last 7 days, indicating expansion.",
-        confidence: 92,
-        source: "LinkedIn Jobs"
-      },
-      {
-        companyName: "Globex",
-        companyId: 102,
-        type: "funding_round",
-        title: "Series B Funding ($25M)",
-        description: "Just announced a $25M Series B led by Sequoia.",
+        companyName: "Cognism",
+        companyId: 1,
+        type: "leadership_change",
+        title: "New CRO Appointed",
+        description: "James Isilay shifted roles. Focus on scaling outbound automation motion.",
         confidence: 100,
-        source: "TechCrunch"
+        source: "LinkedIn Changes"
       },
       {
-        companyName: "Initech",
-        companyId: 103,
+        companyName: "Apollo.io",
+        companyId: 2,
+        type: "funding_round",
+        title: "Series D ($1.6B Valuation)",
+        description: "Raised new funding round to expand GTM intelligence platform.",
+        confidence: 100,
+        source: "Crunchbase API"
+      },
+      {
+        companyName: "Clay",
+        companyId: 6,
+        type: "hiring_surge",
+        title: "Go-to-Market Hiring Surge",
+        description: "Opened 12 new roles across Sales, RevOps, and Marketing in the last 14 days.",
+        confidence: 94,
+        source: "Greenhouse"
+      },
+      {
+        companyName: "Apriora",
+        companyId: 5,
         type: "tech_adoption",
-        title: "Adopted Snowflake",
-        description: "Job descriptions now require Snowflake experience, replacing Redshift.",
-        confidence: 85,
+        title: "Adopted Gong",
+        description: "Recent job postings for AE roles now require Gong experience.",
+        confidence: 88,
         source: "Job Postings"
       },
       {
-        companyName: "Soylent",
-        companyId: 104,
-        type: "leadership_change",
-        title: "New VP of Sales",
-        description: "Hired John Smith as VP of Sales from Salesforce.",
-        confidence: 95,
-        source: "LinkedIn Changes"
+        companyName: "Zepto",
+        companyId: 3,
+        type: "intent_data",
+        title: "Researching 'Autonomous Agents'",
+        description: "Surge in intent topic consumption for 'AI Sales Agents' and 'Autonomous Pipeline'.",
+        confidence: 82,
+        source: "Bombora Intent"
+      },
+      {
+        companyName: "AGS Health",
+        companyId: 4,
+        type: "competitor_detected",
+        title: "Evaluating Outreach.io",
+        description: "Contacts mapped to an active Outreach.io evaluation based on recent web traffic.",
+        confidence: 76,
+        source: "Clearbit Reveal"
       }
     ]
     

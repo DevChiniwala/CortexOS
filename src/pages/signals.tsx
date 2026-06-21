@@ -1,7 +1,8 @@
 import * as React from "react"
 import { useSignals } from "@/lib/hooks"
-import { SignalCard } from "@/components/signals/signal-card"
-import { SignalHeatmap } from "@/components/signals/signal-heatmap"
+import { SignalFeed } from "@/components/signals/signal-feed"
+import { IntentMesh } from "@/components/signals/intent-mesh"
+import { useNavigate } from "react-router-dom"
 import { IconFilter, IconRadar, IconSword, IconX, IconTarget, IconShield, IconMessageCircle, IconBulb } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 
@@ -55,93 +56,92 @@ export default function Signals() {
     if (card) setSelectedBattlecard(card)
   }
 
+  const navigate = useNavigate()
+
+  const handleAction = (signal: any) => {
+    // Jump to flow builder and prepopulate the trigger
+    navigate('/flow')
+  }
+
   return (
-    <div className="flex flex-col gap-8 p-8 max-w-7xl mx-auto w-full h-full relative">
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <IconRadar className="w-8 h-8 text-primary" />
-            <h1 className="text-3xl font-display font-semibold tracking-tight text-ink">Intelligence Signals</h1>
-          </div>
-          <p className="text-ink-3">Real-time buying signals detected across your target accounts</p>
+    <div className="flex flex-col h-full bg-bg">
+      {/* Header */}
+      <div className="px-8 pt-8 pb-6 border-b border-line bg-surface/30 backdrop-blur-sm shrink-0">
+        <div className="flex items-center gap-2 text-ink-3 text-sm font-medium tracking-wide uppercase mb-4">
+          <span className="w-2 h-2 rounded-full bg-primary"></span>
+          03 — Intent Mesh
         </div>
-        <div className="flex items-center gap-3 bg-surface border border-line rounded-lg p-1">
-          <Button 
-            variant={filterType === "all" ? "default" : "ghost"} 
-            size="sm"
-            onClick={() => setFilterType("all")}
-            className={filterType === "all" ? "bg-surface-hover text-ink shadow-sm" : ""}
-          >
-            All Signals
-          </Button>
-          <Button 
-            variant={filterType === "funding_round" ? "default" : "ghost"} 
-            size="sm"
-            onClick={() => setFilterType("funding_round")}
-            className={filterType === "funding_round" ? "bg-surface-hover text-ink shadow-sm" : ""}
-          >
-            Funding
-          </Button>
-          <Button 
-            variant={filterType === "hiring_surge" ? "default" : "ghost"} 
-            size="sm"
-            onClick={() => setFilterType("hiring_surge")}
-            className={filterType === "hiring_surge" ? "bg-surface-hover text-ink shadow-sm" : ""}
-          >
-            Hiring
-          </Button>
-          <Button 
-            variant={filterType === "tech_adoption" ? "default" : "ghost"} 
-            size="sm"
-            onClick={() => setFilterType("tech_adoption")}
-            className={filterType === "tech_adoption" ? "bg-surface-hover text-ink shadow-sm" : ""}
-          >
-            Tech Stack
-          </Button>
-          <Button 
-            variant={filterType === "competitive" ? "default" : "ghost"} 
-            size="sm"
-            onClick={() => setFilterType("competitive")}
-            className={filterType === "competitive" ? "bg-surface-hover text-ink shadow-sm" : ""}
-          >
-            <IconSword className="w-4 h-4 mr-1" />
-            Competitive
-          </Button>
+        <div className="flex items-end justify-between">
+          <div>
+            <h1 className="text-4xl font-display font-medium text-ink tracking-tight">Intelligence Signals</h1>
+            <p className="text-ink-2 mt-1">Real-time buying signals detected across your target accounts</p>
+          </div>
+          <div className="flex items-center gap-3 bg-surface border border-line rounded-lg p-1">
+            <Button 
+              variant={filterType === "all" ? "default" : "ghost"} 
+              size="sm"
+              onClick={() => setFilterType("all")}
+              className={filterType === "all" ? "bg-surface-hover text-ink shadow-sm" : ""}
+            >
+              All
+            </Button>
+            <Button 
+              variant={filterType === "funding_round" ? "default" : "ghost"} 
+              size="sm"
+              onClick={() => setFilterType("funding_round")}
+              className={filterType === "funding_round" ? "bg-surface-hover text-ink shadow-sm" : ""}
+            >
+              Funding
+            </Button>
+            <Button 
+              variant={filterType === "hiring_surge" ? "default" : "ghost"} 
+              size="sm"
+              onClick={() => setFilterType("hiring_surge")}
+              className={filterType === "hiring_surge" ? "bg-surface-hover text-ink shadow-sm" : ""}
+            >
+              Hiring
+            </Button>
+            <Button 
+              variant={filterType === "intent_data" ? "default" : "ghost"} 
+              size="sm"
+              onClick={() => setFilterType("intent_data")}
+              className={filterType === "intent_data" ? "bg-surface-hover text-ink shadow-sm" : ""}
+            >
+              Intent
+            </Button>
+            <Button 
+              variant={filterType === "competitive" ? "default" : "ghost"} 
+              size="sm"
+              onClick={() => setFilterType("competitive")}
+              className={filterType === "competitive" ? "bg-surface-hover text-ink shadow-sm" : ""}
+            >
+              <IconSword className="w-4 h-4 mr-1" />
+              Competitive
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-col gap-8">
-        <SignalHeatmap signals={signals} />
-
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between border-b border-line pb-2">
-            <h3 className="text-lg font-medium text-ink">Live Signal Feed</h3>
-            <span className="text-sm font-medium text-ink-3 bg-surface-hover px-2 py-0.5 rounded-full">
-              {filteredSignals.length} detected
-            </span>
-          </div>
+      <div className="flex-1 overflow-y-auto p-8">
+        <div className="max-w-7xl mx-auto flex flex-col gap-8">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filteredSignals.length > 0 ? (
-              filteredSignals.map(signal => (
-                <div key={signal.id} className="relative group">
-                  <SignalCard signal={signal} />
-                  <button
-                    onClick={() => handleViewBattlecard(signal.id)}
-                    className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-amber-500/90 hover:bg-amber-500 text-white text-xs font-medium px-2.5 py-1 rounded-md flex items-center gap-1 shadow-lg"
-                  >
-                    <IconSword className="w-3.5 h-3.5" />
-                    Battlecard
-                  </button>
-                </div>
-              ))
-            ) : (
-              <div className="col-span-full py-12 flex flex-col items-center justify-center text-center border-2 border-dashed border-line rounded-xl bg-surface/30">
-                <IconFilter className="w-8 h-8 text-ink-3 mb-3 opacity-50" />
-                <h3 className="text-base font-medium text-ink">No signals found</h3>
-                <p className="text-sm text-ink-3 mt-1">Try adjusting your filters or expanding your tracked accounts.</p>
-              </div>
-            )}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="flex flex-col gap-4">
+              <h3 className="text-xs font-semibold tracking-widest text-ink-3 uppercase">Account Intent Mesh</h3>
+              <IntentMesh signals={signals} />
+              <p className="text-sm text-ink-3 mt-2">
+                Accounts with multiple overlapping signals are moved to the center of the radar. Higher signal density correlates with a 3x higher meeting conversion rate.
+              </p>
+            </div>
+            
+            <div className="flex flex-col gap-4">
+              <h3 className="text-xs font-semibold tracking-widest text-ink-3 uppercase">Detected Signals</h3>
+              <SignalFeed 
+                signals={filteredSignals} 
+                onBattlecard={handleViewBattlecard}
+                onAction={handleAction} 
+              />
+            </div>
           </div>
         </div>
       </div>
