@@ -11,7 +11,7 @@ interface AddCompanyModalProps {
 }
 
 export function AddCompanyModal({ open, onClose }: AddCompanyModalProps) {
-  const { addCompany } = useCompanyMutations()
+  const { insertCompany } = useCompanyMutations()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [formData, setFormData] = React.useState<NewCompany>({
     companyName: "",
@@ -36,7 +36,7 @@ export function AddCompanyModal({ open, onClose }: AddCompanyModalProps) {
 
     setIsSubmitting(true)
     try {
-      await addCompany(formData)
+      await insertCompany(formData)
       onClose()
       setFormData({ companyName: "", website: "", city: "", state: "", country: "" })
     } catch (err) {

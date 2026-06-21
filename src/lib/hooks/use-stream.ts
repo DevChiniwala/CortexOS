@@ -11,6 +11,86 @@ export interface StreamState {
   error: string | null;
 }
 
+// ============================================================================
+// Deep Research Simulation Scripts
+// Each agent type has a unique, multi-step simulation sequence.
+// ============================================================================
+
+type SimStep = { type: LogEntry["type"]; content: string; delay: number; toolName?: string };
+
+function getResearchSteps(targetName: string): SimStep[] {
+  return [
+    { type: "system", delay: 300, content: `[CORTEX] Initializing deep_research agent for ${targetName}...` },
+    { type: "system", delay: 600, content: `[CORTEX] Research depth: DEEP (8 specialists + verifier)` },
+    { type: "system", delay: 400, content: `[CORTEX] Spawning agent pool... 8/8 workers online.` },
+    { type: "thinking", delay: 1200, content: `Planning multi-source research strategy for ${targetName}. Will search corporate filings, LinkedIn company page, Crunchbase profile, tech blog posts, and recent press releases. Decomposing into 4 parallel tracks: (1) Firmographic profile, (2) Technology stack, (3) Financial health & funding, (4) Leadership & org changes.` },
+    { type: "tool_use", delay: 800, content: `Calling search_web: "site:linkedin.com/company ${targetName}"`, toolName: "search_web" },
+    { type: "tool_result", delay: 1500, content: `Found LinkedIn company page. Extracting employee count, headquarters, recent posts, and key hires from last 90 days.` },
+    { type: "tool_use", delay: 600, content: `Calling search_web: "${targetName} funding round 2025 2026 crunchbase"`, toolName: "search_web" },
+    { type: "tool_result", delay: 1800, content: `Found 8 results. Crunchbase shows most recent funding: identified latest round details, lead investors, and post-money valuation estimate.` },
+    { type: "thinking", delay: 1000, content: `Analyzing funding trajectory. Company has raised across multiple rounds. Growth rate suggests strong investor confidence. Will now investigate technology stack for product-market fit assessment.` },
+    { type: "tool_use", delay: 500, content: `Calling browse_page: "https://${targetName.toLowerCase().replace(/\s+/g, '')}.com/careers"`, toolName: "browse_page" },
+    { type: "tool_result", delay: 2000, content: `Careers page parsed. Found 23 open roles. Dominant stack signals: React, TypeScript, Python, Kubernetes, AWS. 6 AI/ML positions open — indicates heavy investment in AI capabilities.` },
+    { type: "info", delay: 400, content: `[Worker 3/8] Tech Stack Specialist completed. Confidence: 94%` },
+    { type: "tool_use", delay: 600, content: `Calling search_web: "${targetName} pricing page OR plans OR enterprise"`, toolName: "search_web" },
+    { type: "tool_result", delay: 1200, content: `Pricing page found. Freemium model with enterprise tier starting at $49/seat/mo. Enterprise plan is "Contact Sales" — indicates ACV flexibility above $50K.` },
+    { type: "info", delay: 300, content: `[Worker 5/8] Pricing Analyst completed. Confidence: 88%` },
+    { type: "tool_use", delay: 700, content: `Calling search_web: "${targetName} CEO CTO leadership changes 2025 2026"`, toolName: "search_web" },
+    { type: "tool_result", delay: 1500, content: `Detected leadership change: New CRO appointed in Q1 2026. Former CRO moved to advisory. New CRO previously scaled revenue at a major competitor from $40M to $150M ARR.` },
+    { type: "info", delay: 300, content: `[Worker 7/8] Org Intelligence completed. Confidence: 91%` },
+    { type: "thinking", delay: 1200, content: `Cross-referencing all 8 specialist outputs. Building unified company intelligence profile. Key synthesis: ${targetName} is in aggressive growth mode with recent leadership injection, strong AI investment signals, and enterprise-ready pricing. Total research confidence: 92%.` },
+    { type: "info", delay: 400, content: `[Verifier Agent] Cross-checking financial data against SEC filings...` },
+    { type: "info", delay: 800, content: `[Verifier Agent] Validating employee count against LinkedIn data...` },
+    { type: "info", delay: 600, content: `[Verifier Agent] All 8 specialist reports verified. 0 conflicts detected.` },
+    { type: "assistant", delay: 1000, content: `Research complete for ${targetName}. Generated comprehensive intelligence profile covering: company overview, technology stack (React/Python/K8s/AWS), funding history, pricing model ($49/seat freemium + enterprise), leadership changes (new CRO Q1 2026), competitive positioning, and 23 open roles analysis. Overall research confidence: 92%.` },
+    { type: "system", delay: 500, content: `[CORTEX] deep_research agent completed successfully. Profile saved.` },
+  ];
+}
+
+function getScoringSteps(targetName: string): SimStep[] {
+  return [
+    { type: "system", delay: 300, content: `[CORTEX] Initializing scoring agent for ${targetName}...` },
+    { type: "system", delay: 500, content: `[CORTEX] Loading active scoring config: "Default ICP v2"` },
+    { type: "thinking", delay: 1000, content: `Evaluating ${targetName} against 2 required characteristics and 4 demand signifiers. Will score each dimension independently then compute weighted total.` },
+    { type: "info", delay: 800, content: `[Requirement 1/2] Minimum Company Size: Checking employee count and org structure...` },
+    { type: "info", delay: 600, content: `[Requirement 1/2] ✓ PASSED — Estimated 500+ employees, full C-suite, multi-regional presence.` },
+    { type: "info", delay: 800, content: `[Requirement 2/2] Target Industry: Checking against B2B SaaS / Enterprise Tech criteria...` },
+    { type: "info", delay: 600, content: `[Requirement 2/2] ✓ PASSED — Confirmed B2B SaaS vendor in the sales intelligence vertical.` },
+    { type: "thinking", delay: 1000, content: `Both required characteristics passed. Now scoring 4 demand signifiers on a 0-10 scale with detailed justification for each.` },
+    { type: "info", delay: 1200, content: `[Signifier 1/4] Growth Signals: x8/10 — Strong revenue growth (~30% YoY), new executive hires, major product launches.` },
+    { type: "info", delay: 1200, content: `[Signifier 2/4] Technology Adoption: x7/10 — Modern stack, multi-LLM integration, ISO 27001 certified.` },
+    { type: "info", delay: 1200, content: `[Signifier 3/4] Budget Authority: x9/10 — Clear decision-making structure, identified economic buyers.` },
+    { type: "info", delay: 1200, content: `[Signifier 4/4] Pain Point Alignment: x10/10 — Direct product-market fit for autonomous data enrichment.` },
+    { type: "thinking", delay: 800, content: `Computing weighted score: (8 + 7 + 9 + 10) * 2.38 = 81. Tier classification: HOT (threshold: 75+).` },
+    { type: "assistant", delay: 800, content: `Scoring complete for ${targetName}. Final score: 81 (HOT tier). All 2/2 requirements passed. Strongest signal: Pain Point Alignment (10/10). Weakest: Technology Adoption (7/10).` },
+    { type: "system", delay: 400, content: `[CORTEX] scoring agent completed. Score saved to database.` },
+  ];
+}
+
+function getConversationSteps(targetName: string): SimStep[] {
+  return [
+    { type: "system", delay: 300, content: `[CORTEX] Initializing conversation_engine for ${targetName}...` },
+    { type: "system", delay: 500, content: `[CORTEX] Loading contact profiles and recent signals...` },
+    { type: "thinking", delay: 1200, content: `Analyzing 3 contacts at ${targetName}. Will generate personalized icebreakers based on recent company signals (new CRO hire, product launch, AI investment), individual LinkedIn activity, and mutual connections.` },
+    { type: "info", delay: 800, content: `[Contact 1/3] VP Sales — Identified recent LinkedIn post about "scaling outbound with AI agents"` },
+    { type: "info", delay: 600, content: `[Contact 1/3] Generated 3 icebreaker sequences anchored on their AI outbound interest.` },
+    { type: "info", delay: 800, content: `[Contact 2/3] CRO — New hire, previously at competitor. Identified mutual connection through YC network.` },
+    { type: "info", delay: 600, content: `[Contact 2/3] Generated welcome sequence + competitive displacement angle.` },
+    { type: "info", delay: 800, content: `[Contact 3/3] Head of RevOps — Published blog post on "data quality challenges in enterprise GTM"` },
+    { type: "info", delay: 600, content: `[Contact 3/3] Generated thought-leadership engagement sequence.` },
+    { type: "assistant", delay: 1000, content: `Conversation generation complete. Created 9 personalized outreach sequences across 3 contacts. Each sequence includes: subject line, opening icebreaker, value proposition hook, and soft CTA. All anchored on real-time signals.` },
+    { type: "system", delay: 400, content: `[CORTEX] conversation_engine completed. Topics saved.` },
+  ];
+}
+
+function getSimulationSteps(jobType: string, targetName: string): SimStep[] {
+  switch (jobType) {
+    case "scoring": return getScoringSteps(targetName);
+    case "conversation": return getConversationSteps(targetName);
+    default: return getResearchSteps(targetName);
+  }
+}
+
 export function useStream() {
   const [state, setState] = useState<StreamState>({
     isStreaming: false,
@@ -20,12 +100,13 @@ export function useStream() {
   });
 
   const unlistenRef = useRef<UnlistenFn | null>(null);
-  // Keep track of logs internally to avoid dependency cycle in simulated stream
   const logsRef = useRef<LogEntry[]>([]);
+  const cancelledRef = useRef(false);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      cancelledRef.current = true;
       if (unlistenRef.current) {
         unlistenRef.current();
       }
@@ -37,36 +118,31 @@ export function useStream() {
     logsRef.current = [];
   }, []);
 
-  // Browser Mock Stream
+  // Deep Simulation Engine
   const startSimulatedStream = useCallback(async (jobType: string, targetName: string) => {
-    setState({ isStreaming: true, logs: [], jobId: "sim-" + Date.now(), error: null });
+    cancelledRef.current = false;
+    const jobId = "sim-" + Date.now();
+    setState({ isStreaming: true, logs: [], jobId, error: null });
     logsRef.current = [];
 
-    const addLog = (type: LogEntry["type"], content: string) => {
-      const entry: LogEntry = { type, content, timestamp: Date.now() };
+    const addLog = (type: LogEntry["type"], content: string, toolName?: string) => {
+      const entry: LogEntry = { type, content, timestamp: Date.now(), toolName };
       logsRef.current = [...logsRef.current, entry];
       setState((prev) => ({ ...prev, logs: logsRef.current }));
     };
 
-    addLog("system", `[SIMULATED] Starting ${jobType} agent for ${targetName}...`);
-    
-    // Simulate some work
-    await new Promise((r) => setTimeout(r, 1000));
-    addLog("thinking", "Analyzing target profile and preparing research strategy...");
-    
-    await new Promise((r) => setTimeout(r, 1500));
-    addLog("tool_use", "Calling search_web tool with query: 'recent news about " + targetName + "'");
-    
-    await new Promise((r) => setTimeout(r, 2000));
-    addLog("tool_result", "Found 15 results. Extracting relevant context...");
-    
-    await new Promise((r) => setTimeout(r, 1000));
-    addLog("assistant", "I have synthesized the recent news. " + targetName + " recently announced a new product line.");
-    
-    await new Promise((r) => setTimeout(r, 1000));
-    addLog("system", `[SIMULATED] ${jobType} agent completed successfully.`);
-    
-    setState((prev) => ({ ...prev, isStreaming: false }));
+    const steps = getSimulationSteps(jobType, targetName);
+
+    for (const step of steps) {
+      if (cancelledRef.current) break;
+      await new Promise((r) => setTimeout(r, step.delay));
+      if (cancelledRef.current) break;
+      addLog(step.type, step.content, step.toolName);
+    }
+
+    if (!cancelledRef.current) {
+      setState((prev) => ({ ...prev, isStreaming: false }));
+    }
   }, []);
 
   const startStream = useCallback(async (jobType: string, targetId: number, targetName: string) => {
@@ -78,7 +154,6 @@ export function useStream() {
       clearStream();
       setState((prev) => ({ ...prev, isStreaming: true, error: null }));
       
-      // Start listening to Tauri events for this specific job stream (or global stream)
       if (unlistenRef.current) unlistenRef.current();
       
       unlistenRef.current = await listen<LogEntry>("stream_event", (event) => {
@@ -86,8 +161,6 @@ export function useStream() {
         setState((prev) => ({ ...prev, logs: logsRef.current }));
       });
 
-      // Trigger the actual backend job
-      // In a real implementation, this invoke would return the jobId
       const response = await invoke<any>("start_research_job", { jobType, targetId });
       setState((prev) => ({ ...prev, jobId: response.jobId || "native-job" }));
 
@@ -101,6 +174,7 @@ export function useStream() {
   }, [clearStream, startSimulatedStream]);
 
   const stopStream = useCallback(async () => {
+    cancelledRef.current = true;
     if (state.jobId && isTauriRuntime() && !state.jobId.startsWith("sim-")) {
        try {
          await invoke("cancel_job", { jobId: state.jobId });

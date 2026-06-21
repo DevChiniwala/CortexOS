@@ -84,7 +84,7 @@ export interface NewContact {
 // Scoring Types
 // ============================================================================
 
-export type ScoringTier = "hot" | "warm" | "nurture" | "disqualified";
+export type ScoringTier = "hot" | "warm" | "nurture" | "filtered" | "unscored";
 
 export interface RequiredCharacteristic {
   id: string;
