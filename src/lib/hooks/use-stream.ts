@@ -83,10 +83,33 @@ function getConversationSteps(targetName: string): SimStep[] {
   ];
 }
 
+function getOutreachSteps(targetName: string): SimStep[] {
+  return [
+    { type: "system", delay: 300, content: `[CORTEX] Initializing outreach_agent for ${targetName}...` },
+    { type: "thinking", delay: 1000, content: `Executing autonomous outreach loop for ${targetName}. Loading conversation drafts, email API credentials, and calendar availability.` },
+    { type: "tool_use", delay: 800, content: `Calling email_api: Send email to ${targetName} contacts.`, toolName: "email_api" },
+    { type: "info", delay: 1500, content: `[SMTP Worker] Sent 3 personalized emails. Awaiting delivery confirmation.` },
+    { type: "tool_result", delay: 1000, content: `Delivery confirmed. 3/3 emails reached inbox.` },
+    { type: "info", delay: 800, content: `[Tracking Worker] Email open detected for Contact #1 (CRO).` },
+    { type: "info", delay: 2000, content: `[Tracking Worker] Reply received from Contact #1.` },
+    { type: "thinking", delay: 1500, content: `Analyzing reply intent using classification model. Text: "The autonomous SDR concept is interesting. Can you send over a deck + do a live demo? I'm open Thursday or Friday afternoon GMT."` },
+    { type: "info", delay: 800, content: `[Classifier Worker] Intent: INTERESTED. Confidence: 95%. Ask: Demo & Deck. Timeframe: Thu/Fri GMT.` },
+    { type: "tool_use", delay: 1000, content: `Calling calendar_api: Find available slots for Thu/Fri afternoon GMT.`, toolName: "calendar_api" },
+    { type: "tool_result", delay: 800, content: `Found 3 available slots.` },
+    { type: "thinking", delay: 1000, content: `Drafting reply to book meeting and include requested deck. Generating single-use scheduling link.` },
+    { type: "tool_use", delay: 600, content: `Calling email_api: Send reply to Contact #1.`, toolName: "email_api" },
+    { type: "tool_result", delay: 1000, content: `Reply sent successfully.` },
+    { type: "info", delay: 2000, content: `[Tracking Worker] Meeting booked via scheduling link.` },
+    { type: "assistant", delay: 1000, content: `Autonomous outreach execution complete for ${targetName}. Sent 3 emails, handled 1 high-intent reply, and successfully booked 1 meeting for Thursday at 2pm GMT. Meeting details synced to CRM and Calendar.` },
+    { type: "system", delay: 500, content: `[CORTEX] outreach_agent completed.` },
+  ];
+}
+
 function getSimulationSteps(jobType: string, targetName: string): SimStep[] {
   switch (jobType) {
     case "scoring": return getScoringSteps(targetName);
     case "conversation": return getConversationSteps(targetName);
+    case "outreach": return getOutreachSteps(targetName);
     default: return getResearchSteps(targetName);
   }
 }

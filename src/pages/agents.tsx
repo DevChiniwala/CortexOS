@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { StreamTerminal } from "@/components/stream/stream-terminal"
 import { useStream, useCompanies } from "@/lib/hooks"
-import { IconBrain, IconSearch, IconTrendingUp, IconMessage2, IconPlayerPlay, IconChevronRight, IconCircleCheck, IconClock } from "@tabler/icons-react"
+import { IconBrain, IconSearch, IconTrendingUp, IconMessage2, IconPlayerPlay, IconChevronRight, IconCircleCheck, IconClock, IconSend } from "@tabler/icons-react"
 import { motion, AnimatePresence } from "motion/react"
 
 const AVAILABLE_AGENTS = [
@@ -39,6 +39,17 @@ const AVAILABLE_AGENTS = [
     color: "text-leaf",
     bgColor: "bg-leaf/10",
     borderColor: "border-leaf/30",
+    workers: 3,
+  },
+  {
+    id: "outreach",
+    name: "Outreach Execution",
+    description: "Autonomously sends emails, tracks opens, classifies replies, and books meetings on your calendar.",
+    detail: "3 specialist workers: SMTP dispatcher, Reply intent classifier (LLM), and Calendar coordinator.",
+    icon: <IconSend className="w-5 h-5" />,
+    color: "text-info",
+    bgColor: "bg-info/10",
+    borderColor: "border-info/30",
     workers: 3,
   }
 ]

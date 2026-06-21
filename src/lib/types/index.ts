@@ -291,3 +291,79 @@ export interface OnboardingStatus {
   hasResearchedPerson: boolean;
   hasConversationTopics: boolean;
 }
+
+// ============================================================================
+// Outreach Types
+// ============================================================================
+
+export type OutreachStatus = "drafting" | "scheduled" | "sending" | "awaiting_reply" | "replied" | "meeting_booked" | "completed" | "bounced" | "opted_out";
+export type ReplyIntent = "interested" | "not_now" | "objection" | "wrong_person" | "unsubscribe" | "auto_reply" | "meeting_request";
+export type EmailProvider = "gmail" | "outlook" | "none";
+
+export interface OutreachSequence {
+  id: string;
+  companyId: number;
+  companyName: string;
+  contactId: number;
+  contactName: string;
+  contactTitle: string;
+  contactEmail: string;
+  status: OutreachStatus;
+  steps: OutreachStep[];
+  signalTrigger: string | null;
+  createdAt: number;
+  completedAt: number | null;
+}
+
+export interface OutreachStep {
+  id: string;
+  stepNumber: number;
+  subject: string;
+  body: string;
+  status: "draft" | "sent" | "opened" | "replied" | "bounced" | "skipped";
+  sentAt: number | null;
+  openedAt: number | null;
+  repliedAt: number | null;
+  scheduledFor: number | null;
+}
+
+export interface EmailReply {
+  id: string;
+  sequenceId: string;
+  stepId: string;
+  contactName: string;
+  contactEmail: string;
+  companyName: string;
+  subject: string;
+  body: string;
+  intent: ReplyIntent;
+  confidence: number;
+  suggestedAction: string;
+  receivedAt: number;
+  handled: boolean;
+}
+
+export interface MeetingBooking {
+  id: string;
+  sequenceId: string;
+  contactName: string;
+  contactTitle: string;
+  companyName: string;
+  scheduledAt: number;
+  durationMinutes: number;
+  meetingLink: string | null;
+  notes: string;
+  status: "confirmed" | "pending" | "cancelled" | "completed";
+}
+
+export interface OutreachStats {
+  totalSequences: number;
+  emailsSent: number;
+  emailsOpened: number;
+  repliesReceived: number;
+  meetingsBooked: number;
+  openRate: number;
+  replyRate: number;
+  meetingRate: number;
+}
+

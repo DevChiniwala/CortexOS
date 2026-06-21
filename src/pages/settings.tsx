@@ -2,7 +2,8 @@ import * as React from "react"
 import { useSettingsStore } from "@/lib/store/settings-store"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { IconBrandChrome, IconBrain, IconShieldCheck } from "@tabler/icons-react"
+import { IconBrandChrome, IconBrain, IconShieldCheck, IconMail } from "@tabler/icons-react"
+import { Button } from "@/components/ui/button"
 import { motion } from "motion/react"
 
 export default function Settings() {
@@ -92,6 +93,51 @@ export default function Settings() {
                     {depth}
                   </button>
                 ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <IconMail className="w-5 h-5 text-primary" />
+              Email Integration
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-6">
+            <div className="flex items-center justify-between p-4 border border-line rounded-xl bg-surface/50">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-line shadow-sm">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" className="w-5 h-5" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-ink">Connected to Google Workspace</span>
+                  <span className="text-xs text-ink-3">dev@cortexos.ai</span>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" className="text-xs">Disconnect</Button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-ink">Daily Send Limit</label>
+                <select className="flex h-10 w-full rounded-lg border border-line bg-bg px-3 py-2 text-sm text-ink outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none font-medium">
+                  <option value="50">50 emails / day (Warmup)</option>
+                  <option value="150" selected>150 emails / day (Standard)</option>
+                  <option value="300">300 emails / day (Aggressive)</option>
+                </select>
+                <p className="text-xs text-ink-3 mt-1">Maximum autonomous emails sent per day to protect deliverability.</p>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-ink">Follow-up Delay</label>
+                <select className="flex h-10 w-full rounded-lg border border-line bg-bg px-3 py-2 text-sm text-ink outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none font-medium">
+                  <option value="2">2 Days</option>
+                  <option value="3" selected>3 Days</option>
+                  <option value="5">5 Days</option>
+                </select>
+                <p className="text-xs text-ink-3 mt-1">Wait time before autonomous follow-up on unreplied emails.</p>
               </div>
             </div>
           </CardContent>

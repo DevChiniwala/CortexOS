@@ -17,6 +17,7 @@ import MemoryGraph from "./pages/memory"
 import Signals from "./pages/signals"
 import Flow from "./pages/flow"
 import Settings from "./pages/settings"
+import Outreach from "./pages/outreach"
 
 const queryClient = createQueryClient()
 
@@ -48,6 +49,7 @@ export default function App() {
           <Route path="agents" element={<Agents />} />
           <Route path="memory" element={<MemoryGraph />} />
           <Route path="flow" element={<Flow />} />
+          <Route path="outreach" element={<Outreach />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>

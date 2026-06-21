@@ -1,6 +1,6 @@
 import * as React from "react"
 import { NavLink } from "react-router-dom"
-import { IconBuilding, IconUsers, IconBrain, IconSettings, IconWaveSine, IconTerminal2, IconNetwork, IconHierarchy } from "@tabler/icons-react"
+import { IconBuilding, IconUsers, IconBrain, IconSettings, IconWaveSine, IconTerminal2, IconNetwork, IconHierarchy, IconSend } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 
 const MAIN_NAV = [
@@ -8,6 +8,7 @@ const MAIN_NAV = [
   { icon: IconBuilding, label: "Companies", path: "/companies" },
   { icon: IconUsers, label: "Contacts", path: "/contacts" },
   { icon: IconWaveSine, label: "Signals", path: "/signals" },
+  { icon: IconSend, label: "Outreach", path: "/outreach" },
 ]
 
 const SYSTEM_NAV = [
