@@ -63,6 +63,10 @@ export interface Contact {
   conversationTopics: string | null;
   conversationGeneratedAt: number | null;
   createdAt: number;
+  // Persona metadata
+  buyingRole?: "Champion" | "Economic Buyer" | "Blocker" | "End User" | "Influencer" | null;
+  personaTags?: string[];
+  relationshipStrength?: number; // 0-100 score
 }
 
 export interface ContactWithCompany extends Contact {

@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { StreamTerminal } from "@/components/stream/stream-terminal"
 import { useStream, useCompanies } from "@/lib/hooks"
-import { IconBrain, IconSearch, IconTrendingUp, IconMessage2, IconPlayerPlay, IconChevronRight, IconCircleCheck, IconClock, IconSend, IconRadar } from "@tabler/icons-react"
+import { IconBrain, IconSearch, IconTrendingUp, IconMessage2, IconPlayerPlay, IconChevronRight, IconCircleCheck, IconClock, IconSend, IconRadar, IconHierarchy } from "@tabler/icons-react"
 import { motion, AnimatePresence } from "motion/react"
 
 const AVAILABLE_AGENTS = [
@@ -62,6 +62,17 @@ const AVAILABLE_AGENTS = [
     bgColor: "bg-purple-500/10",
     borderColor: "border-purple-500/30",
     workers: 4,
+  },
+  {
+    id: "persona",
+    name: "Persona Mapper",
+    description: "Builds out the buying committee, assigns buying roles, and calculates relationship strength.",
+    detail: "Cross-references career history to identify past customers and shared connections.",
+    icon: <IconHierarchy className="w-5 h-5" />,
+    color: "text-rose-500",
+    bgColor: "bg-rose-500/10",
+    borderColor: "border-rose-500/30",
+    workers: 2,
   }
 ]
 

@@ -5,7 +5,7 @@
 // ============================================================================
 
 import type { CompanyWithScore, ContactWithCompany, NewCompany, NewContact } from "@/lib/types"
-import { MOCK_COMPANIES } from "./mock-data"
+import { MOCK_COMPANIES, MOCK_CONTACTS } from "./mock-data"
 
 const KEYS = {
   companies: "cortexos:companies",
@@ -99,7 +99,12 @@ export function localDeleteCompanies(ids: number[]): number {
 let contactIdCounter = read<number>("cortexos:contactIdCounter", 200)
 
 export function localGetContacts(): ContactWithCompany[] {
-  return read<ContactWithCompany[]>(KEYS.contacts, [])
+  const data = read<ContactWithCompany[]>(KEYS.contacts, [])
+  if (data.length === 0) {
+    write(KEYS.contacts, MOCK_CONTACTS)
+    return MOCK_CONTACTS as ContactWithCompany[]
+  }
+  return data
 }
 
 export function localInsertContact(data: NewContact): number {

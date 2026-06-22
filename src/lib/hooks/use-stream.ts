@@ -123,12 +123,29 @@ function getSignalMonitorSteps(targetName: string): SimStep[] {
   ];
 }
 
+function getPersonaMapperSteps(targetName: string): SimStep[] {
+  return [
+    { type: "system", delay: 300, content: `[CORTEX] Initializing persona_mapper for ${targetName}...` },
+    { type: "thinking", delay: 1000, content: `Starting deep relationship mapping for ${targetName}. Identifying buying committee members and extracting persona metadata.` },
+    { type: "tool_use", delay: 800, content: `Calling linkedin_api: Scan ${targetName} employee directory for VP and C-level executives.`, toolName: "linkedin_api" },
+    { type: "tool_result", delay: 1500, content: `Found 3 key contacts: CEO, VP of Sales, and Director of RevOps.` },
+    { type: "info", delay: 800, content: `[Classification Worker] Assigning Buying Roles: CEO -> Economic Buyer, VP of Sales -> Champion, RevOps -> Influencer.` },
+    { type: "tool_use", delay: 1000, content: `Calling web_scraper: Cross-reference contact history for relationship strength indicators (past employers, shared connections, previous software stack).`, toolName: "web_scraper" },
+    { type: "tool_result", delay: 1200, content: `VP of Sales was an early adopter of your platform at their previous company. Relationship strength increased to 85/100.` },
+    { type: "thinking", delay: 1500, content: `Generating persona tags for each contact based on recent posts, job descriptions, and career history.` },
+    { type: "info", delay: 800, content: `[Graph Engine] Mapped buying committee structure. Identified Champion as optimal entry point.` },
+    { type: "assistant", delay: 1000, content: `Persona mapping complete. Grouped contacts into Buying Committee with assigned roles and relationship paths. Data saved to Contacts.` },
+    { type: "system", delay: 500, content: `[CORTEX] persona_mapper completed.` },
+  ];
+}
+
 function getSimulationSteps(jobType: string, targetName: string): SimStep[] {
   switch (jobType) {
     case "scoring": return getScoringSteps(targetName);
     case "conversation": return getConversationSteps(targetName);
     case "outreach": return getOutreachSteps(targetName);
     case "signals": return getSignalMonitorSteps(targetName);
+    case "persona": return getPersonaMapperSteps(targetName);
     default: return getResearchSteps(targetName);
   }
 }
