@@ -1,7 +1,8 @@
 import * as React from "react"
 import { localGetActivity, type ActivityItem } from "@/lib/local-store"
 import { formatDistanceToNow } from "date-fns"
-import { IconBuilding, IconUser, IconRadar, IconPlayerPlay, IconCircleCheck } from "@tabler/icons-react"
+import { IconBuilding, IconUser, IconRadar, IconPlayerPlay, IconCircleCheck, IconRobot } from "@tabler/icons-react"
+import { cn } from "@/lib/utils"
 
 export function ActivityFeed() {
   const [activities, setActivities] = React.useState<ActivityItem[]>([])
@@ -43,7 +44,29 @@ export function ActivityFeed() {
             {getIcon(activity.type)}
           </div>
           
-          <div className="flex flex-col pt-1.5">
+          <div className="flex flex-col pt-1">
+            <div className="flex items-center gap-2 mb-0.5">
+              {activity.actor && (
+                <>
+                  {activity.actor.type === "agent" ? (
+                    <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 text-[10px] font-bold text-purple-400 uppercase tracking-wider">
+                      <IconRobot className="w-3 h-3" />
+                      {activity.actor.name}
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5 text-xs font-medium text-ink-2">
+                      <span className={cn(
+                        "w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white",
+                        activity.actor.avatar === "D" ? "bg-primary" : activity.actor.avatar === "S" ? "bg-emerald-500" : "bg-rose-500"
+                      )}>
+                        {activity.actor.avatar}
+                      </span>
+                      {activity.actor.name}
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
             <span className="text-sm text-ink leading-snug">{activity.message}</span>
             <span className="text-xs text-ink-3 font-mono mt-0.5">
               {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
@@ -54,3 +77,4 @@ export function ActivityFeed() {
     </div>
   )
 }
+

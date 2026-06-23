@@ -2,7 +2,7 @@ import * as React from "react"
 import { useSettingsStore } from "@/lib/store/settings-store"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { IconBrandChrome, IconBrain, IconShieldCheck, IconMail } from "@tabler/icons-react"
+import { IconBrandChrome, IconBrain, IconShieldCheck, IconMail, IconUsers } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { motion } from "motion/react"
 
@@ -139,6 +139,72 @@ export default function Settings() {
                 </select>
                 <p className="text-xs text-ink-3 mt-1">Wait time before autonomous follow-up on unreplied emails.</p>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <IconUsers className="w-5 h-5 text-primary" />
+              Team & Workspace
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-6">
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1">
+                <p className="text-sm font-medium text-ink">Acme Corp GTM Workspace</p>
+                <p className="text-xs text-ink-3">Enterprise Plan • 3/10 Seats Filled</p>
+              </div>
+              <Button size="sm">Invite Member</Button>
+            </div>
+
+            <div className="rounded-xl border border-line overflow-hidden">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-surface-hover text-ink-2 border-b border-line">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">User</th>
+                    <th className="px-4 py-3 font-medium">Role</th>
+                    <th className="px-4 py-3 font-medium">Agent Allocation</th>
+                    <th className="px-4 py-3 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line text-ink">
+                  <tr>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-[10px]">D</div>
+                        <span className="font-medium">Dev</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-ink-2">Admin</td>
+                    <td className="px-4 py-3 text-ink-2">Unlimited</td>
+                    <td className="px-4 py-3"><span className="w-2 h-2 rounded-full bg-success inline-block mr-2" />Online</td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-600 flex items-center justify-center font-bold text-[10px]">S</div>
+                        <span className="font-medium">Sarah</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-ink-2">Member</td>
+                    <td className="px-4 py-3 text-ink-2">10 Agents / day</td>
+                    <td className="px-4 py-3"><span className="w-2 h-2 rounded-full bg-ink-3 inline-block mr-2" />Offline</td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded-full bg-rose-500/20 text-rose-600 flex items-center justify-center font-bold text-[10px]">M</div>
+                        <span className="font-medium">Mike</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-ink-2">Viewer</td>
+                    <td className="px-4 py-3 text-ink-2">Read-only</td>
+                    <td className="px-4 py-3"><span className="w-2 h-2 rounded-full bg-success inline-block mr-2" />Online</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </CardContent>
         </Card>

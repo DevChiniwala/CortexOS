@@ -164,19 +164,37 @@ export interface ActivityItem {
   type: string
   message: string
   timestamp: string
+  actor?: {
+    name: string
+    type: "user" | "agent"
+    avatar?: string
+  }
 }
 
 export function localGetActivity(): ActivityItem[] {
   return read<ActivityItem[]>(KEYS.activity, [])
 }
 
-export function localAddActivity(type: string, message: string): void {
+const MOCK_ACTORS = [
+  { name: "Dev", type: "user" as const, avatar: "D" },
+  { name: "Sarah", type: "user" as const, avatar: "S" },
+  { name: "Mike", type: "user" as const, avatar: "M" },
+  { name: "Cortex Orchestrator", type: "agent" as const },
+]
+
+export function localAddActivity(type: string, message: string, actorOverride?: ActivityItem["actor"]): void {
   const activity = localGetActivity()
+  
+  // Randomly assign a team member if no actor is provided (to simulate multi-user)
+  const randomActor = MOCK_ACTORS[Math.floor(Math.random() * MOCK_ACTORS.length)]
+  const actor = actorOverride || randomActor
+
   activity.unshift({
     id: crypto.randomUUID(),
     type,
     message,
     timestamp: new Date().toISOString(),
+    actor,
   })
   write(KEYS.activity, activity.slice(0, 100))
 }

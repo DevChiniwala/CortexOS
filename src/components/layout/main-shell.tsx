@@ -1,10 +1,14 @@
+import * as React from "react";
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./sidebar";
-import { IconSearch } from "@tabler/icons-react";
+import { IconSearch, IconActivity } from "@tabler/icons-react";
 import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
 import { StreamPanelLayout } from "../stream/stream-panel-layout";
+import { GlobalActivity } from "./global-activity";
 
 export function MainShell() {
+  const [isActivityOpen, setIsActivityOpen] = React.useState(false)
+
   return (
     <div className="flex h-screen w-full overflow-hidden bg-bg text-ink selection:bg-primary/30">
       <OnboardingWizard />
@@ -17,10 +21,30 @@ export function MainShell() {
             <span>Press Cmd+K to search CortexOS</span>
           </div>
           <div className="flex items-center gap-4 text-sm">
+            {/* Online Team Avatars */}
+            <div className="flex items-center gap-2">
+              <div className="flex -space-x-1.5">
+                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-[9px] font-bold border-2 border-surface">D</div>
+                <div className="w-6 h-6 rounded-full bg-rose-500 flex items-center justify-center text-white text-[9px] font-bold border-2 border-surface">M</div>
+              </div>
+              <span className="text-[10px] text-ink-3 font-medium">2 online</span>
+            </div>
+
+            <div className="w-px h-5 bg-line" />
+
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-success animate-pulse"></span>
               <span className="text-ink-2 font-mono text-xs">SYS_ONLINE</span>
             </div>
+
+            <button 
+              onClick={() => setIsActivityOpen(true)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-surface-hover text-ink-2 hover:text-ink transition-colors"
+            >
+              <IconActivity className="w-4 h-4" />
+              <span className="font-medium text-xs">Activity</span>
+            </button>
+
             <button className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-primary/10 text-primary transition-colors">
               <span className="font-medium">+ New Task</span>
             </button>
@@ -38,6 +62,10 @@ export function MainShell() {
           </StreamPanelLayout>
         </div>
       </main>
+
+      {/* Global Activity Slide-out */}
+      <GlobalActivity isOpen={isActivityOpen} onClose={() => setIsActivityOpen(false)} />
     </div>
   );
 }
+
