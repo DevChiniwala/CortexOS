@@ -148,6 +148,24 @@ export interface CompanyScore {
   createdAt: number;
 }
 
+export interface ICPWeightAdjustment {
+  signifierId: string;
+  signifierName: string;
+  previousWeight: number;
+  newWeight: number;
+  reason: string;
+  confidenceDelta: number;
+}
+
+export interface LearningLoopLog {
+  id: string;
+  timestamp: string;
+  triggerEvent: "meeting_booked" | "deal_won" | "outreach_rejected" | "deal_lost";
+  companyName: string;
+  adjustments: ICPWeightAdjustment[];
+  impactDescription: string;
+}
+
 export interface CompanyWithScore extends Company {
   score: CompanyScore | null;
 }

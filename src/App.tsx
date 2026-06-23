@@ -18,6 +18,7 @@ import Signals from "./pages/signals"
 import Flow from "./pages/flow"
 import Settings from "./pages/settings"
 import Outreach from "./pages/outreach"
+import ICP from "./pages/icp"
 
 const queryClient = createQueryClient()
 
@@ -47,6 +48,7 @@ export default function App() {
           <Route path="contacts/:id" element={<ContactDetail />} />
           <Route path="signals" element={<Signals />} />
           <Route path="agents" element={<Agents />} />
+          <Route path="icp" element={<ICP />} />
           <Route path="memory" element={<MemoryGraph />} />
           <Route path="flow" element={<Flow />} />
           <Route path="outreach" element={<Outreach />} />

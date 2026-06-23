@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { StreamTerminal } from "@/components/stream/stream-terminal"
 import { useStream, useCompanies } from "@/lib/hooks"
-import { IconBrain, IconSearch, IconTrendingUp, IconMessage2, IconPlayerPlay, IconChevronRight, IconCircleCheck, IconClock, IconSend, IconRadar, IconHierarchy } from "@tabler/icons-react"
+import { IconBrain, IconSearch, IconTrendingUp, IconMessage2, IconPlayerPlay, IconChevronRight, IconCircleCheck, IconClock, IconSend, IconRadar, IconHierarchy, IconTarget } from "@tabler/icons-react"
 import { motion, AnimatePresence } from "motion/react"
 
 const AVAILABLE_AGENTS = [
@@ -73,6 +73,17 @@ const AVAILABLE_AGENTS = [
     bgColor: "bg-rose-500/10",
     borderColor: "border-rose-500/30",
     workers: 2,
+  },
+  {
+    id: "icp",
+    name: "ICP Optimizer",
+    description: "Autonomously tunes your scoring algorithm by feeding back closed-won/lost deal data.",
+    detail: "Statistical regression over 30-day cohorts to identify true conversion indicators.",
+    icon: <IconTarget className="w-5 h-5" />,
+    color: "text-emerald-500",
+    bgColor: "bg-emerald-500/10",
+    borderColor: "border-emerald-500/30",
+    workers: 1,
   }
 ]
 

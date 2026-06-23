@@ -139,6 +139,23 @@ function getPersonaMapperSteps(targetName: string): SimStep[] {
   ];
 }
 
+function getIcpOptimizerSteps(targetName: string): SimStep[] {
+  return [
+    { type: "system", delay: 300, content: `[CORTEX] Initializing icp_optimizer for global learning loop...` },
+    { type: "thinking", delay: 1000, content: `Pulling last 30 days of Outreach & CRM telemetry data. Looking for statistical correlations between signifier weights and Won/Lost outcomes.` },
+    { type: "tool_use", delay: 800, content: `Calling crm_api: Query Closed Won deals in Q2.`, toolName: "crm_api" },
+    { type: "tool_result", delay: 1500, content: `Fetched 42 Closed Won deals.` },
+    { type: "tool_use", delay: 1000, content: `Calling outreach_api: Query Rejected / No-show sequences.`, toolName: "outreach_api" },
+    { type: "tool_result", delay: 1200, content: `Fetched 84 negative outcomes.` },
+    { type: "thinking", delay: 1500, content: `Running multivariable regression on scoring criteria. Discovered anomaly: 'Pain Point Alignment' weight is 1.0, but negatively correlates (-0.24) with short-term wins for Engineering personas.` },
+    { type: "info", delay: 800, content: `[Optimization Engine] Adjusting weight for 'Pain Point Alignment' down to 0.8.` },
+    { type: "thinking", delay: 1500, content: `Discovered positive correlation (+0.42): 'Growth Signals' (Specifically new C-Suite) heavily precedes conversion.` },
+    { type: "info", delay: 800, content: `[Optimization Engine] Adjusting weight for 'Growth Signals' up to 1.8.` },
+    { type: "assistant", delay: 1000, content: `ICP weights optimized. Confidence increased to 84.2%. Rerunning global lead scoring against pipeline.` },
+    { type: "system", delay: 500, content: `[CORTEX] icp_optimizer completed. Sleeping.` },
+  ];
+}
+
 function getSimulationSteps(jobType: string, targetName: string): SimStep[] {
   switch (jobType) {
     case "scoring": return getScoringSteps(targetName);
@@ -146,6 +163,7 @@ function getSimulationSteps(jobType: string, targetName: string): SimStep[] {
     case "outreach": return getOutreachSteps(targetName);
     case "signals": return getSignalMonitorSteps(targetName);
     case "persona": return getPersonaMapperSteps(targetName);
+    case "icp": return getIcpOptimizerSteps(targetName);
     default: return getResearchSteps(targetName);
   }
 }
