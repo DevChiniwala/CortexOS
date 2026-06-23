@@ -358,6 +358,7 @@ export interface OutreachSequence {
 export interface OutreachStep {
   id: string;
   stepNumber: number;
+  channel: "email" | "linkedin" | "whatsapp" | "sms";
   subject: string;
   body: string;
   status: "draft" | "sent" | "opened" | "replied" | "bounced" | "skipped";

@@ -1,6 +1,6 @@
 import * as React from "react"
 import type { OutreachStep } from "@/lib/types"
-import { IconMail, IconMailOpened, IconMessageReply, IconAlertCircle, IconClock, IconCheck } from "@tabler/icons-react"
+import { IconMail, IconMailOpened, IconMessageReply, IconAlertCircle, IconClock, IconCheck, IconBrandLinkedin, IconBrandWhatsapp, IconMessage } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 
 interface SequenceTimelineProps {
@@ -9,9 +9,13 @@ interface SequenceTimelineProps {
 }
 
 export function SequenceTimeline({ steps, className }: SequenceTimelineProps) {
-  const getStepIcon = (status: OutreachStep["status"]) => {
+  const getStepIcon = (status: OutreachStep["status"], channel: OutreachStep["channel"]) => {
     switch (status) {
-      case "sent": return <IconMail className="w-4 h-4" />
+      case "sent": 
+        if (channel === "linkedin") return <IconBrandLinkedin className="w-4 h-4" />
+        if (channel === "whatsapp") return <IconBrandWhatsapp className="w-4 h-4" />
+        if (channel === "sms") return <IconMessage className="w-4 h-4" />
+        return <IconMail className="w-4 h-4" />
       case "opened": return <IconMailOpened className="w-4 h-4" />
       case "replied": return <IconMessageReply className="w-4 h-4" />
       case "bounced": return <IconAlertCircle className="w-4 h-4" />
@@ -53,7 +57,7 @@ export function SequenceTimeline({ steps, className }: SequenceTimelineProps) {
           {/* Timeline connector */}
           <div className="flex flex-col items-center shrink-0">
             <div className={cn("w-8 h-8 rounded-full border-2 flex items-center justify-center", getStepColor(step.status))}>
-              {getStepIcon(step.status)}
+              {getStepIcon(step.status, step.channel)}
             </div>
             {i < steps.length - 1 && (
               <div className={cn("w-0.5 flex-1 min-h-8", getLineColor(step.status))} />
@@ -71,7 +75,13 @@ export function SequenceTimeline({ steps, className }: SequenceTimelineProps) {
                 {step.status}
               </span>
             </div>
-            <h4 className="text-sm font-medium text-ink mb-1 truncate">{step.subject}</h4>
+            <h4 className="text-sm font-medium text-ink mb-1 truncate flex items-center gap-2">
+              {step.channel === "linkedin" && <IconBrandLinkedin className="w-3.5 h-3.5 text-blue-500" />}
+              {step.channel === "whatsapp" && <IconBrandWhatsapp className="w-3.5 h-3.5 text-emerald-500" />}
+              {step.channel === "sms" && <IconMessage className="w-3.5 h-3.5 text-purple-500" />}
+              {step.channel === "email" && <IconMail className="w-3.5 h-3.5 text-ink-3" />}
+              {step.subject || "No Subject"}
+            </h4>
             <p className="text-xs text-ink-3 line-clamp-2 leading-relaxed">{step.body.substring(0, 150)}...</p>
             
             {/* Timestamps */}
