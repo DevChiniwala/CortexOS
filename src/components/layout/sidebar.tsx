@@ -1,6 +1,6 @@
 import * as React from "react"
 import { NavLink } from "react-router-dom"
-import { IconBuilding, IconUsers, IconBrain, IconSettings, IconWaveSine, IconTerminal2, IconNetwork, IconHierarchy, IconSend, IconTarget, IconCircleCheck, IconPlus, IconPlugConnected } from "@tabler/icons-react"
+import { IconBuilding, IconUsers, IconBrain, IconSettings, IconWaveSine, IconTerminal2, IconNetwork, IconHierarchy, IconSend, IconTarget, IconCircleCheck, IconPlus, IconPlugConnected, IconMessage, IconCurrencyDollar, IconTool } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 
 const MAIN_NAV = [
@@ -9,6 +9,8 @@ const MAIN_NAV = [
   { icon: IconUsers, label: "Contacts", path: "/contacts" },
   { icon: IconWaveSine, label: "Signals", path: "/signals" },
   { icon: IconSend, label: "Outreach", path: "/outreach" },
+  { icon: IconMessage, label: "Channels", path: "/channels" },
+  { icon: IconCurrencyDollar, label: "Revenue", path: "/revenue" },
 ]
 
 const SYSTEM_NAV = [
@@ -17,6 +19,7 @@ const SYSTEM_NAV = [
   { icon: IconPlugConnected, label: "Integrations", path: "/integrations" },
   { icon: IconNetwork, label: "Memory Graph", path: "/memory" },
   { icon: IconHierarchy, label: "Flow Builder", path: "/flow" },
+  { icon: IconTool, label: "Agent Builder", path: "/agent-builder" },
   { icon: IconSettings, label: "Settings", path: "/settings" },
 ]
 

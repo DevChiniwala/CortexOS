@@ -20,6 +20,9 @@ import Settings from "./pages/settings"
 import Outreach from "./pages/outreach"
 import ICP from "./pages/icp"
 import Integrations from "./pages/integrations"
+import Channels from "./pages/channels"
+import Revenue from "./pages/revenue"
+import AgentBuilder from "./pages/agent-builder"
 
 const queryClient = createQueryClient()
 
@@ -53,6 +56,9 @@ export default function App() {
           <Route path="memory" element={<MemoryGraph />} />
           <Route path="flow" element={<Flow />} />
           <Route path="outreach" element={<Outreach />} />
+          <Route path="channels" element={<Channels />} />
+          <Route path="revenue" element={<Revenue />} />
+          <Route path="agent-builder" element={<AgentBuilder />} />
           <Route path="integrations" element={<Integrations />} />
           <Route path="settings" element={<Settings />} />
         </Route>
