@@ -156,6 +156,22 @@ function getIcpOptimizerSteps(targetName: string): SimStep[] {
   ];
 }
 
+function getCrmSyncSteps(targetName: string): SimStep[] {
+  return [
+    { type: "system", delay: 300, content: `[CORTEX] Initializing crm_sync for ${targetName}...` },
+    { type: "thinking", delay: 1000, content: `Connecting to HubSpot API. Authenticating with OAuth2 token.` },
+    { type: "tool_use", delay: 800, content: `Calling hubspot_api: Push scored companies with tier >= warm.`, toolName: "hubspot_api" },
+    { type: "tool_result", delay: 1500, content: `Pushed 24 company records. Created 3 new accounts, updated 21 existing.` },
+    { type: "tool_use", delay: 1000, content: `Calling hubspot_api: Push contacts with buying roles and persona tags.`, toolName: "hubspot_api" },
+    { type: "tool_result", delay: 1200, content: `Synced 18 contacts. Mapped buying_role to custom CRM property.` },
+    { type: "tool_use", delay: 800, content: `Calling hubspot_api: Pull deal stage updates from CRM pipeline.`, toolName: "hubspot_api" },
+    { type: "tool_result", delay: 1500, content: `Pulled 8 deal stage changes. 2 moved to Closed Won, 1 to Closed Lost.` },
+    { type: "thinking", delay: 1000, content: `Forwarding deal outcomes to ICP Optimizer for weight adjustment. Closed Won companies will reinforce current scoring weights.` },
+    { type: "assistant", delay: 1000, content: `CRM sync complete. 24 companies pushed, 18 contacts synced, 8 deal updates pulled. Next sync in 15 minutes.` },
+    { type: "system", delay: 500, content: `[CORTEX] crm_sync sleeping for 15m.` },
+  ];
+}
+
 function getSimulationSteps(jobType: string, targetName: string): SimStep[] {
   switch (jobType) {
     case "scoring": return getScoringSteps(targetName);
@@ -164,6 +180,7 @@ function getSimulationSteps(jobType: string, targetName: string): SimStep[] {
     case "signals": return getSignalMonitorSteps(targetName);
     case "persona": return getPersonaMapperSteps(targetName);
     case "icp": return getIcpOptimizerSteps(targetName);
+    case "crm": return getCrmSyncSteps(targetName);
     default: return getResearchSteps(targetName);
   }
 }

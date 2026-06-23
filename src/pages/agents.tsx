@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { StreamTerminal } from "@/components/stream/stream-terminal"
 import { useStream, useCompanies } from "@/lib/hooks"
-import { IconBrain, IconSearch, IconTrendingUp, IconMessage2, IconPlayerPlay, IconChevronRight, IconCircleCheck, IconClock, IconSend, IconRadar, IconHierarchy, IconTarget } from "@tabler/icons-react"
+import { IconBrain, IconSearch, IconTrendingUp, IconMessage2, IconPlayerPlay, IconChevronRight, IconCircleCheck, IconClock, IconSend, IconRadar, IconHierarchy, IconTarget, IconPlugConnected } from "@tabler/icons-react"
 import { motion, AnimatePresence } from "motion/react"
 
 const AVAILABLE_AGENTS = [
@@ -83,6 +83,17 @@ const AVAILABLE_AGENTS = [
     color: "text-emerald-500",
     bgColor: "bg-emerald-500/10",
     borderColor: "border-emerald-500/30",
+    workers: 1,
+  },
+  {
+    id: "crm",
+    name: "CRM Sync",
+    description: "Bi-directional sync pushing scored leads to your CRM and pulling deal stage updates back.",
+    detail: "HubSpot, Salesforce, and Pipedrive connectors with field-level mapping.",
+    icon: <IconPlugConnected className="w-5 h-5" />,
+    color: "text-info",
+    bgColor: "bg-info/10",
+    borderColor: "border-info/30",
     workers: 1,
   }
 ]
