@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" width="900" height="620">
+  <defs>
+    <linearGradient id="archGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#FF5500;stop-opacity:0.8"/><stop offset="100%" style="stop-color:#FF8C00;stop-opacity:0.8"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/></filter>
+  </defs>
+  <rect width="900" height="620" rx="16" fill="#0A0A0F"/>
+  <g opacity="0.04">
+    <line x1="0" y1="100" x2="900" y2="100" stroke="#fff" stroke-width="0.5"/><line x1="0" y1="200" x2="900" y2="200" stroke="#fff" stroke-width="0.5"/><line x1="0" y1="300" x2="900" y2="300" stroke="#fff" stroke-width="0.5"/><line x1="0" y1="400" x2="900" y2="400" stroke="#fff" stroke-width="0.5"/><line x1="0" y1="500" x2="900" y2="500" stroke="#fff" stroke-width="0.5"/>
+    <line x1="150" y1="0" x2="150" y2="620" stroke="#fff" stroke-width="0.5"/><line x1="300" y1="0" x2="300" y2="620" stroke="#fff" stroke-width="0.5"/><line x1="450" y1="0" x2="450" y2="620" stroke="#fff" stroke-width="0.5"/><line x1="600" y1="0" x2="600" y2="620" stroke="#fff" stroke-width="0.5"/><line x1="750" y1="0" x2="750" y2="620" stroke="#fff" stroke-width="0.5"/>
+  </g>
+  <text x="450" y="38" text-anchor="middle" font-family="monospace" font-size="11" fill="#666" letter-spacing="3">SYSTEM ARCHITECTURE</text>
+
+  <!-- LAYER 1: FRONTEND -->
+  <text x="60" y="80" font-family="monospace" font-size="9" fill="#FF5500" letter-spacing="2" opacity="0.6">PRESENTATION LAYER</text>
+  <rect x="40" y="90" width="820" height="100" rx="12" fill="#1A1A2E" stroke="#FF5500" stroke-width="0.8" filter="url(#shadow)"/>
+  <text x="65" y="115" font-family="system-ui" font-size="13" fill="#FF5500" font-weight="700">⚛ React 19 + Tailwind 4</text>
+  <g font-family="monospace" font-size="9">
+    <rect x="60" y="130" width="85" height="42" rx="6" fill="#FF5500" fill-opacity="0.1" stroke="#FF5500" stroke-width="0.5"/><text x="102" y="148" text-anchor="middle" fill="#FF8C00">Dashboard</text><text x="102" y="162" text-anchor="middle" fill="#666" font-size="7">KPIs + Funnel</text>
+    <rect x="155" y="130" width="85" height="42" rx="6" fill="#FF5500" fill-opacity="0.1" stroke="#FF5500" stroke-width="0.5"/><text x="197" y="148" text-anchor="middle" fill="#FF8C00">Companies</text><text x="197" y="162" text-anchor="middle" fill="#666" font-size="7">Pipeline View</text>
+    <rect x="250" y="130" width="85" height="42" rx="6" fill="#FF5500" fill-opacity="0.1" stroke="#FF5500" stroke-width="0.5"/><text x="292" y="148" text-anchor="middle" fill="#FF8C00">Contacts</text><text x="292" y="162" text-anchor="middle" fill="#666" font-size="7">Buying Comms</text>
+    <rect x="345" y="130" width="85" height="42" rx="6" fill="#FF5500" fill-opacity="0.1" stroke="#FF5500" stroke-width="0.5"/><text x="387" y="148" text-anchor="middle" fill="#FF8C00">Signals</text><text x="387" y="162" text-anchor="middle" fill="#666" font-size="7">Intent Mesh</text>
+    <rect x="440" y="130" width="85" height="42" rx="6" fill="#FF5500" fill-opacity="0.1" stroke="#FF5500" stroke-width="0.5"/><text x="482" y="148" text-anchor="middle" fill="#FF8C00">Outreach</text><text x="482" y="162" text-anchor="middle" fill="#666" font-size="7">Sequences</text>
+    <rect x="535" y="130" width="70" height="42" rx="6" fill="#FF5500" fill-opacity="0.1" stroke="#FF5500" stroke-width="0.5"/><text x="570" y="148" text-anchor="middle" fill="#FF8C00">ICP</text><text x="570" y="162" text-anchor="middle" fill="#666" font-size="7">Self-Learn</text>
+    <rect x="615" y="130" width="70" height="42" rx="6" fill="#FF5500" fill-opacity="0.1" stroke="#FF5500" stroke-width="0.5"/><text x="650" y="148" text-anchor="middle" fill="#FF8C00">Flow</text><text x="650" y="162" text-anchor="middle" fill="#666" font-size="7">Builder</text>
+    <rect x="695" y="130" width="70" height="42" rx="6" fill="#FF5500" fill-opacity="0.1" stroke="#FF5500" stroke-width="0.5"/><text x="730" y="148" text-anchor="middle" fill="#FF8C00">Integ</text><text x="730" y="162" text-anchor="middle" fill="#666" font-size="7">CRM Sync</text>
+    <rect x="775" y="130" width="70" height="42" rx="6" fill="#FF5500" fill-opacity="0.1" stroke="#FF5500" stroke-width="0.5"/><text x="810" y="148" text-anchor="middle" fill="#FF8C00">Memory</text><text x="810" y="162" text-anchor="middle" fill="#666" font-size="7">Graph</text>
+  </g>
+
+  <!-- IPC Arrow -->
+  <line x1="450" y1="190" x2="450" y2="240" stroke="#FF5500" stroke-width="1.5" stroke-dasharray="4 3"><animate attributeName="stroke-dashoffset" values="0;14" dur="1s" repeatCount="indefinite"/></line>
+  <text x="480" y="220" font-family="monospace" font-size="8" fill="#FF5500" opacity="0.7">Tauri IPC</text>
+
+  <!-- LAYER 2: STATE -->
+  <text x="60" y="252" font-family="monospace" font-size="9" fill="#00AEEF" letter-spacing="2" opacity="0.6">STATE MANAGEMENT + IPC BRIDGE</text>
+  <rect x="40" y="260" width="820" height="70" rx="12" fill="#1A1A2E" stroke="#00AEEF" stroke-width="0.8" filter="url(#shadow)"/>
+  <g font-family="monospace" font-size="9">
+    <rect x="60" y="275" width="120" height="38" rx="6" fill="#00AEEF" fill-opacity="0.08" stroke="#00AEEF" stroke-width="0.5"/><text x="120" y="292" text-anchor="middle" fill="#00AEEF" font-size="10">Zustand Stores</text><text x="120" y="305" text-anchor="middle" fill="#555" font-size="7">Settings · Selection · Flow</text>
+    <rect x="200" y="275" width="140" height="38" rx="6" fill="#00AEEF" fill-opacity="0.08" stroke="#00AEEF" stroke-width="0.5"/><text x="270" y="292" text-anchor="middle" fill="#00AEEF" font-size="10">TanStack Query v5</text><text x="270" y="305" text-anchor="middle" fill="#555" font-size="7">Cache · Sync · Optimistic</text>
+    <rect x="360" y="275" width="130" height="38" rx="6" fill="#00AEEF" fill-opacity="0.08" stroke="#00AEEF" stroke-width="0.5"/><text x="425" y="292" text-anchor="middle" fill="#00AEEF" font-size="10">Event Bridge</text><text x="425" y="305" text-anchor="middle" fill="#555" font-size="7">Tauri Events → React</text>
+    <rect x="510" y="275" width="130" height="38" rx="6" fill="#00AEEF" fill-opacity="0.08" stroke="#00AEEF" stroke-width="0.5"/><text x="575" y="292" text-anchor="middle" fill="#00AEEF" font-size="10">IPC Commands</text><text x="575" y="305" text-anchor="middle" fill="#555" font-size="7">invoke() Wrappers</text>
+    <rect x="660" y="275" width="180" height="38" rx="6" fill="#00AEEF" fill-opacity="0.08" stroke="#00AEEF" stroke-width="0.5"/><text x="750" y="292" text-anchor="middle" fill="#00AEEF" font-size="10">LocalStorage Fallback</text><text x="750" y="305" text-anchor="middle" fill="#555" font-size="7">Browser-mode persistence</text>
+  </g>
+
+  <!-- Arrow -->
+  <line x1="450" y1="330" x2="450" y2="370" stroke="#A855F7" stroke-width="1.5" stroke-dasharray="4 3"><animate attributeName="stroke-dashoffset" values="0;14" dur="1.2s" repeatCount="indefinite"/></line>
+  <text x="480" y="355" font-family="monospace" font-size="8" fill="#A855F7" opacity="0.7">Commands</text>
+
+  <!-- LAYER 3: AGENTS -->
+  <text x="60" y="382" font-family="monospace" font-size="9" fill="#A855F7" letter-spacing="2" opacity="0.6">AGENT ORCHESTRATION LAYER</text>
+  <rect x="40" y="390" width="820" height="90" rx="12" fill="#1A1A2E" stroke="#A855F7" stroke-width="0.8" filter="url(#shadow)"/>
+  <text x="65" y="415" font-family="system-ui" font-size="13" fill="#A855F7" font-weight="700">🤖 Autonomous Agent Swarm (8 Agents)</text>
+  <g font-family="monospace" font-size="8">
+    <rect x="60" y="425" width="88" height="38" rx="6" fill="#A855F7" fill-opacity="0.1" stroke="#A855F7" stroke-width="0.5"/><text x="104" y="440" text-anchor="middle" fill="#C084FC">Research</text><circle cx="68" cy="455" r="3" fill="#00D084"><animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/></circle><text x="82" y="458" fill="#555" font-size="7">4 workers</text>
+    <rect x="158" y="425" width="88" height="38" rx="6" fill="#A855F7" fill-opacity="0.1" stroke="#A855F7" stroke-width="0.5"/><text x="202" y="440" text-anchor="middle" fill="#C084FC">Scoring</text><circle cx="166" cy="455" r="3" fill="#00D084"><animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/></circle><text x="180" y="458" fill="#555" font-size="7">2 workers</text>
+    <rect x="256" y="425" width="88" height="38" rx="6" fill="#A855F7" fill-opacity="0.1" stroke="#A855F7" stroke-width="0.5"/><text x="300" y="440" text-anchor="middle" fill="#C084FC">Conversation</text><circle cx="264" cy="455" r="3" fill="#00D084"><animate attributeName="opacity" values="0.4;1;0.4" dur="1.8s" repeatCount="indefinite"/></circle><text x="278" y="458" fill="#555" font-size="7">2 workers</text>
+    <rect x="354" y="425" width="88" height="38" rx="6" fill="#A855F7" fill-opacity="0.1" stroke="#A855F7" stroke-width="0.5"/><text x="398" y="440" text-anchor="middle" fill="#C084FC">Outreach</text><circle cx="362" cy="455" r="3" fill="#00D084"><animate attributeName="opacity" values="0.6;1;0.6" dur="1.3s" repeatCount="indefinite"/></circle><text x="376" y="458" fill="#555" font-size="7">3 workers</text>
+    <rect x="452" y="425" width="88" height="38" rx="6" fill="#A855F7" fill-opacity="0.1" stroke="#A855F7" stroke-width="0.5"/><text x="496" y="440" text-anchor="middle" fill="#C084FC">Intent Radar</text><circle cx="460" cy="455" r="3" fill="#00D084"><animate attributeName="opacity" values="0.3;1;0.3" dur="2.2s" repeatCount="indefinite"/></circle><text x="474" y="458" fill="#555" font-size="7">4 workers</text>
+    <rect x="550" y="425" width="88" height="38" rx="6" fill="#A855F7" fill-opacity="0.1" stroke="#A855F7" stroke-width="0.5"/><text x="594" y="440" text-anchor="middle" fill="#C084FC">Persona Map</text><circle cx="558" cy="455" r="3" fill="#00D084"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.6s" repeatCount="indefinite"/></circle><text x="572" y="458" fill="#555" font-size="7">2 workers</text>
+    <rect x="648" y="425" width="88" height="38" rx="6" fill="#A855F7" fill-opacity="0.1" stroke="#A855F7" stroke-width="0.5"/><text x="692" y="440" text-anchor="middle" fill="#C084FC">ICP Optimizer</text><circle cx="656" cy="455" r="3" fill="#FFB020"><animate attributeName="opacity" values="0.4;1;0.4" dur="1.4s" repeatCount="indefinite"/></circle><text x="670" y="458" fill="#555" font-size="7">1 worker</text>
+    <rect x="746" y="425" width="88" height="38" rx="6" fill="#A855F7" fill-opacity="0.1" stroke="#A855F7" stroke-width="0.5"/><text x="790" y="440" text-anchor="middle" fill="#C084FC">CRM Sync</text><circle cx="754" cy="455" r="3" fill="#00D084"><animate attributeName="opacity" values="0.6;1;0.6" dur="1.9s" repeatCount="indefinite"/></circle><text x="768" y="458" fill="#555" font-size="7">1 worker</text>
+  </g>
+
+  <!-- Arrow -->
+  <line x1="450" y1="480" x2="450" y2="510" stroke="#00D084" stroke-width="1.5" stroke-dasharray="4 3"><animate attributeName="stroke-dashoffset" values="0;14" dur="1.4s" repeatCount="indefinite"/></line>
+
+  <!-- LAYER 4: DATA -->
+  <text x="60" y="525" font-family="monospace" font-size="9" fill="#00D084" letter-spacing="2" opacity="0.6">DATA + PERSISTENCE LAYER</text>
+  <rect x="40" y="535" width="820" height="60" rx="12" fill="#1A1A2E" stroke="#00D084" stroke-width="0.8" filter="url(#shadow)"/>
+  <g font-family="monospace" font-size="9">
+    <rect x="60" y="548" width="160" height="34" rx="6" fill="#00D084" fill-opacity="0.08" stroke="#00D084" stroke-width="0.5"/><text x="140" y="565" text-anchor="middle" fill="#00D084" font-size="10">SQLite (Tauri)</text><text x="140" y="576" text-anchor="middle" fill="#555" font-size="7">Companies · Contacts · Jobs</text>
+    <rect x="240" y="548" width="160" height="34" rx="6" fill="#00D084" fill-opacity="0.08" stroke="#00D084" stroke-width="0.5"/><text x="320" y="565" text-anchor="middle" fill="#00D084" font-size="10">LocalStorage</text><text x="320" y="576" text-anchor="middle" fill="#555" font-size="7">Browser-mode fallback</text>
+    <rect x="420" y="548" width="160" height="34" rx="6" fill="#00D084" fill-opacity="0.08" stroke="#00D084" stroke-width="0.5"/><text x="500" y="565" text-anchor="middle" fill="#00D084" font-size="10">Memory Graph</text><text x="500" y="576" text-anchor="middle" fill="#555" font-size="7">Knowledge graph store</text>
+    <rect x="600" y="548" width="240" height="34" rx="6" fill="#00D084" fill-opacity="0.08" stroke="#00D084" stroke-width="0.5"/><text x="720" y="565" text-anchor="middle" fill="#00D084" font-size="10">External APIs</text><text x="720" y="576" text-anchor="middle" fill="#555" font-size="7">HubSpot · LinkedIn · Bombora · Apollo</text>
+  </g>
+</svg>

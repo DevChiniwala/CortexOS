@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF5500;stop-opacity:1">
+        <animate attributeName="stop-color" values="#FF5500;#FF8C00;#FF5500" dur="3s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1">
+        <animate attributeName="stop-color" values="#FF8C00;#FF5500;#FF8C00" dur="3s" repeatCount="indefinite"/>
+      </stop>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="800" height="200" rx="16" fill="#0A0A0F"/>
+  <g opacity="0.08">
+    <line x1="0" y1="50" x2="800" y2="50" stroke="#FF5500" stroke-width="0.5"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="4s" repeatCount="indefinite"/></line>
+    <line x1="0" y1="100" x2="800" y2="100" stroke="#FF5500" stroke-width="0.5"><animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite"/></line>
+    <line x1="0" y1="150" x2="800" y2="150" stroke="#FF5500" stroke-width="0.5"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="5s" repeatCount="indefinite"/></line>
+    <line x1="200" y1="0" x2="200" y2="200" stroke="#FF5500" stroke-width="0.5"><animate attributeName="opacity" values="0.2;0.6;0.2" dur="4s" repeatCount="indefinite"/></line>
+    <line x1="400" y1="0" x2="400" y2="200" stroke="#FF5500" stroke-width="0.5"><animate attributeName="opacity" values="0.4;0.9;0.4" dur="3s" repeatCount="indefinite"/></line>
+    <line x1="600" y1="0" x2="600" y2="200" stroke="#FF5500" stroke-width="0.5"><animate attributeName="opacity" values="0.2;0.6;0.2" dur="5s" repeatCount="indefinite"/></line>
+  </g>
+  <circle cx="100" cy="50" r="2" fill="#FF5500" opacity="0.6">
+    <animate attributeName="cx" values="100;700;100" dur="8s" repeatCount="indefinite"/>
+    <animate attributeName="cy" values="50;150;50" dur="6s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="300" cy="150" r="1.5" fill="#00AEEF" opacity="0.4">
+    <animate attributeName="cx" values="300;600;300" dur="10s" repeatCount="indefinite"/>
+    <animate attributeName="cy" values="150;30;150" dur="7s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="600" cy="80" r="1" fill="#00D084" opacity="0.5">
+    <animate attributeName="cx" values="600;200;600" dur="9s" repeatCount="indefinite"/>
+    <animate attributeName="cy" values="80;170;80" dur="5s" repeatCount="indefinite"/>
+  </circle>
+  <g filter="url(#softGlow)">
+    <circle cx="120" cy="100" r="4" fill="#FF5500" opacity="0.8"><animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite"/></circle>
+    <circle cx="680" cy="100" r="4" fill="#FF5500" opacity="0.8"><animate attributeName="r" values="4;6;4" dur="2.5s" repeatCount="indefinite"/></circle>
+    <line x1="124" y1="100" x2="676" y2="100" stroke="url(#grad1)" stroke-width="1" opacity="0.3" stroke-dasharray="8 4"><animate attributeName="stroke-dashoffset" values="0;24" dur="2s" repeatCount="indefinite"/></line>
+  </g>
+  <text x="400" y="85" text-anchor="middle" font-family="'SF Pro Display','Inter',system-ui,sans-serif" font-size="48" font-weight="800" fill="url(#grad1)" filter="url(#glow)" letter-spacing="-2">CortexOS</text>
+  <text x="400" y="120" text-anchor="middle" font-family="'SF Mono','JetBrains Mono',monospace" font-size="14" fill="#888" letter-spacing="4">AUTONOMOUS GTM ORCHESTRATION ENGINE</text>
+  <rect x="280" y="145" width="240" height="24" rx="12" fill="#1A1A2E" stroke="#FF5500" stroke-width="0.5" opacity="0.8"/>
+  <circle cx="298" cy="157" r="4" fill="#00D084"><animate attributeName="opacity" values="0.4;1;0.4" dur="1.5s" repeatCount="indefinite"/></circle>
+  <text x="312" y="162" font-family="'SF Mono',monospace" font-size="11" fill="#00D084" letter-spacing="1">8 AGENTS ONLINE · v0.2.1</text>
+</svg>
