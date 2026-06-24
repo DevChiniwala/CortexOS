@@ -23,6 +23,7 @@ import Integrations from "./pages/integrations"
 import Channels from "./pages/channels"
 import Revenue from "./pages/revenue"
 import AgentBuilder from "./pages/agent-builder"
+import Marketplace from "./pages/marketplace"
 
 const queryClient = createQueryClient()
 
@@ -59,6 +60,7 @@ export default function App() {
           <Route path="channels" element={<Channels />} />
           <Route path="revenue" element={<Revenue />} />
           <Route path="agent-builder" element={<AgentBuilder />} />
+          <Route path="marketplace" element={<Marketplace />} />
           <Route path="integrations" element={<Integrations />} />
           <Route path="settings" element={<Settings />} />
         </Route>

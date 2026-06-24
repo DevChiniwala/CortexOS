@@ -1,6 +1,6 @@
 import * as React from "react"
 import { NavLink } from "react-router-dom"
-import { IconBuilding, IconUsers, IconBrain, IconSettings, IconWaveSine, IconTerminal2, IconNetwork, IconHierarchy, IconSend, IconTarget, IconCircleCheck, IconPlus, IconPlugConnected, IconMessage, IconCurrencyDollar, IconTool } from "@tabler/icons-react"
+import { IconBuilding, IconUsers, IconBrain, IconSettings, IconWaveSine, IconTerminal2, IconNetwork, IconHierarchy, IconSend, IconTarget, IconCircleCheck, IconPlus, IconPlugConnected, IconMessage, IconCurrencyDollar, IconTool, IconShoppingCart } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 
 const MAIN_NAV = [
@@ -20,6 +20,7 @@ const SYSTEM_NAV = [
   { icon: IconNetwork, label: "Memory Graph", path: "/memory" },
   { icon: IconHierarchy, label: "Flow Builder", path: "/flow" },
   { icon: IconTool, label: "Agent Builder", path: "/agent-builder" },
+  { icon: IconShoppingCart, label: "Marketplace", path: "/marketplace" },
   { icon: IconSettings, label: "Settings", path: "/settings" },
 ]
 

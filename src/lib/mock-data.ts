@@ -415,6 +415,7 @@ export const MOCK_COMPANIES: CompanyWithScore[] = [
       scoringNotes: "Borderline competitor, but high growth. Score pulled down by pain point alignment (they build this internally).",
       scoredAt: Date.now() - 86400000 * 5,
       createdAt: Date.now() - 86400000 * 5,
+    }
   }
 ];
 
