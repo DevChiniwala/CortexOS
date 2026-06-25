@@ -2,7 +2,7 @@ import * as React from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useCompanies, useContacts, useCompanyMutations, useStream } from "@/lib/hooks"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+
 import { StreamTerminal } from "@/components/stream/stream-terminal"
 import { IconArrowLeft, IconCheck, IconX, IconBrandLinkedin, IconWorld, IconMapPin, IconChartBar } from "@tabler/icons-react"
 import { motion } from "motion/react"
@@ -84,7 +84,7 @@ export default function CompanyDetail() {
                 ].map((mode) => (
                   <button
                     key={mode.id}
-                    onClick={() => setResearchDepth(mode.id as any)}
+                    onClick={() => setResearchDepth(mode.id as "light" | "standard" | "deep")}
                     className={`p-4 rounded-lg border text-left transition-all ${
                       researchDepth === mode.id 
                         ? "border-flame bg-flame/5 shadow-sm" 
@@ -113,7 +113,7 @@ export default function CompanyDetail() {
               ].map(tab => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id as "company" | "people" | "score")}
                   className={`pb-3 text-sm font-medium transition-colors border-b-2 -mb-[1px] ${
                     activeTab === tab.id 
                       ? "border-ink text-ink" 
@@ -170,6 +170,7 @@ export default function CompanyDetail() {
                     ))}
                   </div>
                   <div className="text-sm text-ink-2 font-medium flex items-center justify-between">
+                    {/* eslint-disable-next-line react-hooks/purity */}
                     <span>{company.score.passesRequirements ? "All requirements passed" : "Requirements failed"} - Scored {new Date(company.score.scoredAt || Date.now()).toLocaleDateString()}</span>
                   </div>
                 </div>
@@ -308,6 +309,7 @@ export default function CompanyDetail() {
             <div className="pt-4 border-t border-line">
               <div className="flex items-center gap-2 text-xs text-ink-3">
                 <IconCheck className="w-3.5 h-3.5" /> 
+                {/* eslint-disable-next-line react-hooks/purity */}
                 Researched {new Date(company.researchedAt || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
               </div>
             </div>

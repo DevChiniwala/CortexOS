@@ -1,6 +1,6 @@
 import * as React from "react"
 import { motion } from "motion/react"
-import { IconMail, IconBrandLinkedin, IconBrandWhatsapp, IconMessage, IconCheck, IconX, IconSettings, IconChartBar } from "@tabler/icons-react"
+import { IconMail, IconBrandLinkedin, IconBrandWhatsapp, IconMessage,  IconX, IconSettings, IconChartBar } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"

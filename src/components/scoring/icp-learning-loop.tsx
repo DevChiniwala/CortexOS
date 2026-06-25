@@ -1,5 +1,5 @@
 import * as React from "react"
-import { IconBrain, IconTrendingUp, IconTrendingDown, IconTarget, IconCheck, IconX, IconArrowRight, IconCalendarEvent, IconDatabase } from "@tabler/icons-react"
+import { IconBrain, IconTrendingUp, IconTrendingDown, IconTarget,  IconX, IconArrowRight, IconCalendarEvent } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 import { motion } from "motion/react"
 import type { LearningLoopLog } from "@/lib/types"

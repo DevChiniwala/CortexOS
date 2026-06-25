@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Command } from "cmdk"
 import { useNavigate } from "react-router-dom"
-import { IconSearch, IconBuilding, IconUser, IconRadar, IconSettings, IconLayoutDashboard, IconNetwork, IconGitBranch, IconPlus, IconDownload, IconUsers, IconBrain, IconWaveSine, IconTerminal2 } from "@tabler/icons-react"
+import { IconSearch, IconBuilding, IconUser, IconRadar,     IconPlus,  IconUsers, IconBrain, IconWaveSine, IconTerminal2 } from "@tabler/icons-react"
 import { AddCompanyModal } from "./modals/add-company-modal"
 import { AddContactModal } from "./modals/add-contact-modal"
 

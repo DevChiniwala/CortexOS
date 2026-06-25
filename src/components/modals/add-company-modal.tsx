@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Dialog, DialogHeader, DialogTitle, DialogBody, DialogFooter } from "../ui/dialog"
-import { Input, Textarea } from "../ui/input"
+import { Input } from "../ui/input"
 import { Button } from "../ui/button"
 import { useCompanyMutations } from "@/lib/hooks"
 import type { NewCompany } from "@/lib/types"

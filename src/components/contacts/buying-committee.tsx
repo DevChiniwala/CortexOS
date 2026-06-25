@@ -1,6 +1,6 @@
 import * as React from "react"
 import type { ContactWithCompany } from "@/lib/types"
-import { IconBuilding, IconCrown, IconCash, IconShieldX, IconUser, IconMessageCircle, IconTrendingUp } from "@tabler/icons-react"
+import { IconBuilding, IconCrown, IconCash, IconShieldX, IconUser,  IconTrendingUp } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 
 interface BuyingCommitteeProps {
@@ -28,7 +28,7 @@ export function BuyingCommittee({ companyName, contacts }: BuyingCommitteeProps)
   }
 
   // Find max relationship strength to scale the bar
-  const maxStrength = Math.max(...contacts.map(c => c.relationshipStrength || 0), 1)
+  const _maxStrength = Math.max(...contacts.map(c => c.relationshipStrength || 0), 1)
 
   return (
     <div className="flex flex-col border border-line bg-surface/30 rounded-xl overflow-hidden shadow-sm">

@@ -8,7 +8,8 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, label, error, id, type, ...props }, ref) => {
-    const inputId = id ?? React.useId()
+    const generatedId = React.useId()
+    const inputId = id ?? generatedId
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
@@ -43,7 +44,8 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, label, error, id, ...props }, ref) => {
-    const textareaId = id ?? React.useId()
+    const generatedId = React.useId()
+    const textareaId = id ?? generatedId
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
@@ -79,7 +81,8 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
 
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, label, error, id, options, placeholder, ...props }, ref) => {
-    const selectId = id ?? React.useId()
+    const generatedId = React.useId()
+    const selectId = id ?? generatedId
     return (
       <div className="flex flex-col gap-1.5">
         {label && (

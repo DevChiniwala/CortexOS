@@ -1,6 +1,6 @@
 import * as React from "react"
 import { CompanyWithScore } from "@/lib/types"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Card,   CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { IconBuilding, IconGripVertical } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"

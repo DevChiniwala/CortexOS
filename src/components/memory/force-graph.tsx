@@ -1,5 +1,5 @@
 import * as React from "react"
-import ForceGraph2D, { ForceGraphMethods } from "react-force-graph-2d"
+import ForceGraph2D from "react-force-graph-2d"
 
 export interface GraphNode {
   id: string

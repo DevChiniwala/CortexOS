@@ -71,7 +71,7 @@ const initialEdges: Edge[] = [
 ]
 
 export function AgentCanvas() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
+  const [nodes, _setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
   const [isRunning, setIsRunning] = React.useState(false)
 
@@ -102,7 +102,8 @@ export function AgentCanvas() {
         <Controls className="fill-ink text-ink bg-surface border border-line rounded-lg overflow-hidden flex flex-col shadow-sm" />
         <MiniMap 
           nodeColor={(n) => {
-            const data = n.data as any;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const data = n.data as { type: string };
             if (data.type === 'trigger') return '#FFB020'
             if (data.type === 'llm') return '#FF5500'
             if (data.type === 'action') return '#00AEEF'

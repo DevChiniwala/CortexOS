@@ -227,6 +227,7 @@ export function useStream() {
 
     const addLog = (type: LogEntry["type"], content: string, toolName?: string) => {
       const entry: LogEntry = { type, content, timestamp: Date.now(), toolName };
+
       logsRef.current = [...logsRef.current, entry];
       setState((prev) => ({ ...prev, logs: logsRef.current }));
     };
@@ -261,7 +262,7 @@ export function useStream() {
         setState((prev) => ({ ...prev, logs: logsRef.current }));
       });
 
-      const response = await invoke<any>("start_research_job", { jobType, targetId });
+      const response = await invoke<Record<string, unknown>>("start_research_job", { jobType, targetId });
       setState((prev) => ({ ...prev, jobId: response.jobId || "native-job" }));
 
     } catch (err) {

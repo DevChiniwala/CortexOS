@@ -1,9 +1,9 @@
 import * as React from "react"
-import { Badge } from "@/components/ui/badge"
+
 import { Button } from "@/components/ui/button"
 import { StreamTerminal } from "@/components/stream/stream-terminal"
 import { useStream, useCompanies } from "@/lib/hooks"
-import { IconBrain, IconSearch, IconTrendingUp, IconMessage2, IconPlayerPlay, IconChevronRight, IconCircleCheck, IconClock, IconSend, IconRadar, IconHierarchy, IconTarget, IconPlugConnected } from "@tabler/icons-react"
+import { IconBrain, IconSearch, IconTrendingUp, IconMessage2, IconPlayerPlay,  IconCircleCheck, IconClock, IconSend, IconRadar, IconHierarchy, IconTarget, IconPlugConnected } from "@tabler/icons-react"
 import { motion, AnimatePresence } from "motion/react"
 
 const AVAILABLE_AGENTS = [
@@ -118,6 +118,7 @@ export default function Agents() {
       const agentName = AVAILABLE_AGENTS.find(a => a.id === selectedAgent)?.name || selectedAgent || "Agent"
       const companyName = companies.find(c => c.id === selectedCompany)?.companyName || "Unknown"
       const hasError = logs.some(l => l.type === "error")
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRecentRuns(prev => [
         { agent: agentName, company: companyName, timestamp: Date.now(), status: hasError ? "error" : "completed" },
         ...prev.slice(0, 9)

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { useContacts, useCompanies } from "@/lib/hooks"
+import { useContacts } from "@/lib/hooks"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
 import { IconArrowLeft, IconBuilding, IconMail, IconBrain, IconBrandLinkedin, IconMessageCircle } from "@tabler/icons-react"

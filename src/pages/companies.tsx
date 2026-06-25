@@ -4,10 +4,10 @@ import { useCompanies, useCompanyMutations } from "@/lib/hooks"
 import { EmptyState } from "@/components/ui/empty-state"
 import { IconBuilding, IconPlus, IconLayoutList, IconLayoutKanban, IconSearch, IconChevronRight } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+
 import { KanbanBoard } from "@/components/pipeline/kanban-board"
 import { motion } from "motion/react"
-import { CompanyWithScore, ScoringTier } from "@/lib/types"
+import {  ScoringTier } from "@/lib/types"
 import { AddCompanyModal } from "@/components/modals/add-company-modal"
 
 export default function Companies() {

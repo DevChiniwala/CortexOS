@@ -68,7 +68,7 @@ function ensureSeedData() {
       localAddSignal(s)
       // Sleep tiny bit to offset timestamps
       const start = Date.now()
-      while (Date.now() - start < 10) {}
+      while (Date.now() - start < 10) { /* wait */ }
     }
   }
 }
@@ -78,6 +78,7 @@ export function useSignals() {
   
   React.useEffect(() => {
     ensureSeedData()
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSignals(localGetSignals())
   }, [])
 

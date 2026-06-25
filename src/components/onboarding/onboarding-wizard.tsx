@@ -2,7 +2,7 @@ import * as React from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { useOnboardingStore } from "@/lib/store/onboarding-store"
 import { Button } from "@/components/ui/button"
-import { IconBrain, IconTarget, IconBolt, IconRocket } from "@tabler/icons-react"
+import {  IconTarget, IconBolt, IconRocket } from "@tabler/icons-react"
 
 const STEPS = [
   {

@@ -138,6 +138,7 @@ export default function Revenue() {
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#1A1A2E', borderColor: '#ffffff20', borderRadius: '8px' }}
                   itemStyle={{ color: '#fff' }}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(value: any) => [`$${Number(value).toLocaleString()}`, undefined as any]}
                 />
                 <Area type="monotone" dataKey="pipeline" stroke="#00AEEF" fillOpacity={1} fill="url(#colorPipeline)" name="Pipeline" />
@@ -194,6 +195,7 @@ export default function Revenue() {
                   <Tooltip 
                     cursor={{fill: 'transparent'}}
                     contentStyle={{ backgroundColor: '#1A1A2E', borderColor: '#ffffff20', borderRadius: '8px', fontSize: '12px' }}
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     formatter={(value: any) => [`$${value}`, "Cost"]}
                   />
                   <Bar dataKey="cost" radius={[0, 4, 4, 0]} barSize={12}>

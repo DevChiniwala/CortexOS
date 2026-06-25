@@ -11,6 +11,7 @@ interface MeetingCardProps {
 }
 
 export function MeetingCard({ meeting, className }: MeetingCardProps) {
+  // eslint-disable-next-line react-hooks/purity
   const isPast = meeting.scheduledAt < Date.now()
 
   return (

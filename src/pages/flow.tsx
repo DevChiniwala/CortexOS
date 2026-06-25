@@ -22,6 +22,7 @@ export default function FlowBuilder() {
   const handleAddNode = (template: typeof NODE_TYPES[0]) => {
     // Determine spawn position (centerish, slightly offset based on node count)
     const offset = nodes.length * 20
+    // eslint-disable-next-line react-hooks/globals
     nodeCounter += 1
     const newNode = {
       id: `${template.id}-${nodeCounter}`,

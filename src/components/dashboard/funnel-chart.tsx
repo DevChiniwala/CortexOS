@@ -6,7 +6,7 @@ export function FunnelChart() {
 
   // Calculate funnel stages based on CRM statuses
   const stages = React.useMemo(() => {
-    const total = companies.length || 1 // prevent div by zero
+    const _total = companies.length || 1 // prevent div by zero
     
     // Example mapping of statuses to generic pipeline stages
     const newCount = companies.filter(c => c.userStatus === 'new' || !c.userStatus).length

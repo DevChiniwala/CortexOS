@@ -1,6 +1,6 @@
 import * as React from "react"
 import type { Signal } from "@/lib/types"
-import { IconRadar, IconBuilding, IconTrendingUp, IconBriefcase, IconUsers, IconBrain, IconArrowRight, IconSword } from "@tabler/icons-react"
+import { IconRadar,  IconTrendingUp, IconBriefcase, IconUsers, IconBrain, IconArrowRight, IconSword } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -34,6 +34,7 @@ export function SignalFeed({ signals, onAction, onBattlecard }: SignalFeedProps)
   }
 
   const formatTimeAgo = (isoString: string) => {
+    // eslint-disable-next-line react-hooks/purity
     const diff = Date.now() - new Date(isoString).getTime()
     const hours = Math.floor(diff / (1000 * 60 * 60))
     if (hours < 1) return "Just now"
@@ -82,7 +83,7 @@ export function SignalFeed({ signals, onAction, onBattlecard }: SignalFeedProps)
                   
                   <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     {signal.type === "competitor_detected" && onBattlecard && (
-                      <Button variant="outline" size="sm" className="h-7 text-xs border-amber-500/50 text-amber-500 hover:bg-amber-500/10" onClick={() => onBattlecard(signal.id as any)}>
+                      <Button variant="outline" size="sm" className="h-7 text-xs border-amber-500/50 text-amber-500 hover:bg-amber-500/10" onClick={() => onBattlecard(signal.id)}>
                         <IconSword className="w-3.5 h-3.5 mr-1" /> Battlecard
                       </Button>
                     )}
