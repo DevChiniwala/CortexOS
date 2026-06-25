@@ -83,7 +83,7 @@ export function SignalFeed({ signals, onAction, onBattlecard }: SignalFeedProps)
                   
                   <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     {signal.type === "competitor_detected" && onBattlecard && (
-                      <Button variant="outline" size="sm" className="h-7 text-xs border-amber-500/50 text-amber-500 hover:bg-amber-500/10" onClick={() => onBattlecard(signal.id)}>
+                      <Button variant="outline" size="sm" className="h-7 text-xs border-amber-500/50 text-amber-500 hover:bg-amber-500/10" onClick={() => onBattlecard(Number(signal.id))}>
                         <IconSword className="w-3.5 h-3.5 mr-1" /> Battlecard
                       </Button>
                     )}

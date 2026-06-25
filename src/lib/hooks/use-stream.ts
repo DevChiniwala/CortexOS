@@ -263,7 +263,7 @@ export function useStream() {
       });
 
       const response = await invoke<Record<string, unknown>>("start_research_job", { jobType, targetId });
-      setState((prev) => ({ ...prev, jobId: response.jobId || "native-job" }));
+      setState((prev) => ({ ...prev, jobId: (response.jobId as string) || "native-job" }));
 
     } catch (err) {
       setState((prev) => ({ 

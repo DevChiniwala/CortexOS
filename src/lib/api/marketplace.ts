@@ -1,7 +1,7 @@
 export interface CommunityAgent {
   id: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  config: Record<string, any>;
+  config?: Record<string, unknown>;
   name: string;
   creator: string;
   creatorAvatar?: string;
