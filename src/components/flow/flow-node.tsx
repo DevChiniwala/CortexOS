@@ -3,12 +3,14 @@ import { Handle, Position, NodeProps } from "@xyflow/react"
 import { IconSearch, IconTrendingUp, IconMessage2, IconUsers, IconBrain, IconMail } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
 
-export type CortexNodeData = {
+import { Node } from "@xyflow/react"
+
+export type CortexNodeData = Node<{
   label: string
   icon: string
   color: string
   description?: string
-}
+}, "cortexNode">
 
 export function CortexNode({ data, selected }: NodeProps<CortexNodeData>) {
   const getIcon = (iconName: string) => {

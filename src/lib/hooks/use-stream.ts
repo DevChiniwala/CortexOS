@@ -145,7 +145,7 @@ function getPersonaMapperSteps(targetName: string): SimStep[] {
   ];
 }
 
-function getIcpOptimizerSteps(targetName: string): SimStep[] {
+function getIcpOptimizerSteps(_targetName: string): SimStep[] {
   return [
     { type: "system", delay: 300, content: `[CORTEX] Initializing icp_optimizer for global learning loop...` },
     { type: "thinking", delay: 1000, content: `Pulling last 30 days of Outreach & CRM telemetry data. Looking for statistical correlations between signifier weights and Won/Lost outcomes.` },

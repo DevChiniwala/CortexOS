@@ -1,8 +1,14 @@
 import * as React from "react"
 import { useStreamPanelStore } from "@/lib/store/stream-panel-store"
 import { StreamTerminal } from "./stream-terminal"
+import { useStream } from "@/lib/hooks/use-stream"
 import { IconX, IconMaximize, IconMinimize } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+
+function StreamTerminalWrapper({ jobId }: { jobId: string }) {
+  const { logs, isStreaming, stopStream } = useStream()
+  return <StreamTerminal logs={logs} isStreaming={isStreaming} title={jobId} onKill={stopStream} className="h-full" />
+}
 
 export function StreamPanelLayout({ children }: { children: React.ReactNode }) {
   const { isOpen, isExpanded, activeTabId, tabs, closePanel, toggleExpanded, setActiveTab, removeTab } = useStreamPanelStore()
@@ -99,7 +105,7 @@ export function StreamPanelLayout({ children }: { children: React.ReactNode }) {
         {/* Active Terminal */}
         <div className="flex-1 p-4 bg-bg overflow-hidden">
           {activeTabId ? (
-            <StreamTerminal jobId={activeTabId} isActive={true} />
+            <StreamTerminalWrapper jobId={activeTabId} />
           ) : (
             <div className="h-full flex items-center justify-center text-ink-3 text-sm">
               Select a stream tab to view logs

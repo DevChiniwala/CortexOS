@@ -25,7 +25,7 @@ interface InteractiveGraphProps {
 }
 
 export function InteractiveGraph({ nodes, links, onNodeClick, width, height }: InteractiveGraphProps) {
-  const fgRef = React.useRef<ForceGraphMethods>()
+  const fgRef = React.useRef<any>(null)
   const containerRef = React.useRef<HTMLDivElement>(null)
   
   const [dimensions, setDimensions] = React.useState({ width: width || 800, height: height || 600 })

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { FlowCanvas } from "@/components/flow/flow-canvas"
-import { IconGitBranch, IconPlus, IconSearch, IconTrendingUp, IconMessage2, IconUsers, IconBrain, IconMail, IconPlayerPlay, IconRadar } from "@tabler/icons-react"
+import { IconGitBranch, IconPlus, IconPlayerPlay } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { useFlowStore } from "@/lib/store/flow-store"
 
@@ -14,14 +14,17 @@ const NODE_TYPES = [
   { id: "custom", label: "Custom Prompt", icon: "brain", color: "orange", description: "Run an arbitrary LLM prompt" },
 ]
 
+let nodeCounter = 0
+
 export default function FlowBuilder() {
   const { addNode, nodes } = useFlowStore()
 
   const handleAddNode = (template: typeof NODE_TYPES[0]) => {
     // Determine spawn position (centerish, slightly offset based on node count)
     const offset = nodes.length * 20
+    nodeCounter += 1
     const newNode = {
-      id: `${template.id}-${Date.now()}`,
+      id: `${template.id}-${nodeCounter}`,
       type: "cortexNode",
       position: { x: 400 + offset, y: 150 + offset },
       data: {

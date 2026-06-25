@@ -26,7 +26,7 @@ interface StreamPanelState {
   closeAllExcept: (id: string) => void;
 }
 
-export const useStreamPanelStore = create<StreamPanelState>()((set, get) => ({
+export const useStreamPanelStore = create<StreamPanelState>()((set, _get) => ({
   isOpen: false,
   isExpanded: false,
   activeTabId: null,

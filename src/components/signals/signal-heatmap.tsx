@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Signal } from "@/lib/local-store"
+import type { Signal } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
 interface SignalHeatmapProps {

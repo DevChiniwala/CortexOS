@@ -3,7 +3,7 @@ import { useSignals } from "@/lib/hooks"
 import { SignalFeed } from "@/components/signals/signal-feed"
 import { IntentMesh } from "@/components/signals/intent-mesh"
 import { useNavigate } from "react-router-dom"
-import { IconFilter, IconRadar, IconSword, IconX, IconTarget, IconShield, IconMessageCircle, IconBulb } from "@tabler/icons-react"
+import { IconSword, IconX, IconTarget, IconShield, IconMessageCircle, IconBulb } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 
 interface Battlecard {
@@ -50,7 +50,7 @@ export default function Signals() {
     return signals.filter(s => s.type === filterType)
   }, [signals, filterType])
 
-  const handleViewBattlecard = (signalId: number) => {
+  const handleViewBattlecard = (_signalId: number) => {
     // In production this would call the backend; for now use mock
     const card = MOCK_BATTLECARDS[1]
     if (card) setSelectedBattlecard(card)
@@ -58,7 +58,7 @@ export default function Signals() {
 
   const navigate = useNavigate()
 
-  const handleAction = (signal: any) => {
+  const handleAction = (_signal: { type: string }) => {
     // Jump to flow builder and prepopulate the trigger
     navigate('/flow')
   }

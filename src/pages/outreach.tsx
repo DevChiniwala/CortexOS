@@ -4,19 +4,15 @@ import { OutreachSequence } from "@/lib/types"
 import { SequenceTimeline } from "@/components/outreach/sequence-timeline"
 import { ReplyCard } from "@/components/outreach/reply-card"
 import { MeetingCard } from "@/components/outreach/meeting-card"
-import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { IconMail, IconMailOpened, IconMessageReply, IconCalendarEvent, IconSend, IconChevronRight, IconArrowLeft } from "@tabler/icons-react"
-import { motion, AnimatePresence } from "motion/react"
 import { cn } from "@/lib/utils"
 
 export default function Outreach() {
   const [selectedSequenceId, setSelectedSequenceId] = React.useState<string | null>(null)
   const stats = getMockOutreachStats()
 
-  const selectedSequence = React.useMemo(() => 
-    MOCK_SEQUENCES.find(s => s.id === selectedSequenceId), 
-  [selectedSequenceId])
+  const selectedSequence = MOCK_SEQUENCES.find(s => s.id === selectedSequenceId)
 
   const getStatusColor = (status: OutreachSequence["status"]) => {
     switch (status) {

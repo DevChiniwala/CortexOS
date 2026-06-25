@@ -4,7 +4,7 @@ import { useCompanies, useContacts, useCompanyMutations, useStream } from "@/lib
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { StreamTerminal } from "@/components/stream/stream-terminal"
-import { IconArrowLeft, IconCheck, IconX, IconBrandLinkedin, IconWorld, IconMapPin } from "@tabler/icons-react"
+import { IconArrowLeft, IconCheck, IconX, IconBrandLinkedin, IconWorld, IconMapPin, IconChartBar } from "@tabler/icons-react"
 import { motion } from "motion/react"
 
 export default function CompanyDetail() {

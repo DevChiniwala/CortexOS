@@ -21,6 +21,7 @@ export const MOCK_SEQUENCES: OutreachSequence[] = [
       {
         id: "step-001-1",
         stepNumber: 1,
+        channel: "email",
         subject: "Congrats on the CRO role — quick thought on autonomous pipeline",
         body: "Hi James,\n\nSaw the news about your appointment as CRO at Cognism — congrats! Having previously scaled revenue at ZoomInfo from $40M to $150M, you clearly know what it takes.\n\nI'm curious: as you evaluate Cognism's outbound motion, have you considered what a fully autonomous SDR layer could do for pipeline velocity? We're seeing teams cut their cost-per-meeting by 60% while 3x-ing volume.\n\nWould love to share a 2-min demo recording if you're open to it.\n\nBest,\nDev",
         status: "opened",
@@ -32,6 +33,7 @@ export const MOCK_SEQUENCES: OutreachSequence[] = [
       {
         id: "step-001-2",
         stepNumber: 2,
+        channel: "email",
         subject: "Re: Congrats on the CRO role — quick thought on autonomous pipeline",
         body: "Hi James,\n\nFollowing up — I noticed Cognism just posted 5 new AI engineer roles. Sounds like the AI investment thesis is real.\n\nCurious if the autonomous GTM angle resonates. Happy to show how it maps to your Scala/Kafka stack specifically.\n\nBest,\nDev",
         status: "replied",
@@ -43,6 +45,7 @@ export const MOCK_SEQUENCES: OutreachSequence[] = [
       {
         id: "step-001-3",
         stepNumber: 3,
+        channel: "email",
         subject: "CortexOS x Cognism — meeting confirmed",
         body: "Great — sent over a calendar invite for Thursday at 2pm GMT. Looking forward to it!",
         status: "sent",
@@ -69,6 +72,7 @@ export const MOCK_SEQUENCES: OutreachSequence[] = [
       {
         id: "step-002-1",
         stepNumber: 1,
+        channel: "email",
         subject: "The autonomous SDR layer Apollo is missing",
         body: "Hi Leandra,\n\nWith Apollo's recent $1.6B raise, you're clearly going all-in on being the GTM operating system. Impressive.\n\nOne gap I've noticed: Apollo is phenomenal at data + sequences, but the actual research-to-meeting workflow still requires human reps. What if that entire loop was autonomous?\n\nWe built CortexOS to do exactly that — AI agents that research, score, draft, send, and book meetings without human intervention. It's what Apollo would build internally in 18 months, available today.\n\nWorth a 15-min call?\n\nBest,\nDev",
         status: "opened",
@@ -80,6 +84,7 @@ export const MOCK_SEQUENCES: OutreachSequence[] = [
       {
         id: "step-002-2",
         stepNumber: 2,
+        channel: "email",
         subject: "Re: The autonomous SDR layer Apollo is missing",
         body: "Hi Leandra,\n\nQuick follow-up — I saw Apollo just launched their AI SDR feature in beta. We should compare notes. CortexOS takes a fundamentally different approach (multi-agent swarm vs single-prompt generation).\n\nHappy to do a technical deep-dive if your team is interested.\n\nBest,\nDev",
         status: "draft",
@@ -106,6 +111,7 @@ export const MOCK_SEQUENCES: OutreachSequence[] = [
       {
         id: "step-003-1",
         stepNumber: 1,
+        channel: "email",
         subject: "Clay's enrichment layer + our agent swarm = 🔥",
         body: "Hi Varun,\n\nBeen following Clay's trajectory since your Reforge days — the $46M Series B was well-deserved.\n\nHere's a thought: Clay is the best enrichment orchestrator in the market. But what if the enriched data could autonomously act on itself? CortexOS agents can consume Clay-enriched profiles and execute the entire research → score → outreach loop without human intervention.\n\nPotential integration partnership? Or even just a technical chat — I think there's a powerful combo here.\n\nBest,\nDev",
         status: "replied",
@@ -132,6 +138,7 @@ export const MOCK_SEQUENCES: OutreachSequence[] = [
       {
         id: "step-004-1",
         stepNumber: 1,
+        channel: "email",
         subject: "Fellow YC founder — autonomous pipeline for Apriora",
         body: "Hi Sid,\n\nCongrats on Apriora's YC batch! AI-powered interviewing is a brilliant wedge.\n\nAs you scale GTM post-batch, you'll need pipeline fast. Most YC companies hire 2-3 SDRs at $80K+ each. What if you could skip that entirely?\n\nCortexOS is an autonomous GTM engine — finds your ICP, researches them, writes personalized outreach, sends it, and books meetings. Zero SDR headcount.\n\nPerfect for a 25-person startup that needs enterprise pipeline without enterprise overhead.\n\n30 min call?\n\nBest,\nDev",
         status: "sent",
@@ -158,6 +165,7 @@ export const MOCK_SEQUENCES: OutreachSequence[] = [
       {
         id: "step-005-1",
         stepNumber: 1,
+        channel: "email",
         subject: "Revenue cycle automation at AGS Health",
         body: "Hi Patrice,\n\nAGS Health's position in revenue cycle management is impressive. With 12,000+ employees, the scale of your operations creates unique opportunities for AI-driven prospecting.\n\nWould love to explore how autonomous outreach could help your BD team surface new hospital partnerships faster.\n\nBest,\nDev",
         status: "bounced",

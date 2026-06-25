@@ -1,4 +1,4 @@
-import { Signal } from "@/lib/local-store"
+import type { Signal } from "@/lib/types"
 import { Badge } from "@/components/ui/badge"
 import { IconTrendingUp, IconBriefcase, IconCode, IconUsers, IconRocket, IconBuilding, IconExternalLink } from "@tabler/icons-react"
 import { formatDistanceToNow } from "date-fns"

@@ -12,7 +12,7 @@ interface AddContactModalProps {
 }
 
 export function AddContactModal({ open, onClose, defaultCompanyId }: AddContactModalProps) {
-  const { addContact } = useContactMutations()
+  const { insertContact } = useContactMutations()
   const { companies } = useCompanies()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   
@@ -49,7 +49,7 @@ export function AddContactModal({ open, onClose, defaultCompanyId }: AddContactM
 
     setIsSubmitting(true)
     try {
-      await addContact(formData)
+      await insertContact(formData)
       onClose()
       setFormData({ firstName: "", lastName: "", email: "", title: "", linkedinUrl: "", companyId: defaultCompanyId })
     } catch (err) {
