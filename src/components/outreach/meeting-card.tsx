@@ -1,7 +1,8 @@
 import * as React from "react"
 import type { MeetingBooking } from "@/lib/types"
 import { Card, CardContent } from "@/components/ui/card"
-import { IconCalendarEvent, IconVideo, IconUsers, IconNotes } from "@tabler/icons-react"
+import { IconCalendarEvent, IconVideo, IconPhone, IconDots, IconBrandZoom, IconUsers, IconNotes } from "@tabler/icons-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -59,7 +60,7 @@ export function MeetingCard({ meeting, className }: MeetingCardProps) {
         </div>
 
         {meeting.meetingLink && !isPast && (
-          <Button className="w-full bg-success text-success-foreground hover:bg-success/90">
+          <Button className="w-full bg-success text-success-foreground hover:bg-success/90" onClick={() => toast.success("Joining meeting...")}>
             <IconVideo className="w-4 h-4 mr-2" />
             Join Meeting
           </Button>

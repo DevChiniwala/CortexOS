@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { IconBrandChrome, IconBrain, IconShieldCheck, IconMail, IconUsers } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 import { motion } from "motion/react"
 
 export default function Settings() {
@@ -116,7 +117,7 @@ export default function Settings() {
                   <span className="text-xs text-ink-3">dev@cortexos.ai</span>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="text-xs">Disconnect</Button>
+              <Button variant="outline" size="sm" className="text-xs" onClick={() => toast.success("Disconnected")}>Disconnect</Button>
             </div>
 
             <div className="grid grid-cols-2 gap-6">
@@ -156,7 +157,7 @@ export default function Settings() {
                 <p className="text-sm font-medium text-ink">Acme Corp GTM Workspace</p>
                 <p className="text-xs text-ink-3">Enterprise Plan • 3/10 Seats Filled</p>
               </div>
-              <Button size="sm">Invite Member</Button>
+              <Button size="sm" onClick={() => toast.success("Invite sent")}>Invite Member</Button>
             </div>
 
             <div className="rounded-xl border border-line overflow-hidden">

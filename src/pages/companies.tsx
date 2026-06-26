@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { useCompanies, useCompanyMutations } from "@/lib/hooks"
 import { EmptyState } from "@/components/ui/empty-state"
 import { IconBuilding, IconPlus, IconLayoutList, IconLayoutKanban, IconSearch, IconChevronRight } from "@tabler/icons-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 
 import { KanbanBoard } from "@/components/pipeline/kanban-board"
@@ -59,7 +60,7 @@ export default function Companies() {
             <p className="text-ink-2">Every account CortexOS has surfaced — grouped, scored, and ready to action.</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" className="bg-bg text-ink-2">
+            <Button variant="outline" className="bg-bg text-ink-2" onClick={() => toast.info("Search focused")}>
               <IconSearch className="w-4 h-4 mr-2" />
               Find Leads
             </Button>

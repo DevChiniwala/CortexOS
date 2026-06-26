@@ -1,6 +1,7 @@
 import * as React from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useContacts } from "@/lib/hooks"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
 import { IconArrowLeft, IconBuilding, IconMail, IconBrain, IconBrandLinkedin, IconMessageCircle } from "@tabler/icons-react"
@@ -63,7 +64,7 @@ export default function ContactDetail() {
           <Button variant="secondary" onClick={() => window.open(contact.linkedinUrl || `https://linkedin.com/search/results/people/?keywords=${encodeURIComponent(contact.firstName + " " + contact.lastName)}`)}>
             <IconBrandLinkedin className="w-4 h-4 mr-2" /> LinkedIn
           </Button>
-          <Button>
+          <Button onClick={() => toast.success("Outreach flow started")}>
             <IconBrain className="w-4 h-4 mr-2" /> Generate Outreach
           </Button>
         </div>
@@ -87,7 +88,7 @@ export default function ContactDetail() {
                   <IconBrain className="w-8 h-8 text-ink-3 mb-3 opacity-50" />
                   <h3 className="text-base font-medium text-ink">No Research Data</h3>
                   <p className="text-sm text-ink-3 mt-1 max-w-md">Run the Deep Researcher agent to analyze this person's background, posts, and potential pain points.</p>
-                  <Button variant="outline" className="mt-4">
+                  <Button variant="outline" className="mt-4" onClick={() => toast.success("Agent queued for research")}>
                     Research Contact
                   </Button>
                 </div>

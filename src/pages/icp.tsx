@@ -1,6 +1,7 @@
 import * as React from "react"
 import { motion } from "motion/react"
 import { IconBrain, IconPlayerPlay, IconSettings } from "@tabler/icons-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { ICPLearningLoop } from "@/components/scoring/icp-learning-loop"
 import type { LearningLoopLog } from "@/lib/types"
@@ -71,11 +72,11 @@ export default function ICP() {
           <p className="text-ink-3">Neural feedback loop dynamically adjusting your scoring algorithm.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => toast.success("CSV import started")}>
             <IconSettings className="w-4 h-4 mr-2" />
             Manual Config
           </Button>
-          <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+          <Button className="bg-purple-600 hover:bg-purple-700 text-white" onClick={() => toast.success("ICP generation triggered")}>
             <IconPlayerPlay className="w-4 h-4 mr-2" />
             Run Optimizer Batch
           </Button>

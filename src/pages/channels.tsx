@@ -1,6 +1,7 @@
 import * as React from "react"
 import { motion } from "motion/react"
-import { IconMail, IconBrandLinkedin, IconBrandWhatsapp, IconMessage,  IconX, IconSettings, IconChartBar } from "@tabler/icons-react"
+import { IconPlus, IconMail, IconBrandLinkedin, IconMessageCircle, IconSettings, IconTrash, IconCheck, IconBrandWhatsapp, IconMessage, IconX, IconChartBar } from "@tabler/icons-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
@@ -107,11 +108,11 @@ export default function Channels() {
                   </div>
                 </div>
                 {channel.connected ? (
-                  <Button variant="ghost" size="icon" className="text-ink-3">
+                  <Button variant="ghost" size="icon" className="text-ink-3" onClick={() => toast("Channel settings")}>
                     <IconSettings className="w-5 h-5" />
                   </Button>
                 ) : (
-                  <Button variant="outline" size="sm">Connect</Button>
+                  <Button variant="outline" size="sm" onClick={() => toast.success("Connection requested")}>Connect</Button>
                 )}
               </CardHeader>
               

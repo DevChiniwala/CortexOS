@@ -1,5 +1,6 @@
 import * as React from "react"
 import { FlowCanvas } from "@/components/flow/flow-canvas"
+import { toast } from "sonner"
 import { IconGitBranch, IconPlus, IconPlayerPlay } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { useFlowStore } from "@/lib/store/flow-store"
@@ -50,10 +51,10 @@ export default function FlowBuilder() {
         </div>
         
         <div className="flex items-center gap-3">
-          <Button variant="secondary">
+          <Button variant="secondary" onClick={() => toast.success("Pipeline saved")}>
             Save Pipeline
           </Button>
-          <Button>
+          <Button onClick={() => toast.success("Pipeline deployed and running")}>
             <IconPlayerPlay className="w-4 h-4 mr-2" /> Run Pipeline
           </Button>
         </div>

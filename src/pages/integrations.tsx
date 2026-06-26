@@ -1,6 +1,7 @@
 import * as React from "react"
 import { motion } from "motion/react"
 import { IconPlugConnected, IconRefresh, IconCheck, IconX, IconArrowsExchange, IconCloudUpload, IconCloudDownload, IconClock } from "@tabler/icons-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
@@ -70,7 +71,7 @@ export default function Integrations() {
           </h1>
           <p className="text-ink-3">Bi-directional sync with your CRM and GTM ecosystem</p>
         </div>
-        <Button className="bg-info hover:bg-info/90 text-white">
+        <Button className="bg-info hover:bg-info/90 text-white" onClick={() => toast.success("Integration requested")}>
           <IconRefresh className="w-4 h-4 mr-2" />
           Force Full Sync
         </Button>
@@ -104,7 +105,7 @@ export default function Integrations() {
                   <IconCheck className="w-3.5 h-3.5" /> Connected
                 </span>
               ) : (
-                <Button size="sm" variant="outline">Connect</Button>
+                <Button size="sm" variant="outline" onClick={() => toast.success("Connecting integration...")}>Connect</Button>
               )}
             </div>
 

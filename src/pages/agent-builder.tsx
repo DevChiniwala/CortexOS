@@ -1,5 +1,6 @@
 import * as React from "react"
 import { AgentCanvas } from "@/components/builder/agent-canvas"
+import { toast } from "sonner"
 import { IconBrain, IconBolt, IconApi, IconMessage } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 
@@ -17,7 +18,7 @@ export default function AgentBuilder() {
           <div>
             <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wider mb-2">Triggers</h3>
             <div className="flex flex-col gap-2">
-              <Button variant="outline" className="justify-start gap-2 h-auto py-2 px-3 bg-surface hover:bg-warning/10 hover:text-warning hover:border-warning/30">
+              <Button variant="outline" className="justify-start gap-2 h-auto py-2 px-3 bg-surface hover:bg-warning/10 hover:text-warning hover:border-warning/30" onClick={() => toast("Drag to canvas to add node")}>
                 <IconBolt className="w-4 h-4 text-warning" />
                 <div className="flex flex-col items-start">
                   <span className="text-sm">Signal Detected</span>
@@ -30,14 +31,14 @@ export default function AgentBuilder() {
           <div>
             <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wider mb-2">Actions</h3>
             <div className="flex flex-col gap-2">
-              <Button variant="outline" className="justify-start gap-2 h-auto py-2 px-3 bg-surface hover:bg-info/10 hover:text-info hover:border-info/30">
+              <Button variant="outline" className="justify-start gap-2 h-auto py-2 px-3 bg-surface hover:bg-info/10 hover:text-info hover:border-info/30" onClick={() => toast("Drag to canvas to add node")}>
                 <IconApi className="w-4 h-4 text-info" />
                 <div className="flex flex-col items-start">
                   <span className="text-sm">Web Scraper</span>
                   <span className="text-[10px] text-ink-3 font-normal">Extract DOM content</span>
                 </div>
               </Button>
-              <Button variant="outline" className="justify-start gap-2 h-auto py-2 px-3 bg-surface hover:bg-info/10 hover:text-info hover:border-info/30">
+              <Button variant="outline" className="justify-start gap-2 h-auto py-2 px-3 bg-surface hover:bg-info/10 hover:text-info hover:border-info/30" onClick={() => toast("Drag to canvas to add node")}>
                 <IconApi className="w-4 h-4 text-info" />
                 <div className="flex flex-col items-start">
                   <span className="text-sm">HTTP Request</span>
@@ -50,7 +51,7 @@ export default function AgentBuilder() {
           <div>
             <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wider mb-2">Intelligence</h3>
             <div className="flex flex-col gap-2">
-              <Button variant="outline" className="justify-start gap-2 h-auto py-2 px-3 bg-surface hover:bg-primary/10 hover:text-primary hover:border-primary/30">
+              <Button variant="outline" className="justify-start gap-2 h-auto py-2 px-3 bg-surface hover:bg-primary/10 hover:text-primary hover:border-primary/30" onClick={() => toast("Drag to canvas to add node")}>
                 <IconBrain className="w-4 h-4 text-primary" />
                 <div className="flex flex-col items-start">
                   <span className="text-sm">LLM Prompt</span>
@@ -63,14 +64,14 @@ export default function AgentBuilder() {
           <div>
             <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wider mb-2">Outputs</h3>
             <div className="flex flex-col gap-2">
-              <Button variant="outline" className="justify-start gap-2 h-auto py-2 px-3 bg-surface hover:bg-leaf/10 hover:text-leaf hover:border-leaf/30">
+              <Button variant="outline" className="justify-start gap-2 h-auto py-2 px-3 bg-surface hover:bg-leaf/10 hover:text-leaf hover:border-leaf/30" onClick={() => toast("Drag to canvas to add node")}>
                 <IconMessage className="w-4 h-4 text-leaf" />
                 <div className="flex flex-col items-start">
                   <span className="text-sm">Send Email</span>
                   <span className="text-[10px] text-ink-3 font-normal">SMTP/API Dispatch</span>
                 </div>
               </Button>
-              <Button variant="outline" className="justify-start gap-2 h-auto py-2 px-3 bg-surface hover:bg-leaf/10 hover:text-leaf hover:border-leaf/30">
+              <Button variant="outline" className="justify-start gap-2 h-auto py-2 px-3 bg-surface hover:bg-leaf/10 hover:text-leaf hover:border-leaf/30" onClick={() => toast("Drag to canvas to add node")}>
                 <IconMessage className="w-4 h-4 text-leaf" />
                 <div className="flex flex-col items-start">
                   <span className="text-sm">Slack Alert</span>

@@ -4,6 +4,8 @@ import { OutreachSequence } from "@/lib/types"
 import { SequenceTimeline } from "@/components/outreach/sequence-timeline"
 import { ReplyCard } from "@/components/outreach/reply-card"
 import { MeetingCard } from "@/components/outreach/meeting-card"
+import { EmptyState } from "@/components/ui/empty-state"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { IconMail, IconMailOpened, IconMessageReply, IconCalendarEvent, IconSend, IconChevronRight, IconArrowLeft } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
@@ -49,8 +51,8 @@ export default function Outreach() {
             <p className="text-ink-2 mt-1">Review sequences, handle replies, and track booked meetings.</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline">Pause All</Button>
-            <Button>Launch Sequence</Button>
+            <Button variant="outline" onClick={() => toast.success("All sequences paused")}>Pause All</Button>
+            <Button onClick={() => toast.success("Sequence launched")}>Launch Sequence</Button>
           </div>
         </div>
 
