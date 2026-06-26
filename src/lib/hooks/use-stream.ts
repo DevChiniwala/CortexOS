@@ -262,7 +262,18 @@ export function useStream() {
         setState((prev) => ({ ...prev, logs: logsRef.current }));
       });
 
-      const response = await invoke<Record<string, unknown>>("start_research_job", { jobType, targetId });
+      let response: Record<string, unknown>;
+      if (jobType === "company_research") {
+        response = await invoke<Record<string, unknown>>("start_research", { leadId: targetId });
+      } else if (jobType === "person_research") {
+        response = await invoke<Record<string, unknown>>("start_person_research", { personId: targetId });
+      } else if (jobType === "scoring") {
+        response = await invoke<Record<string, unknown>>("start_scoring", { leadId: targetId });
+      } else if (jobType === "conversation") {
+        response = await invoke<Record<string, unknown>>("start_conversation_generation", { personId: targetId });
+      } else {
+        throw new Error(`Unknown native job type: ${jobType}`);
+      }
       setState((prev) => ({ ...prev, jobId: (response.jobId as string) || "native-job" }));
 
     } catch (err) {

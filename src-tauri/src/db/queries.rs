@@ -116,6 +116,16 @@ pub fn update_lead_research_status(conn: &Connection, lead_id: i64, status: &str
     Ok(())
 }
 
+pub fn save_lead_company_profile(conn: &Connection, lead_id: i64, profile: &str) -> Result<(), String> {
+    let now = chrono::Utc::now().timestamp_millis();
+    conn.execute(
+        "UPDATE leads SET company_profile = ?1, research_status = 'completed', researched_at = ?2 WHERE id = ?3",
+        params![profile, now, lead_id],
+    )
+    .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
 pub fn delete_leads(conn: &Connection, ids: &[i64]) -> Result<usize, String> {
     if ids.is_empty() {
         return Ok(0);

@@ -1,6 +1,8 @@
 /// Cortex Core Logic
 /// Abstract modular structure for the backend domain models and logic.
 
+pub mod llm;
+
 pub mod models {
     use serde::{Deserialize, Serialize};
 

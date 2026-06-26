@@ -7,6 +7,7 @@ use std::sync::{Arc, Mutex};
 
 pub use schema::*;
 
+#[derive(Clone)]
 pub struct DbState {
     pub conn: Arc<Mutex<Connection>>,
 }
