@@ -4,6 +4,9 @@ import { toast } from "sonner"
 import { IconGitBranch, IconPlus, IconPlayerPlay } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { useFlowStore } from "@/lib/store/flow-store"
+import { invoke } from "@tauri-apps/api/core"
+import { listen } from "@tauri-apps/api/event"
+import { isTauriRuntime } from "@/lib/ipc/commands"
 
 const NODE_TYPES = [
   { id: "trigger-signal", label: "Signal Trigger", icon: "radar", color: "purple", description: "Trigger when a specific signal type is detected" },
@@ -18,7 +21,38 @@ const NODE_TYPES = [
 let nodeCounter = 0
 
 export default function FlowBuilder() {
-  const { addNode, nodes } = useFlowStore()
+  const { addNode, nodes, edges } = useFlowStore()
+  const [isRunning, setIsRunning] = React.useState(false)
+
+  React.useEffect(() => {
+    if (!isTauriRuntime()) return
+    const unlistenStart = listen("flow_node_started", (e: any) => toast.info(`Started Node: ${e.payload.nodeId}`))
+    const unlistenDone = listen("flow_node_completed", (e: any) => toast.success(`Completed Node: ${e.payload.nodeId}`))
+    const unlistenComp = listen("flow_completed", () => {
+      toast.success("Flow executed successfully!")
+      setIsRunning(false)
+    })
+    return () => {
+      unlistenStart.then(f => f())
+      unlistenDone.then(f => f())
+      unlistenComp.then(f => f())
+    }
+  }, [])
+
+  const handleRunPipeline = async () => {
+    if (!isTauriRuntime()) {
+      toast.error("Flow execution requires Tauri backend.")
+      return
+    }
+    setIsRunning(true)
+    toast.info("Deploying flow DAG...")
+    try {
+      await invoke("execute_flow", { payload: { nodes, edges } })
+    } catch (e) {
+      toast.error(String(e))
+      setIsRunning(false)
+    }
+  }
 
   const handleAddNode = (template: typeof NODE_TYPES[0]) => {
     // Determine spawn position (centerish, slightly offset based on node count)
@@ -54,8 +88,8 @@ export default function FlowBuilder() {
           <Button variant="secondary" onClick={() => toast.success("Pipeline saved")}>
             Save Pipeline
           </Button>
-          <Button onClick={() => toast.success("Pipeline deployed and running")}>
-            <IconPlayerPlay className="w-4 h-4 mr-2" /> Run Pipeline
+          <Button disabled={isRunning} onClick={handleRunPipeline}>
+            <IconPlayerPlay className="w-4 h-4 mr-2" /> {isRunning ? "Running..." : "Run Pipeline"}
           </Button>
         </div>
       </div>

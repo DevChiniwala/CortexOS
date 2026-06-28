@@ -10,6 +10,8 @@ import { KanbanBoard } from "@/components/pipeline/kanban-board"
 import { motion } from "motion/react"
 import {  ScoringTier } from "@/lib/types"
 import { AddCompanyModal } from "@/components/modals/add-company-modal"
+import { ImportApolloModal } from "@/components/modals/import-apollo-modal"
+import { IconCloudDownload } from "@tabler/icons-react"
 
 export default function Companies() {
   const navigate = useNavigate()
@@ -18,6 +20,7 @@ export default function Companies() {
   const [view, setView] = React.useState<"list" | "board">("list")
   const [activeTier, setActiveTier] = React.useState<ScoringTier | "all">("all")
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false)
+  const [isApolloModalOpen, setIsApolloModalOpen] = React.useState(false)
 
   const handleStatusChange = async (companyId: number, status: string) => {
     try {
@@ -63,6 +66,10 @@ export default function Companies() {
             <Button variant="outline" className="bg-bg text-ink-2" onClick={() => toast.info("Search focused")}>
               <IconSearch className="w-4 h-4 mr-2" />
               Find Leads
+            </Button>
+            <Button variant="outline" className="border-flame/30 text-flame hover:bg-flame/10" onClick={() => setIsApolloModalOpen(true)}>
+              <IconCloudDownload className="w-4 h-4 mr-2" />
+              Apollo Import
             </Button>
             <Button onClick={() => setIsAddModalOpen(true)}>
               <IconPlus className="w-4 h-4 mr-2" />
@@ -202,6 +209,7 @@ export default function Companies() {
       </motion.div>
 
       <AddCompanyModal open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
+      <ImportApolloModal open={isApolloModalOpen} onClose={() => setIsApolloModalOpen(false)} />
     </div>
   )
 }

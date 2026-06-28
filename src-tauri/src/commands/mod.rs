@@ -1,5 +1,7 @@
 pub mod jobs;
 pub mod research;
+pub mod data;
+pub mod flow;
 
 use tauri::{AppHandle, State};
 use crate::db::DbState;
@@ -261,5 +263,10 @@ pub fn generate_handlers() -> impl Fn(tauri::ipc::Invoke) -> bool {
         research::start_person_research,
         research::start_scoring,
         research::start_conversation_generation,
+        // Data (Apollo)
+        data::search_apollo_companies,
+        data::import_apollo_company,
+        // Flow Execution
+        flow::execute_flow,
     ]
 }
