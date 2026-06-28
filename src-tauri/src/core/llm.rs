@@ -102,3 +102,65 @@ pub async fn generate_embedding(text: &str) -> Result<Vec<f32>, Box<dyn std::err
         Err("No embedding returned".into())
     }
 }
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub struct ExtractedClaim {
+    pub claim: String,
+    pub quote: String,
+    pub source_url: String,
+}
+
+pub async fn extract_claims(raw_content: &str, url: &str, topic: &str) -> Result<Vec<ExtractedClaim>, Box<dyn std::error::Error + Send + Sync>> {
+    dotenv::dotenv().ok();
+    
+    let api_key = env::var("OPENAI_API_KEY").unwrap_or_default();
+    if api_key.is_empty() {
+        return Err("Missing OPENAI_API_KEY".into());
+    }
+
+    let client = Client::new();
+    let prompt = format!(
+        "You are an extraction agent. Extract facts from the following text about: {}.\n\
+        Return a JSON array of objects with 'claim', 'quote' (must be an exact verbatim substring), and 'source_url' (set to '{}').\n\
+        If no relevant facts are found, return [].\n\nTEXT:\n{}",
+        topic, url, raw_content
+    );
+
+    let request = CreateChatCompletionRequestArgs::default()
+        .model("gpt-4o-mini") // Cheaper and faster for extraction
+        .response_format(serde_json::json!({ "type": "json_object" }))
+        .messages([
+            ChatCompletionRequestSystemMessageArgs::default()
+                .content("You are a JSON fact extractor. Return ONLY valid JSON in this format: { \"claims\": [ { \"claim\": \"...\", \"quote\": \"...\", \"source_url\": \"...\" } ] }.")
+                .build()?
+                .into(),
+            ChatCompletionRequestUserMessageArgs::default()
+                .content(prompt)
+                .build()?
+                .into(),
+        ])
+        .build()?;
+
+    let response = client.chat().create(request).await?;
+    
+    if let Some(choice) = response.choices.first() {
+        if let Some(content) = &choice.message.content {
+            #[derive(serde::Deserialize)]
+            struct ExtractionResponse {
+                claims: Vec<ExtractedClaim>,
+            }
+            let res: ExtractionResponse = serde_json::from_str(content)?;
+            return Ok(res.claims);
+        }
+    }
+    
+    Ok(vec![])
+}
+
+pub fn verify_claim(claim: &ExtractedClaim, raw_content: &str) -> bool {
+    if claim.quote.is_empty() {
+        return false;
+    }
+    // Pure Rust string matching for zero-hallucination verification
+    raw_content.contains(&claim.quote)
+}

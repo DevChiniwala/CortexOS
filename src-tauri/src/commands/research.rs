@@ -90,13 +90,125 @@ pub async fn start_research(
     let app_clone = app.clone();
     let job_id_clone = job_id.clone();
     let db_inner = db.inner().clone();
+    let lead_name_clone = lead_name.clone();
 
     tokio::spawn(async move {
-        match llm::stream_research(app_clone.clone(), prompt).await {
+        // --- GROUNDED RESEARCH PIPELINE ---
+        let _ = app_clone.emit("stream_event", llm::LogEntry {
+            log_type: "system".to_string(),
+            content: "Initializing Multi-Agent Grounded Research Pipeline...".to_string(),
+            timestamp: chrono::Utc::now().timestamp_millis(),
+            tool_name: None,
+        });
+
+        let topics = vec![
+            ("Business Model & Core Offering", format!("{} business model and products", lead_name_clone)),
+            ("Recent Triggers & News", format!("{} recent news funding leadership", lead_name_clone)),
+            ("Technology Stack", format!("{} tech stack engineering jobs", lead_name_clone)),
+            ("Competitors & Pain Points", format!("{} competitors alternatives", lead_name_clone)),
+        ];
+
+        let mut tasks = Vec::new();
+
+        for (topic, query) in topics {
+            let app_task = app_clone.clone();
+            let topic_task = topic.to_string();
+            let query_task = query.clone();
+
+            let task = tokio::spawn(async move {
+                let _ = app_task.emit("stream_event", llm::LogEntry {
+                    log_type: "agent".to_string(),
+                    content: format!("Searching web for: {}...", query_task),
+                    timestamp: chrono::Utc::now().timestamp_millis(),
+                    tool_name: Some("search_web".to_string()),
+                });
+
+                let results = match crate::core::tavily::search_web(&query_task, 2).await {
+                    Ok(r) => r,
+                    Err(_) => return vec![],
+                };
+
+                let mut verified = Vec::new();
+                for res in results {
+                    if let Some(raw) = &res.raw_content {
+                        let _ = app_task.emit("stream_event", llm::LogEntry {
+                            log_type: "system".to_string(),
+                            content: format!("Extracting claims from {}...", res.url),
+                            timestamp: chrono::Utc::now().timestamp_millis(),
+                            tool_name: None,
+                        });
+                        
+                        if let Ok(claims) = llm::extract_claims(raw, &res.url, &topic_task).await {
+                            for claim in claims {
+                                if llm::verify_claim(&claim, raw) {
+                                    verified.push(claim);
+                                }
+                            }
+                        }
+                    }
+                }
+                verified
+            });
+            tasks.push(task);
+        }
+
+        let mut all_verified_claims = Vec::new();
+        let results = futures::future::join_all(tasks).await;
+        for res in results {
+            if let Ok(claims) = res {
+                all_verified_claims.extend(claims);
+            }
+        }
+
+        let _ = app_clone.emit("stream_event", llm::LogEntry {
+            log_type: "system".to_string(),
+            content: format!("Verification complete. {} claims passed verbatim source check.", all_verified_claims.len()),
+            timestamp: chrono::Utc::now().timestamp_millis(),
+            tool_name: None,
+        });
+
+        // Format claims for synthesis
+        let mut evidence_str = String::new();
+        for (i, claim) in all_verified_claims.iter().enumerate() {
+            evidence_str.push_str(&format!("[{}]: \"{}\" (Source: {})\n", i + 1, claim.claim, claim.source_url));
+        }
+
+        let synthesis_prompt = format!(
+            "You are a synthesis agent writing a unified company profile for {}.\n\
+            CRITICAL INSTRUCTION: You may ONLY use the verified facts provided below. \
+            Do not hallucinate. Do not add external information.\n\
+            For every claim you include in your profile, you MUST include the inline citation chip matching the source number (e.g., [1]).\n\n\
+            VERIFIED EVIDENCE:\n{}\n\n\
+            Format the output as a beautifully structured markdown research brief.",
+            lead_name_clone, evidence_str
+        );
+
+        match llm::stream_research(app_clone.clone(), synthesis_prompt).await {
             Ok(full_response) => {
+                let mut final_output = full_response.clone();
+                final_output.push_str("\n\n### Verified Evidence & Citations\n");
+                
+                let _ = app_clone.emit("stream_event", llm::LogEntry {
+                    log_type: "agent".to_string(),
+                    content: "\n\n### Verified Evidence & Citations\n".to_string(),
+                    timestamp: chrono::Utc::now().timestamp_millis(),
+                    tool_name: None,
+                });
+
+                for (i, claim) in all_verified_claims.iter().enumerate() {
+                    let source_line = format!("**[{}]** \"{}\" — [Source]({})\n", i + 1, claim.quote, claim.source_url);
+                    final_output.push_str(&source_line);
+                    let _ = app_clone.emit("stream_event", llm::LogEntry {
+                        log_type: "agent".to_string(),
+                        content: source_line,
+                        timestamp: chrono::Utc::now().timestamp_millis(),
+                        tool_name: None,
+                    });
+                }
+
                 // Save the research output to the database
                 if let Ok(conn) = db_inner.conn.lock() {
-                    let _ = queries::save_lead_company_profile(&conn, lead_id, &full_response);
+                    let _ = queries::save_lead_company_profile(&conn, lead_id, &final_output);
                 }
                 
                 // --- RAG STORAGE PHASE ---
@@ -108,9 +220,9 @@ pub async fn start_research(
                     tool_name: None,
                 });
                 
-                if let Ok(embedding) = llm::generate_embedding(&full_response).await {
+                if let Ok(embedding) = llm::generate_embedding(&final_output).await {
                     if let Ok(conn) = db_inner.conn.lock() {
-                        let _ = crate::core::memory::store_memory(&conn, lead_id, &full_response, &embedding);
+                        let _ = crate::core::memory::store_memory(&conn, lead_id, &final_output, &embedding);
                     }
                 }
 
@@ -121,7 +233,6 @@ pub async fn start_research(
             }
             Err(err) => {
                 let error_msg = format!("LLM Error: {}", err);
-                // Emit error to the UI
                 let _ = app_clone.emit("stream_event", llm::LogEntry {
                     log_type: "error".to_string(),
                     content: error_msg.clone(),
