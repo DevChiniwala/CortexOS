@@ -1,5 +1,5 @@
 use async_openai::{
-    types::{CreateChatCompletionRequestArgs, ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs},
+    types::{CreateChatCompletionRequestArgs, ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs, CreateEmbeddingRequestArgs},
     Client,
 };
 use futures::StreamExt;
@@ -78,4 +78,27 @@ fn emit_log(app: &AppHandle, log_type: &str, content: &str) {
         timestamp: chrono::Utc::now().timestamp_millis(),
         tool_name: None,
     });
+}
+
+pub async fn generate_embedding(text: &str) -> Result<Vec<f32>, Box<dyn std::error::Error + Send + Sync>> {
+    dotenv::dotenv().ok();
+    
+    let api_key = env::var("OPENAI_API_KEY").unwrap_or_default();
+    if api_key.is_empty() {
+        return Err("Missing OPENAI_API_KEY".into());
+    }
+
+    let client = Client::new();
+    let request = CreateEmbeddingRequestArgs::default()
+        .model("text-embedding-3-small")
+        .input([text])
+        .build()?;
+        
+    let response = client.embeddings().create(request).await?;
+    
+    if let Some(data) = response.data.first() {
+        Ok(data.embedding.clone())
+    } else {
+        Err("No embedding returned".into())
+    }
 }

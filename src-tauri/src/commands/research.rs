@@ -97,6 +97,24 @@ pub async fn start_research(
                 // Save the research output to the database
                 if let Ok(conn) = db_inner.conn.lock() {
                     let _ = queries::save_lead_company_profile(&conn, lead_id, &full_response);
+                }
+                
+                // --- RAG STORAGE PHASE ---
+                // Generate embedding of the final research and save it to vector memory
+                let _ = app_clone.emit("stream_event", llm::LogEntry {
+                    log_type: "system".to_string(),
+                    content: "Committing profile to Vector Memory...".to_string(),
+                    timestamp: chrono::Utc::now().timestamp_millis(),
+                    tool_name: None,
+                });
+                
+                if let Ok(embedding) = llm::generate_embedding(&full_response).await {
+                    if let Ok(conn) = db_inner.conn.lock() {
+                        let _ = crate::core::memory::store_memory(&conn, lead_id, &full_response, &embedding);
+                    }
+                }
+
+                if let Ok(conn) = db_inner.conn.lock() {
                     let _ = queries::update_job_status(&conn, &job_id_clone, "completed", Some(0));
                 }
                 events::emit_job_status_changed(&app_clone, job_id_clone, "completed".to_string(), Some(0));
@@ -355,8 +373,34 @@ pub async fn start_conversation_generation(
     let job_id_clone = job_id.clone();
     let db_inner = db.inner().clone();
 
+    let person_name_clone = person_name.clone();
+
     tokio::spawn(async move {
-        match llm::stream_research(app_clone.clone(), prompt).await {
+        // --- RAG RETRIEVAL PHASE ---
+        let _ = app_clone.emit("stream_event", llm::LogEntry {
+            log_type: "system".to_string(),
+            content: "Searching Vector Memory for semantic matches...".to_string(),
+            timestamp: chrono::Utc::now().timestamp_millis(),
+            tool_name: None,
+        });
+
+        let mut rag_context = String::new();
+        if let Ok(embedding) = llm::generate_embedding(&person_name_clone).await {
+            if let Ok(conn) = db_inner.conn.lock() {
+                if let Ok(memories) = crate::core::memory::search_memories(&conn, &embedding, 3) {
+                    if !memories.is_empty() {
+                        rag_context.push_str("\n\n--- MEMORY LAYER: PAST CONTEXT & PROFILES ---\nUse these highly-relevant semantic memories to inform your outreach strategy:\n");
+                        for mem in memories {
+                            rag_context.push_str(&format!("[Past Company Profile]:\n{}\n\n", mem.text_content));
+                        }
+                    }
+                }
+            }
+        }
+        
+        let final_prompt = format!("{}\n{}", prompt, rag_context);
+
+        match llm::stream_research(app_clone.clone(), final_prompt).await {
             Ok(_full_response) => {
                 if let Ok(conn) = db_inner.conn.lock() {
                     let _ = queries::update_job_status(&conn, &job_id_clone, "completed", Some(0));

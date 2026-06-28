@@ -81,6 +81,14 @@ fn init_schema(conn: &Connection) -> SqliteResult<()> {
             created_at INTEGER NOT NULL
         );
 
+        CREATE TABLE IF NOT EXISTS vector_embeddings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            company_id INTEGER NOT NULL,
+            text_content TEXT NOT NULL,
+            embedding TEXT NOT NULL,
+            created_at INTEGER NOT NULL
+        );
+
         CREATE TABLE IF NOT EXISTS signals (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             lead_id INTEGER NOT NULL REFERENCES leads(id) ON DELETE CASCADE,

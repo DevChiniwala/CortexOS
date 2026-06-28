@@ -4,6 +4,7 @@
 pub mod llm;
 pub mod apollo;
 pub mod flow;
+pub mod memory;
 
 pub mod models {
     use serde::{Deserialize, Serialize};
