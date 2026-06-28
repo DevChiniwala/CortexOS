@@ -157,10 +157,130 @@ pub async fn extract_claims(raw_content: &str, url: &str, topic: &str) -> Result
     Ok(vec![])
 }
 
-pub fn verify_claim(claim: &ExtractedClaim, raw_content: &str) -> bool {
-    if claim.quote.is_empty() {
-        return false;
-    }
-    // Pure Rust string matching for zero-hallucination verification
-    raw_content.contains(&claim.quote)
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct VerificationResult {
+    pub passed: bool,
+    pub confidence: f32,    // 1.0 = exact match, 0.85+ = near match
+    pub match_type: String, // "exact", "normalized", "fuzzy", "failed"
 }
+
+/// Normalize text for comparison: collapse whitespace, normalize quotes,
+/// dashes, and other characters LLMs commonly alter when re-typing quotes.
+fn normalize_for_comparison(s: &str) -> String {
+    let mut result = String::with_capacity(s.len());
+    let mut last_was_space = false;
+
+    for c in s.chars() {
+        let normalized = match c {
+            // Smart quotes → straight quotes
+            '\u{2018}' | '\u{2019}' | '\u{201A}' | '\u{2039}' | '\u{203A}' => '\'',
+            '\u{201C}' | '\u{201D}' | '\u{201E}' | '\u{00AB}' | '\u{00BB}' => '"',
+            // Em/en dashes → hyphen
+            '\u{2013}' | '\u{2014}' | '\u{2012}' => '-',
+            // Ellipsis → three dots
+            '\u{2026}' => '.',
+            // Non-breaking space → regular space
+            '\u{00A0}' => ' ',
+            other => other,
+        };
+
+        if normalized.is_whitespace() {
+            if !last_was_space {
+                result.push(' ');
+                last_was_space = true;
+            }
+        } else {
+            result.push(normalized.to_lowercase().next().unwrap_or(normalized));
+            last_was_space = false;
+        }
+    }
+
+    result.trim().to_string()
+}
+
+/// Hardened claim verifier that handles near-exact quotes.
+/// Three-tier matching:
+///   1. Exact substring match → confidence 1.0
+///   2. Normalized match (after collapsing whitespace/quotes/dashes) → confidence 0.92
+///   3. Fuzzy match (longest common subsequence ratio) → confidence = LCS ratio if >= 0.80
+pub fn verify_claim(claim: &ExtractedClaim, raw_content: &str) -> VerificationResult {
+    if claim.quote.is_empty() || claim.quote.len() < 10 {
+        return VerificationResult { passed: false, confidence: 0.0, match_type: "failed".to_string() };
+    }
+
+    // Tier 1: Exact match
+    if raw_content.contains(&claim.quote) {
+        return VerificationResult { passed: true, confidence: 1.0, match_type: "exact".to_string() };
+    }
+
+    // Tier 2: Normalized match
+    let norm_quote = normalize_for_comparison(&claim.quote);
+    let norm_source = normalize_for_comparison(raw_content);
+
+    if norm_source.contains(&norm_quote) {
+        return VerificationResult { passed: true, confidence: 0.92, match_type: "normalized".to_string() };
+    }
+
+    // Tier 3: Fuzzy match — sliding window LCS ratio over the source
+    // Only attempt this for quotes under 500 chars to avoid O(n*m) blowup
+    if norm_quote.len() < 500 {
+        let quote_chars: Vec<char> = norm_quote.chars().collect();
+        let source_chars: Vec<char> = norm_source.chars().collect();
+        let q_len = quote_chars.len();
+
+        if q_len > 0 && source_chars.len() >= q_len {
+            let window_size = (q_len as f32 * 1.3) as usize; // Allow 30% larger window
+            let mut best_ratio: f32 = 0.0;
+
+            let step = std::cmp::max(1, q_len / 10); // Don't check every single offset
+            let mut i = 0;
+            while i + q_len <= source_chars.len() {
+                let end = std::cmp::min(i + window_size, source_chars.len());
+                let window: String = source_chars[i..end].iter().collect();
+                let ratio = lcs_ratio(&norm_quote, &window);
+                if ratio > best_ratio {
+                    best_ratio = ratio;
+                }
+                if best_ratio >= 0.95 { break; } // Early exit on strong match
+                i += step;
+            }
+
+            if best_ratio >= 0.80 {
+                return VerificationResult { passed: true, confidence: best_ratio, match_type: "fuzzy".to_string() };
+            }
+        }
+    }
+
+    VerificationResult { passed: false, confidence: 0.0, match_type: "failed".to_string() }
+}
+
+/// Longest Common Subsequence ratio between two strings.
+/// Returns a value between 0.0 and 1.0.
+fn lcs_ratio(a: &str, b: &str) -> f32 {
+    let a_chars: Vec<char> = a.chars().collect();
+    let b_chars: Vec<char> = b.chars().collect();
+    let m = a_chars.len();
+    let n = b_chars.len();
+
+    if m == 0 || n == 0 { return 0.0; }
+
+    // Space-optimized LCS using two rows
+    let mut prev = vec![0u32; n + 1];
+    let mut curr = vec![0u32; n + 1];
+
+    for i in 1..=m {
+        for j in 1..=n {
+            if a_chars[i - 1] == b_chars[j - 1] {
+                curr[j] = prev[j - 1] + 1;
+            } else {
+                curr[j] = std::cmp::max(prev[j], curr[j - 1]);
+            }
+        }
+        std::mem::swap(&mut prev, &mut curr);
+        curr.iter_mut().for_each(|x| *x = 0);
+    }
+
+    let lcs_len = prev[n] as f32;
+    lcs_len / m as f32
+}
+

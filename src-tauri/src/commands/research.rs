@@ -140,7 +140,14 @@ pub async fn start_research(
                         
                         if let Ok(claims) = llm::extract_claims(raw, &res.url, &topic_task).await {
                             for claim in claims {
-                                if llm::verify_claim(&claim, raw) {
+                                let result = llm::verify_claim(&claim, raw);
+                                if result.passed {
+                                    let _ = app_task.emit("stream_event", llm::LogEntry {
+                                        log_type: "system".to_string(),
+                                        content: format!("  ✓ Verified ({}%, {}): {}", (result.confidence * 100.0) as u32, result.match_type, &claim.claim[..std::cmp::min(80, claim.claim.len())]),
+                                        timestamp: chrono::Utc::now().timestamp_millis(),
+                                        tool_name: None,
+                                    });
                                     verified.push(claim);
                                 }
                             }
