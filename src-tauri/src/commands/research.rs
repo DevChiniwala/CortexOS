@@ -92,7 +92,7 @@ pub async fn start_research(
     let db_inner = db.inner().clone();
     let lead_name_clone = lead_name.clone();
 
-    tokio::spawn(async move {
+    tauri::async_runtime::spawn(async move {
         let ctx = crate::core::agents::AgentContext {
             app: app_clone.clone(),
             lead_name: lead_name_clone.clone(),
@@ -236,7 +236,7 @@ pub async fn start_person_research(
     let job_id_clone = job_id.clone();
     let db_inner = db.inner().clone();
 
-    tokio::spawn(async move {
+    tauri::async_runtime::spawn(async move {
         match llm::stream_research(app_clone.clone(), prompt).await {
             Ok(_full_response) => {
                 if let Ok(conn) = db_inner.conn.lock() {
@@ -323,7 +323,7 @@ pub async fn start_scoring(
     let job_id_clone = job_id.clone();
     let db_inner = db.inner().clone();
 
-    tokio::spawn(async move {
+    tauri::async_runtime::spawn(async move {
         match llm::stream_research(app_clone.clone(), prompt).await {
             Ok(_full_response) => {
                 if let Ok(conn) = db_inner.conn.lock() {
@@ -406,7 +406,7 @@ pub async fn start_conversation_generation(
 
     let person_name_clone = person_name.clone();
 
-    tokio::spawn(async move {
+    tauri::async_runtime::spawn(async move {
         // --- RAG RETRIEVAL PHASE ---
         let _ = app_clone.emit("stream_event", llm::LogEntry {
             log_type: "system".to_string(),

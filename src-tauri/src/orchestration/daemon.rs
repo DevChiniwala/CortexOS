@@ -7,7 +7,7 @@ use crate::db::get_db_path;
 pub fn start_verification_daemon() {
     let db_path = get_db_path();
 
-    tokio::spawn(async move {
+    tauri::async_runtime::spawn(async move {
         info!("Data Integrity Verification Daemon started");
 
         loop {

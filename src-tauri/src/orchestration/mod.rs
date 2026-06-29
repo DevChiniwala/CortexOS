@@ -70,7 +70,7 @@ pub fn start_orchestrator(app_handle: AppHandle) -> mpsc::Sender<String> {
     // Start background verification daemon
     daemon::start_verification_daemon();
 
-    tokio::spawn(async move {
+    tauri::async_runtime::spawn(async move {
         info!("Orchestration Engine started");
         
         loop {
@@ -95,7 +95,7 @@ pub fn start_orchestrator(app_handle: AppHandle) -> mpsc::Sender<String> {
                                     continue;
                                 }
 
-                                tokio::spawn(async move {
+                                tauri::async_runtime::spawn(async move {
                                     use crate::agents::{researcher::ResearcherAgent, copywriter::CopywriterAgent};
                                     use crate::orchestration::agent::{Agent, AgentContext};
                                     use std::collections::HashMap;
