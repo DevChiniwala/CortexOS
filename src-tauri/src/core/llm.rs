@@ -1,7 +1,3 @@
-use async_openai::{
-    types::{CreateChatCompletionRequestArgs, ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs, CreateEmbeddingRequestArgs},
-    Client,
-};
 use futures::StreamExt;
 use tauri::{AppHandle, Emitter};
 use std::env;
@@ -16,59 +12,169 @@ pub struct LogEntry {
     pub tool_name: Option<String>,
 }
 
-pub async fn stream_research(app: AppHandle, prompt: String) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+// ─── Gemini HTTP helpers ───────────────────────────────────────────
+
+fn gemini_api_key() -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
     dotenv::dotenv().ok();
-    
-    let api_key = env::var("OPENAI_API_KEY").unwrap_or_default();
-    if api_key.is_empty() {
-        emit_log(&app, "error", "OPENAI_API_KEY is not set in environment.");
-        return Err("Missing OPENAI_API_KEY".into());
+    let key = env::var("GEMINI_API_KEY").unwrap_or_default();
+    if key.is_empty() {
+        return Err("Missing GEMINI_API_KEY in .env".into());
+    }
+    Ok(key)
+}
+
+/// Non-streaming Gemini call (for extraction). Returns the text content.
+async fn gemini_generate(
+    model: &str,
+    system_prompt: &str,
+    user_prompt: &str,
+    json_mode: bool,
+) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    let api_key = gemini_api_key()?;
+    let url = format!(
+        "https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent?key={}",
+        model, api_key
+    );
+
+    let mut generation_config = serde_json::json!({
+        "temperature": 0.2,
+        "maxOutputTokens": 4096,
+    });
+
+    if json_mode {
+        generation_config["responseMimeType"] = serde_json::json!("application/json");
     }
 
-    let client = Client::new();
+    let body = serde_json::json!({
+        "systemInstruction": {
+            "parts": [{ "text": system_prompt }]
+        },
+        "contents": [
+            {
+                "role": "user",
+                "parts": [{ "text": user_prompt }]
+            }
+        ],
+        "generationConfig": generation_config,
+    });
 
-    let request = CreateChatCompletionRequestArgs::default()
-        .model("gpt-4o")
-        .max_tokens(1024_u32)
-        .messages([
-            ChatCompletionRequestSystemMessageArgs::default()
-                .content("You are an autonomous B2B research agent. You are researching a target entity to generate actionable sales insights and a unified battlecard. Think step-by-step and explain your reasoning.")
-                .build()?
-                .into(),
-            ChatCompletionRequestUserMessageArgs::default()
-                .content(prompt)
-                .build()?
-                .into(),
-        ])
-        .build()?;
+    let client = reqwest::Client::new();
+    let resp = client.post(&url)
+        .header("Content-Type", "application/json")
+        .json(&body)
+        .send()
+        .await?;
 
-    emit_log(&app, "system", "Connecting to OpenAI...");
+    let status = resp.status();
+    let text = resp.text().await?;
 
-    let mut stream = client.chat().create_stream(request).await?;
+    if !status.is_success() {
+        return Err(format!("Gemini API error ({}): {}", status, text).into());
+    }
+
+    let json: serde_json::Value = serde_json::from_str(&text)?;
+
+    // Extract content from: candidates[0].content.parts[0].text
+    let content = json["candidates"]
+        .get(0)
+        .and_then(|c| c["content"]["parts"].get(0))
+        .and_then(|p| p["text"].as_str())
+        .unwrap_or("")
+        .to_string();
+
+    Ok(content)
+}
+
+/// Streaming Gemini call (for synthesis). Emits tokens via Tauri events.
+async fn gemini_stream(
+    app: &AppHandle,
+    model: &str,
+    system_prompt: &str,
+    user_prompt: &str,
+) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    let api_key = gemini_api_key()?;
+    let url = format!(
+        "https://generativelanguage.googleapis.com/v1beta/models/{}:streamGenerateContent?alt=sse&key={}",
+        model, api_key
+    );
+
+    let body = serde_json::json!({
+        "systemInstruction": {
+            "parts": [{ "text": system_prompt }]
+        },
+        "contents": [
+            {
+                "role": "user",
+                "parts": [{ "text": user_prompt }]
+            }
+        ],
+        "generationConfig": {
+            "temperature": 0.3,
+            "maxOutputTokens": 8192,
+        },
+    });
+
+    let client = reqwest::Client::new();
+    let resp = client.post(&url)
+        .header("Content-Type", "application/json")
+        .json(&body)
+        .send()
+        .await?;
+
+    if !resp.status().is_success() {
+        let status = resp.status();
+        let text = resp.text().await?;
+        return Err(format!("Gemini streaming error ({}): {}", status, text).into());
+    }
+
     let mut full_response = String::new();
+    let mut stream = resp.bytes_stream();
+    let mut buffer = String::new();
 
-    emit_log(&app, "agent", "Thinking...");
+    while let Some(chunk_result) = stream.next().await {
+        let chunk_bytes = chunk_result?;
+        let chunk_str = String::from_utf8_lossy(&chunk_bytes);
+        buffer.push_str(&chunk_str);
 
-    while let Some(result) = stream.next().await {
-        match result {
-            Ok(response) => {
-                for choice in response.choices {
-                    if let Some(content) = choice.delta.content {
-                        full_response.push_str(&content);
-                        // Emit token stream
-                        emit_log(&app, "agent", &content);
+        // Process complete SSE lines
+        while let Some(line_end) = buffer.find('\n') {
+            let line = buffer[..line_end].trim().to_string();
+            buffer = buffer[line_end + 1..].to_string();
+
+            if line.starts_with("data: ") {
+                let json_str = &line[6..];
+                if let Ok(json) = serde_json::from_str::<serde_json::Value>(json_str) {
+                    if let Some(text) = json["candidates"]
+                        .get(0)
+                        .and_then(|c| c["content"]["parts"].get(0))
+                        .and_then(|p| p["text"].as_str())
+                    {
+                        full_response.push_str(text);
+                        emit_log(app, "agent", text);
                     }
                 }
-            }
-            Err(err) => {
-                emit_log(&app, "error", &format!("Stream error: {}", err));
             }
         }
     }
 
-    emit_log(&app, "result", "Research synthesis complete.");
-
     Ok(full_response)
+}
+
+// ─── Public API (same signatures as before) ─────────────────────────
+
+pub async fn stream_research(app: AppHandle, prompt: String) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    emit_log(&app, "system", "Connecting to Gemini...");
+    emit_log(&app, "agent", "Thinking...");
+
+    let result = gemini_stream(
+        &app,
+        "gemini-2.5-flash",
+        "You are an autonomous B2B research agent. You are researching a target entity to generate actionable sales insights and a unified battlecard. Think step-by-step and explain your reasoning.",
+        &prompt,
+    ).await?;
+
+    emit_log(&app, "result", "Research synthesis complete.");
+    Ok(result)
 }
 
 fn emit_log(app: &AppHandle, log_type: &str, content: &str) {
@@ -81,26 +187,46 @@ fn emit_log(app: &AppHandle, log_type: &str, content: &str) {
 }
 
 pub async fn generate_embedding(text: &str) -> Result<Vec<f32>, Box<dyn std::error::Error + Send + Sync>> {
-    dotenv::dotenv().ok();
-    
-    let api_key = env::var("OPENAI_API_KEY").unwrap_or_default();
-    if api_key.is_empty() {
-        return Err("Missing OPENAI_API_KEY".into());
+    let api_key = gemini_api_key()?;
+
+    let url = format!(
+        "https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={}",
+        api_key
+    );
+
+    let body = serde_json::json!({
+        "model": "models/text-embedding-004",
+        "content": {
+            "parts": [{ "text": text }]
+        }
+    });
+
+    let client = reqwest::Client::new();
+    let resp = client.post(&url)
+        .header("Content-Type", "application/json")
+        .json(&body)
+        .send()
+        .await?;
+
+    let status = resp.status();
+    let text_resp = resp.text().await?;
+
+    if !status.is_success() {
+        return Err(format!("Gemini Embedding error ({}): {}", status, text_resp).into());
     }
 
-    let client = Client::new();
-    let request = CreateEmbeddingRequestArgs::default()
-        .model("text-embedding-3-small")
-        .input([text])
-        .build()?;
-        
-    let response = client.embeddings().create(request).await?;
-    
-    if let Some(data) = response.data.first() {
-        Ok(data.embedding.clone())
-    } else {
-        Err("No embedding returned".into())
-    }
+    let json: serde_json::Value = serde_json::from_str(&text_resp)?;
+
+    // Response shape: { "embedding": { "values": [0.1, 0.2, ...] } }
+    let values = json["embedding"]["values"]
+        .as_array()
+        .ok_or("Gemini embedding response missing 'values' array")?;
+
+    let embedding: Vec<f32> = values.iter()
+        .filter_map(|v| v.as_f64().map(|f| f as f32))
+        .collect();
+
+    Ok(embedding)
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -111,53 +237,38 @@ pub struct ExtractedClaim {
 }
 
 pub async fn extract_claims(raw_content: &str, url: &str, topic: &str) -> Result<Vec<ExtractedClaim>, Box<dyn std::error::Error + Send + Sync>> {
-    dotenv::dotenv().ok();
-    
-    let api_key = env::var("OPENAI_API_KEY").unwrap_or_default();
-    if api_key.is_empty() {
-        return Err("Missing OPENAI_API_KEY".into());
-    }
-
-    let client = Client::new();
-    let prompt = format!(
+    let user_prompt = format!(
         "You are an extraction agent. Extract facts from the following text about: {}.\n\
-        Return a JSON array of objects with 'claim', 'quote' (must be an exact verbatim substring), and 'source_url' (set to '{}').\n\
-        If no relevant facts are found, return [].\n\nTEXT:\n{}",
+        Return a JSON object with a single key 'claims' containing an array of objects, each with 'claim', 'quote' (must be an exact verbatim substring from the text), and 'source_url' (set to '{}').\n\
+        If no relevant facts are found, return {{\"claims\": []}}.\n\nTEXT:\n{}",
         topic, url, raw_content
     );
 
-    let request = CreateChatCompletionRequestArgs::default()
-        .model("gpt-4o-mini") // Cheaper and faster for extraction
-        .response_format(serde_json::json!({ "type": "json_object" }))
-        .messages([
-            ChatCompletionRequestSystemMessageArgs::default()
-                .content("You are a JSON fact extractor. Return ONLY valid JSON in this format: { \"claims\": [ { \"claim\": \"...\", \"quote\": \"...\", \"source_url\": \"...\" } ] }.")
-                .build()?
-                .into(),
-            ChatCompletionRequestUserMessageArgs::default()
-                .content(prompt)
-                .build()?
-                .into(),
-        ])
-        .build()?;
+    let content = gemini_generate(
+        "gemini-2.5-flash",
+        "You are a JSON fact extractor. Return ONLY valid JSON in this format: { \"claims\": [ { \"claim\": \"...\", \"quote\": \"...\", \"source_url\": \"...\" } ] }.",
+        &user_prompt,
+        true, // JSON mode
+    ).await?;
 
-    let response = client.chat().create(request).await?;
-    
-    if let Some(choice) = response.choices.first() {
-        if let Some(content) = &choice.message.content {
-            #[derive(serde::Deserialize)]
-            struct ExtractionResponse {
-                claims: Vec<ExtractedClaim>,
+    #[derive(serde::Deserialize)]
+    struct ExtractionResponse {
+        claims: Vec<ExtractedClaim>,
+    }
+
+    match serde_json::from_str::<ExtractionResponse>(&content) {
+        Ok(res) => Ok(res.claims),
+        Err(_) => {
+            // Try to parse as a direct array
+            match serde_json::from_str::<Vec<ExtractedClaim>>(&content) {
+                Ok(claims) => Ok(claims),
+                Err(_) => Ok(vec![]),
             }
-            let res: ExtractionResponse = serde_json::from_str(content)?;
-            return Ok(res.claims);
         }
     }
-    
-    Ok(vec![])
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct VerificationResult {
     pub passed: bool,
     pub confidence: f32,    // 1.0 = exact match, 0.85+ = near match
@@ -249,6 +360,7 @@ pub fn verify_claim(claim: &ExtractedClaim, raw_content: &str) -> VerificationRe
         if q_len > 0 && source_chars.len() >= q_len {
             let window_size = (q_len as f32 * 1.3) as usize; // Allow 30% larger window
             let mut best_ratio: f32 = 0.0;
+            let mut best_window = String::new();
 
             let step = std::cmp::max(1, q_len / 10); // Don't check every single offset
             let mut i = 0;
@@ -258,6 +370,7 @@ pub fn verify_claim(claim: &ExtractedClaim, raw_content: &str) -> VerificationRe
                 let ratio = lcs_ratio(&norm_quote, &window);
                 if ratio > best_ratio {
                     best_ratio = ratio;
+                    best_window = window;
                 }
                 if best_ratio >= 0.95 { break; } // Early exit on strong match
                 i += step;
@@ -267,10 +380,10 @@ pub fn verify_claim(claim: &ExtractedClaim, raw_content: &str) -> VerificationRe
                 // Secondary check: verify numbers in the fuzzy match to prevent LCS hallucination
                 // e.g. "20%" vs "200%" will have a high LCS but different numbers
                 let quote_nums = extract_numbers(&norm_quote);
-                let window_nums = extract_numbers(&window);
+                let window_nums = extract_numbers(&best_window);
                 let mut numbers_match = true;
-                for num in quote_nums {
-                    if !window_nums.contains(&num) {
+                for num in &quote_nums {
+                    if !window_nums.contains(num) {
                         numbers_match = false;
                         break;
                     }
@@ -315,4 +428,3 @@ fn lcs_ratio(a: &str, b: &str) -> f32 {
     let lcs_len = prev[n] as f32;
     lcs_len / m as f32
 }
-

@@ -41,10 +41,52 @@ impl LlmClient {
         }
     }
 
-    pub async fn completion(&self, system_prompt: &str, messages: &[Message]) -> Result<String, String> {
-        // Stub implementation - will be expanded to support Anthropic/OpenAI
-        // For now, it just simulates an API call
-        tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
-        Ok(format!("Simulated response from {} acting as {}", self.model, system_prompt))
+    pub async fn completion(&self, system_prompt: &str, _messages: &[Message]) -> Result<String, String> {
+        let url = format!(
+            "https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent?key={}",
+            self.model, self.api_key
+        );
+
+        let body = serde_json::json!({
+            "systemInstruction": {
+                "parts": [{ "text": system_prompt }]
+            },
+            "contents": [
+                {
+                    "role": "user",
+                    "parts": [{ "text": _messages.last().map(|m| m.content.as_str()).unwrap_or("") }]
+                }
+            ],
+            "generationConfig": {
+                "temperature": 0.3,
+                "maxOutputTokens": 4096,
+            },
+        });
+
+        let resp = self.client.post(&url)
+            .header("Content-Type", "application/json")
+            .json(&body)
+            .send()
+            .await
+            .map_err(|e| format!("Gemini request failed: {}", e))?;
+
+        let status = resp.status();
+        let text = resp.text().await.map_err(|e| e.to_string())?;
+
+        if !status.is_success() {
+            return Err(format!("Gemini API error ({}): {}", status, text));
+        }
+
+        let json: serde_json::Value = serde_json::from_str(&text)
+            .map_err(|e| format!("Failed to parse Gemini response: {}", e))?;
+
+        let content = json["candidates"]
+            .get(0)
+            .and_then(|c| c["content"]["parts"].get(0))
+            .and_then(|p| p["text"].as_str())
+            .unwrap_or("")
+            .to_string();
+
+        Ok(content)
     }
 }

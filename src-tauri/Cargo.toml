@@ -31,12 +31,11 @@ chrono = { version = "0.4", features = ["serde"] }
 thiserror = "2"
 dirs = "5"
 which = "7"
-reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "stream"] }
 sha2 = "0.10"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 async-trait = "0.1.80"
-async-openai = "0.23.0"
 dotenv = "0.15.0"
 futures = "0.3"
 # Unix signal handling for graceful process shutdown

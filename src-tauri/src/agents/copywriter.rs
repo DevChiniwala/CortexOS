@@ -57,7 +57,7 @@ You must output ONLY valid JSON in the following format:
         let response = self.llm.completion(&self.system_prompt(), &messages).await?;
 
         // Store generated copy in memory
-        context.memory.insert("copywriter_raw_output", &response);
+        context.memory.insert("copywriter_raw_output".to_string(), response.clone());
 
         Ok(response)
     }

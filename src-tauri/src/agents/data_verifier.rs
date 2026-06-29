@@ -50,7 +50,7 @@ If no corrections are needed, the 'corrections' object should be empty."#
 
         let response = self.llm.completion(&self.system_prompt(), &messages).await?;
 
-        context.memory.insert("data_verifier_raw_output", &response);
+        context.memory.insert("data_verifier_raw_output".to_string(), response.clone());
 
         Ok(response)
     }

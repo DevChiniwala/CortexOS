@@ -94,11 +94,13 @@ async fn run_specialist(ctx: &AgentContext, agent_name: &str, query: &str) -> Ag
         tool_name: None,
     });
 
+    let verified_count = verified.len();
+
     AgentArtifact {
         agent_name: agent_name.to_string(),
         claims: verified,
         raw_claim_count: raw_count,
-        verified_claim_count: verified.len(),
+        verified_claim_count: verified_count,
     }
 }
 

@@ -52,8 +52,8 @@ You must output ONLY valid JSON in the following format:
         let response = self.llm.completion(&self.system_prompt(), &messages).await?;
 
         // Store some metadata in working memory
-        context.memory.insert("last_researched_entity", input);
-        context.memory.insert("researcher_raw_output", &response);
+        context.memory.insert("last_researched_entity".to_string(), input.to_string());
+        context.memory.insert("researcher_raw_output".to_string(), response.clone());
 
         Ok(response)
     }
