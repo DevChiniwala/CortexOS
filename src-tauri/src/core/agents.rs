@@ -6,7 +6,7 @@ use crate::core::{llm, tavily};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AgentArtifact {
     pub agent_name: String,
-    pub claims: Vec<llm::ExtractedClaim>,
+    pub claims: Vec<(llm::ExtractedClaim, llm::VerificationResult)>,
     pub raw_claim_count: usize,
     pub verified_claim_count: usize,
 }
@@ -81,7 +81,7 @@ async fn run_specialist(ctx: &AgentContext, agent_name: &str, query: &str) -> Ag
                         timestamp: chrono::Utc::now().timestamp_millis(),
                         tool_name: None,
                     });
-                    verified.push(claim);
+                    verified.push((claim, result));
                 }
             }
         }
@@ -167,7 +167,7 @@ pub async fn synthesize_profile(ctx: &AgentContext, artifacts: &[AgentArtifact])
     }
 
     let mut evidence_str = String::new();
-    for (i, claim) in all_claims.iter().enumerate() {
+    for (i, (claim, _result)) in all_claims.iter().enumerate() {
         evidence_str.push_str(&format!("[{}]: \"{}\" (Source: {})\n", i + 1, claim.claim, claim.source_url));
     }
 
@@ -201,8 +201,13 @@ pub async fn synthesize_profile(ctx: &AgentContext, artifacts: &[AgentArtifact])
         Ok(full_response) => {
             let mut final_output = full_response;
             final_output.push_str("\n\n---\n### Verified Evidence & Citations\n");
-            for (i, claim) in all_claims.iter().enumerate() {
-                final_output.push_str(&format!("**[{}]** \"{}\" — [Source]({})\n", i + 1, claim.quote, claim.source_url));
+            for (i, (claim, result)) in all_claims.iter().enumerate() {
+                let badge = if result.match_type == "fuzzy" {
+                    format!("Likely Match ({}%)", (result.confidence * 100.0) as u32)
+                } else {
+                    "✓ Verified".to_string()
+                };
+                final_output.push_str(&format!("**[{}]** \"{}\" — [Source]({}) `{}`\n", i + 1, claim.quote, claim.source_url, badge));
             }
 
             let total_raw: usize = artifacts.iter().map(|a| a.raw_claim_count).sum();

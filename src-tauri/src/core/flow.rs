@@ -241,7 +241,7 @@ pub async fn execute_dag(app: AppHandle, payload: FlowPayload) -> Result<(), Str
                 // Build a text blob from all verified claims and embed it
                 let mut memory_text = String::new();
                 for artifact in &artifacts {
-                    for claim in &artifact.claims {
+                    for (claim, _result) in &artifact.claims {
                         memory_text.push_str(&format!("{} ", claim.claim));
                     }
                 }

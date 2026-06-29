@@ -198,6 +198,24 @@ fn normalize_for_comparison(s: &str) -> String {
     result.trim().to_string()
 }
 
+/// Helper to extract contiguous numeric digits from a string to validate facts
+fn extract_numbers(s: &str) -> Vec<String> {
+    let mut numbers = Vec::new();
+    let mut current = String::new();
+    for c in s.chars() {
+        if c.is_ascii_digit() {
+            current.push(c);
+        } else if !current.is_empty() {
+            numbers.push(current.clone());
+            current.clear();
+        }
+    }
+    if !current.is_empty() {
+        numbers.push(current);
+    }
+    numbers
+}
+
 /// Hardened claim verifier that handles near-exact quotes.
 /// Three-tier matching:
 ///   1. Exact substring match → confidence 1.0
@@ -246,7 +264,21 @@ pub fn verify_claim(claim: &ExtractedClaim, raw_content: &str) -> VerificationRe
             }
 
             if best_ratio >= 0.80 {
-                return VerificationResult { passed: true, confidence: best_ratio, match_type: "fuzzy".to_string() };
+                // Secondary check: verify numbers in the fuzzy match to prevent LCS hallucination
+                // e.g. "20%" vs "200%" will have a high LCS but different numbers
+                let quote_nums = extract_numbers(&norm_quote);
+                let window_nums = extract_numbers(&window);
+                let mut numbers_match = true;
+                for num in quote_nums {
+                    if !window_nums.contains(&num) {
+                        numbers_match = false;
+                        break;
+                    }
+                }
+                
+                if numbers_match {
+                    return VerificationResult { passed: true, confidence: best_ratio, match_type: "fuzzy".to_string() };
+                }
             }
         }
     }
