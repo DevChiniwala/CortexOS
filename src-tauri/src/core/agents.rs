@@ -146,11 +146,36 @@ pub fn verify_artifacts(artifacts: &[AgentArtifact]) -> AgentArtifact {
         all_claims.extend(artifact.claims.clone());
     }
 
+    // De-duplicate and find multi-source corroborations
+    let mut deduplicated: Vec<(llm::ExtractedClaim, llm::VerificationResult)> = Vec::new();
+    
+    for (claim, result) in all_claims {
+        let mut found_match = false;
+        
+        for (existing_claim, existing_result) in deduplicated.iter_mut() {
+            // If the text is very similar (LCS > 0.85)
+            if llm::lcs_ratio(&claim.claim, &existing_claim.claim) > 0.85 {
+                // And it comes from a different source URL
+                if claim.source_url != existing_claim.source_url {
+                    existing_result.source_count += 1;
+                    existing_result.corroborated = true;
+                    // Optional: we could append the URL, but keeping the first is cleaner for markdown links
+                }
+                found_match = true;
+                break;
+            }
+        }
+        
+        if !found_match {
+            deduplicated.push((claim, result));
+        }
+    }
+
     AgentArtifact {
         agent_name: "Verifier".to_string(),
-        claims: all_claims.clone(),
+        claims: deduplicated.clone(),
         raw_claim_count: total_raw,
-        verified_claim_count: all_claims.len(),
+        verified_claim_count: deduplicated.len(),
     }
 }
 
@@ -209,7 +234,8 @@ pub async fn synthesize_profile(ctx: &AgentContext, artifacts: &[AgentArtifact])
                 } else {
                     "✓ Verified".to_string()
                 };
-                final_output.push_str(&format!("**[{}]** \"{}\" — [Source]({}) `{}`\n", i + 1, claim.quote, claim.source_url, badge));
+                let src_meta = if result.source_count > 1 { format!(" |src={}|", result.source_count) } else { "".to_string() };
+                final_output.push_str(&format!("**[{}]** \"{}\" — [Source]({}) `{}`{}\n", i + 1, claim.quote, claim.source_url, badge, src_meta));
             }
 
             let total_raw: usize = artifacts.iter().map(|a| a.raw_claim_count).sum();

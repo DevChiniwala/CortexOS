@@ -49,7 +49,7 @@ pub async fn start_research(
         entity_label: lead_name.clone(),
         status: "running".to_string(),
         prompt: custom_prompt.clone().unwrap_or_else(|| format!("Research {}", lead_name)),
-        model: Some("gpt-4o".to_string()),
+        model: Some("gemini-2.5-flash".to_string()),
         working_dir: format!("/tmp/cortex/{}", job_id),
         output_path: None,
         exit_code: None,
@@ -199,7 +199,7 @@ pub async fn start_person_research(
         entity_label: person_name.clone(),
         status: "running".to_string(),
         prompt: custom_prompt.clone().unwrap_or_else(|| format!("Research {}", person_name)),
-        model: Some("gpt-4o".to_string()),
+        model: Some("gemini-2.5-flash".to_string()),
         working_dir: format!("/tmp/cortex/{}", job_id),
         output_path: None,
         exit_code: None,
@@ -235,12 +235,75 @@ pub async fn start_person_research(
     let app_clone = app.clone();
     let job_id_clone = job_id.clone();
     let db_inner = db.inner().clone();
+    let person_name_clone = person_name.clone();
 
     tauri::async_runtime::spawn(async move {
-        match llm::stream_research(app_clone.clone(), prompt).await {
-            Ok(_full_response) => {
+        // Step 1: Search the web for the person
+        let search_query = format!("{} professional background linkedin", person_name_clone);
+        let _ = app_clone.emit("stream_event", llm::LogEntry {
+            log_type: "system".to_string(),
+            content: format!("Searching web for: {}", search_query),
+            timestamp: chrono::Utc::now().timestamp_millis(),
+            tool_name: None,
+        });
+
+        let results = crate::core::tavily::search(&search_query, 3).await.unwrap_or_default();
+        let mut verified_claims = Vec::new();
+
+        for res in results {
+            let raw = res.raw_content.clone().unwrap_or(res.content.clone());
+            // Extract people facts using the person's name as the context company to extract their specific roles
+            if let Ok(people) = llm::extract_people(&raw, &res.url, &person_name_clone).await {
+                for person in people {
+                    // Only keep facts about the person we're actually researching
+                    if person.name.to_lowercase().contains(&person_name_clone.to_lowercase()) {
+                        let result = llm::verify_person(&person, &raw);
+                        if result.passed {
+                            verified_claims.push((person, result));
+                        }
+                    }
+                }
+            }
+        }
+
+        let mut evidence_str = String::new();
+        for (i, (claim, result)) in verified_claims.iter().enumerate() {
+            evidence_str.push_str(&format!("[{}]: {} is {} \"{}\" (Source: {})\n", i + 1, claim.name, claim.title, claim.quote, claim.source_url));
+        }
+
+        let grounded_prompt = if verified_claims.is_empty() {
+            prompt
+        } else {
+            format!(
+                "{} \n\nCRITICAL INSTRUCTION: You MUST use the verified facts below and include inline citations [1].\n\nVERIFIED EVIDENCE:\n{}",
+                prompt, evidence_str
+            )
+        };
+
+        match llm::stream_research(app_clone.clone(), grounded_prompt).await {
+            Ok(full_response) => {
+                let mut final_output = full_response;
+                if !verified_claims.is_empty() {
+                    final_output.push_str("\n\n---\n### Verified Evidence & Citations\n");
+                    for (i, (claim, result)) in verified_claims.iter().enumerate() {
+                        let badge = if result.match_type == "fuzzy" {
+                            format!("Likely Match ({}%)", (result.confidence * 100.0) as u32)
+                        } else {
+                            "✓ Verified".to_string()
+                        };
+                        final_output.push_str(&format!("**[{}]** \"{}\" — [Source]({}) `{}`\n", i + 1, claim.quote, claim.source_url, badge));
+                    }
+                }
+
                 if let Ok(conn) = db_inner.conn.lock() {
+                    // Save to person profile (assumes a queries::save_person_profile exists or update person)
+                    // Just update the status for now as before.
                     let _ = queries::update_job_status(&conn, &job_id_clone, "completed", Some(0));
+                    // Update person research status
+                    let _ = conn.execute(
+                        "UPDATE contacts SET research_status = 'completed', person_profile = ?1, researched_at = ?2 WHERE id = ?3",
+                        (final_output, chrono::Utc::now().timestamp_millis(), person_id)
+                    );
                 }
                 events::emit_job_status_changed(&app_clone, job_id_clone, "completed".to_string(), Some(0));
             }

@@ -321,6 +321,8 @@ pub struct VerificationResult {
     pub passed: bool,
     pub confidence: f32,    // 1.0 = exact match, 0.85+ = near match
     pub match_type: String, // "exact", "normalized", "fuzzy", "failed"
+    pub source_count: u32,
+    pub corroborated: bool,
 }
 
 /// Normalize text for comparison: collapse whitespace, normalize quotes,
@@ -382,12 +384,12 @@ fn extract_numbers(s: &str) -> Vec<String> {
 ///   3. Fuzzy match (longest common subsequence ratio) → confidence = LCS ratio if >= 0.80
 pub fn verify_claim(claim: &ExtractedClaim, raw_content: &str) -> VerificationResult {
     if claim.quote.is_empty() || claim.quote.len() < 10 {
-        return VerificationResult { passed: false, confidence: 0.0, match_type: "failed".to_string() };
+        return VerificationResult { passed: false, confidence: 0.0, match_type: "failed".to_string(), source_count: 0, corroborated: false };
     }
 
     // Tier 1: Exact match
     if raw_content.contains(&claim.quote) {
-        return VerificationResult { passed: true, confidence: 1.0, match_type: "exact".to_string() };
+        return VerificationResult { passed: true, confidence: 1.0, match_type: "exact".to_string(), source_count: 1, corroborated: false };
     }
 
     // Tier 2: Normalized match
@@ -395,7 +397,7 @@ pub fn verify_claim(claim: &ExtractedClaim, raw_content: &str) -> VerificationRe
     let norm_source = normalize_for_comparison(raw_content);
 
     if norm_source.contains(&norm_quote) {
-        return VerificationResult { passed: true, confidence: 0.92, match_type: "normalized".to_string() };
+        return VerificationResult { passed: true, confidence: 0.92, match_type: "normalized".to_string(), source_count: 1, corroborated: false };
     }
 
     // Tier 3: Fuzzy match — sliding window LCS ratio over the source
@@ -429,27 +431,26 @@ pub fn verify_claim(claim: &ExtractedClaim, raw_content: &str) -> VerificationRe
                 // e.g. "20%" vs "200%" will have a high LCS but different numbers
                 let quote_nums = extract_numbers(&norm_quote);
                 let window_nums = extract_numbers(&best_window);
-                let mut numbers_match = true;
-                for num in &quote_nums {
-                    if !window_nums.contains(num) {
-                        numbers_match = false;
-                        break;
-                    }
-                }
                 
-                if numbers_match {
-                    return VerificationResult { passed: true, confidence: best_ratio, match_type: "fuzzy".to_string() };
+                if window_nums == quote_nums {
+                    return VerificationResult { 
+                        passed: true, 
+                        confidence: best_ratio, 
+                        match_type: "fuzzy".to_string(),
+                        source_count: 1,
+                        corroborated: false
+                    };
                 }
             }
         }
     }
 
-    VerificationResult { passed: false, confidence: 0.0, match_type: "failed".to_string() }
+    VerificationResult { passed: false, confidence: 0.0, match_type: "failed".to_string(), source_count: 0, corroborated: false }
 }
 
 /// Longest Common Subsequence ratio between two strings.
 /// Returns a value between 0.0 and 1.0.
-fn lcs_ratio(a: &str, b: &str) -> f32 {
+pub fn lcs_ratio(a: &str, b: &str) -> f32 {
     let a_chars: Vec<char> = a.chars().collect();
     let b_chars: Vec<char> = b.chars().collect();
     let m = a_chars.len();

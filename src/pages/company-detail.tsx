@@ -6,6 +6,11 @@ import { Button } from "@/components/ui/button"
 import { StreamTerminal } from "@/components/stream/stream-terminal"
 import { IconArrowLeft, IconCheck, IconX, IconBrandLinkedin, IconWorld, IconMapPin, IconChartBar, IconTrendingUp } from "@tabler/icons-react"
 import { EmptyState } from "@/components/ui/empty-state"
+import { TrustScoreRing } from "@/components/ui/trust-score-ring"
+import { EvidenceCard } from "@/components/ui/evidence-card"
+import { TrustBadge } from "@/components/ui/trust-badge"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import { motion } from "motion/react"
 
 export default function CompanyDetail() {
@@ -16,7 +21,7 @@ export default function CompanyDetail() {
   const { updateCompanyStatus } = useCompanyMutations()
   const { isStreaming, logs, startStream, stopStream } = useStream()
 
-  const [activeTab, setActiveTab] = React.useState<"company" | "people" | "score">("score")
+  const [activeTab, setActiveTab] = React.useState<"company" | "evidence" | "people" | "score">("score")
   const [researchDepth, setResearchDepth] = React.useState<"light" | "standard" | "deep">("deep")
 
   const company = companies.find(c => c.id === Number(id))
@@ -41,6 +46,53 @@ export default function CompanyDetail() {
   const tier = company.score?.tier
   const requirements = company.score?.requirementResults || []
   const signifiers = company.score?.scoreBreakdown || []
+
+  // Extract evidence from markdown if it exists
+  const extractedEvidence = React.useMemo(() => {
+    if (!company.companyProfile) return []
+    const lines = company.companyProfile.split('\n')
+    const evidenceIndex = lines.findIndex(l => l.includes("Verified Evidence & Citations"))
+    if (evidenceIndex === -1) return []
+    
+    const evidenceLines = lines.slice(evidenceIndex + 1).filter(l => l.startsWith('**['))
+    return evidenceLines.map(line => {
+      // **[1]** "quote text" — [Source](url) `badge` |src=2|
+      const match = line.match(/\*\*\[\d+\]\*\* "(.*?)" — \[Source\]\((.*?)\) `(.*?)`(?: \|src=(\d+)\|)?/)
+      if (!match) return null
+      
+      const [_, quote, url, badge, srcCountStr] = match
+      let matchType: "exact" | "normalized" | "fuzzy" = "exact"
+      let conf = 1.0
+      
+      if (badge.includes("Likely Match")) {
+        matchType = "fuzzy"
+        const pct = badge.match(/(\d+)%/)
+        if (pct) conf = parseInt(pct[1]) / 100
+      } else if (badge.includes("Near Match")) {
+        matchType = "normalized"
+        conf = 0.92
+      }
+      
+      const sourceCount = srcCountStr ? parseInt(srcCountStr) : 1
+      
+      return { quote, url, matchType, conf, sourceCount }
+    }).filter(Boolean) as Array<{quote: string, url: string, matchType: "exact" | "normalized" | "fuzzy", conf: number, sourceCount: number}>
+  }, [company.companyProfile])
+
+  // Extract trust score
+  const trustScoreMatch = company.companyProfile?.match(/\*\*Trust Score: (\d+)%\*\* \((\d+) \/ (\d+)/)
+  const trustScore = trustScoreMatch ? {
+    pct: parseInt(trustScoreMatch[1]),
+    verified: parseInt(trustScoreMatch[2]),
+    total: parseInt(trustScoreMatch[3])
+  } : null
+
+  // Split profile from evidence section for display
+  const profileMarkdown = React.useMemo(() => {
+    if (!company.companyProfile) return ""
+    const parts = company.companyProfile.split('---')
+    return parts[0]
+  }, [company.companyProfile])
 
   return (
     <div className="flex flex-col h-full bg-bg">
@@ -109,12 +161,13 @@ export default function CompanyDetail() {
             <div className="flex items-center gap-6 border-b border-line">
               {[
                 { id: "company", label: "Company" },
+                { id: "evidence", label: `Evidence (${extractedEvidence.length})` },
                 { id: "people", label: `People (${companyContacts.length})` },
                 { id: "score", label: `Score (${score || '-'})` }
               ].map(tab => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as "company" | "people" | "score")}
+                  onClick={() => setActiveTab(tab.id as "company" | "evidence" | "people" | "score")}
                   className={`pb-3 text-sm font-medium transition-colors border-b-2 -mb-[1px] ${
                     activeTab === tab.id 
                       ? "border-ink text-ink" 
@@ -138,6 +191,58 @@ export default function CompanyDetail() {
                 </Button>
               </div>
             </div>
+
+            {/* Tab Content: Company */}
+            {activeTab === "company" && company.companyProfile && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="prose prose-invert prose-ink max-w-none prose-headings:font-display prose-headings:font-medium prose-a:text-info prose-a:no-underline hover:prose-a:underline">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {profileMarkdown}
+                </ReactMarkdown>
+              </motion.div>
+            )}
+            {activeTab === "company" && !company.companyProfile && (
+              <EmptyState 
+                icon={<IconChartBar className="w-8 h-8" />}
+                title="No Profile Data"
+                description="Run the deep researcher to generate a unified company profile."
+                className="mt-8"
+              />
+            )}
+
+            {/* Tab Content: Evidence */}
+            {activeTab === "evidence" && extractedEvidence.length > 0 && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                <div className="flex items-center justify-between pb-4 border-b border-line">
+                  <h3 className="text-sm font-semibold tracking-widest text-ink-3 uppercase">Verified Claims ({extractedEvidence.length})</h3>
+                  {trustScore && (
+                    <div className="text-sm text-ink-2">
+                      <strong className={trustScore.pct > 70 ? "text-leaf" : "text-warning"}>{trustScore.pct}% Trust Score</strong> — {trustScore.verified} of {trustScore.total} claims verified
+                    </div>
+                  )}
+                </div>
+                <div className="grid gap-4">
+                  {extractedEvidence.map((ev, i) => (
+                    <EvidenceCard
+                      key={i}
+                      claim={ev.quote.substring(0, 100) + (ev.quote.length > 100 ? "..." : "")}
+                      quote={ev.quote}
+                      sourceUrl={ev.url}
+                      matchType={ev.matchType}
+                      confidence={ev.conf}
+                      sourceCount={ev.sourceCount}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+            {activeTab === "evidence" && extractedEvidence.length === 0 && (
+              <EmptyState 
+                icon={<IconShieldCheck className="w-8 h-8" />}
+                title="No Verified Evidence"
+                description="Run research to extract and verify facts about this company."
+                className="mt-8"
+              />
+            )}
 
             {/* Tab Content: Score */}
             {activeTab === "score" && company.score && (
@@ -231,7 +336,19 @@ export default function CompanyDetail() {
         </div>
 
         {/* Right Sidebar */}
-        <div className="w-80 border-l border-line bg-surface/30 p-8 flex flex-col gap-8 shrink-0 overflow-y-auto">
+        <div className="w-80 border-l border-line bg-surface/30 p-8 flex flex-col gap-10 shrink-0 overflow-y-auto">
+          {/* Top Trust Summary */}
+          {trustScore && (
+            <div className="flex flex-col items-center p-6 bg-surface border border-line rounded-xl shadow-sm">
+              <TrustScoreRing 
+                score={trustScore.pct} 
+                verified={trustScore.verified} 
+                total={trustScore.total} 
+                size={100} 
+              />
+            </div>
+          )}
+
           {/* Top Score Summary */}
           <div className="space-y-3">
             <div className="text-xs font-semibold tracking-widest text-ink-3 uppercase">Score</div>

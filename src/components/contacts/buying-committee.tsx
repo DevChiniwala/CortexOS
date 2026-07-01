@@ -2,6 +2,7 @@ import * as React from "react"
 import type { ContactWithCompany } from "@/lib/types"
 import { IconBuilding, IconCrown, IconCash, IconShieldX, IconUser,  IconTrendingUp } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+import { TrustBadge } from "@/components/ui/trust-badge"
 
 interface BuyingCommitteeProps {
   companyName: string
@@ -68,7 +69,14 @@ export function BuyingCommittee({ companyName, contacts }: BuyingCommitteeProps)
             <div className="flex items-start justify-between mb-3">
               <div className="flex flex-col">
                 <span className="text-sm font-semibold text-ink leading-tight">{contact.firstName} {contact.lastName}</span>
-                <span className="text-xs text-ink-2">{contact.title}</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-ink-2">{contact.title}</span>
+                  {contact.researchStatus === 'completed' ? (
+                    <TrustBadge matchType="exact" size="sm" showLabel={false} />
+                  ) : (
+                    <TrustBadge matchType="manual" size="sm" showLabel={false} />
+                  )}
+                </div>
               </div>
               <div className={cn("px-2 py-1 flex items-center gap-1 rounded text-[10px] uppercase tracking-wider font-bold border", getRoleStyle(contact.buyingRole))}>
                 {getRoleIcon(contact.buyingRole)}

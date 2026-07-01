@@ -34,8 +34,24 @@ export function FlowCanvas() {
           maskColor="rgba(0,0,0,0.7)"
           className="bg-surface border border-line rounded-lg shadow-sm !w-48 !h-32 !bottom-4 !right-4"
         />
-        <Panel position="top-right" className="bg-surface/80 backdrop-blur border border-line px-3 py-1.5 rounded-lg text-xs font-mono text-ink-3">
-          Status: Ready
+        <Panel position="top-right" className="bg-surface/80 backdrop-blur border border-line p-3 rounded-lg flex flex-col gap-3 shadow-sm min-w-[200px]">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-3">Flow Status</span>
+            <span className="text-xs font-mono text-ink-2">Ready</span>
+          </div>
+          <button 
+            onClick={() => {
+              import("@/lib/ipc/commands").then(({ executeFlow }) => {
+                executeFlow({
+                  nodes: nodes.map(n => ({ id: n.id, label: n.data.label as string })),
+                  edges: edges.map(e => ({ source: e.source, target: e.target }))
+                })
+              })
+            }}
+            className="w-full py-2 bg-primary text-white text-sm font-medium rounded shadow hover:bg-primary-hover transition-colors"
+          >
+            ▶ Run Flow
+          </button>
         </Panel>
       </ReactFlow>
     </div>

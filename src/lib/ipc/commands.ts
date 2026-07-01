@@ -349,3 +349,26 @@ export async function getApolloKeyStatus(): Promise<ApolloKeyStatus> {
 export async function getOnboardingStatus(): Promise<OnboardingStatus> {
   return invoke("get_onboarding_status");
 }
+
+// ============================================================================
+// Flow Commands
+// ============================================================================
+
+export interface FlowNode {
+  id: string;
+  label: string;
+}
+
+export interface FlowEdge {
+  source: string;
+  target: string;
+}
+
+export interface FlowPayload {
+  nodes: FlowNode[];
+  edges: FlowEdge[];
+}
+
+export async function executeFlow(payload: FlowPayload): Promise<void> {
+  return invoke("execute_flow", { payload });
+}

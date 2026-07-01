@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { motion } from "motion/react"
 import { AddContactModal } from "@/components/modals/add-contact-modal"
 import { BuyingCommittee } from "@/components/contacts/buying-committee"
+import { TrustBadge } from "@/components/ui/trust-badge"
 import type { ContactWithCompany } from "@/lib/types"
 
 export default function Contacts() {
@@ -81,6 +82,7 @@ export default function Contacts() {
               <thead className="bg-surface-hover text-ink-2 border-b border-line">
                 <tr>
                   <th className="px-6 py-4 font-medium">Name</th>
+                  <th className="px-6 py-4 font-medium">Verification</th>
                   <th className="px-6 py-4 font-medium">Company</th>
                   <th className="px-6 py-4 font-medium">Title</th>
                   <th className="px-6 py-4 font-medium">Role</th>
@@ -95,12 +97,23 @@ export default function Contacts() {
                     onClick={() => navigate(`/contacts/${contact.id}`)}
                   >
                     <td className="px-6 py-4 font-medium">{contact.firstName} {contact.lastName}</td>
+                    <td className="px-6 py-4">
+                      {contact.researchStatus === 'completed' ? (
+                        <TrustBadge matchType="exact" size="sm" showLabel={false} />
+                      ) : (
+                        <TrustBadge matchType="manual" size="sm" showLabel={false} />
+                      )}
+                    </td>
                     <td className="px-6 py-4 text-ink-2">{contact.companyName || "-"}</td>
                     <td className="px-6 py-4 text-ink-2">{contact.title || "-"}</td>
                     <td className="px-6 py-4 text-ink-2">
-                      <span className="px-2 py-0.5 bg-bg border border-line rounded text-xs">{contact.buyingRole || "Unknown"}</span>
+                      {contact.buyingRole ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface border border-line">
+                          {contact.buyingRole}
+                        </span>
+                      ) : "-"}
                     </td>
-                    <td className="px-6 py-4 text-ink-3">{contact.email || "-"}</td>
+                    <td className="px-6 py-4 text-ink-2">{contact.email || "-"}</td>
                   </tr>
                 ))}
               </tbody>
