@@ -12,6 +12,8 @@
   <img src="https://img.shields.io/badge/TypeScript_6-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/>
   <img src="https://img.shields.io/badge/Tailwind_4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind"/>
   <img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite"/>
+  <img src="https://img.shields.io/badge/TanStack_Query-FF4154?style=for-the-badge&logo=reactquery&logoColor=white" alt="TanStack Query"/>
+  <img src="https://img.shields.io/badge/XYFlow-FF0072?style=for-the-badge&logo=react&logoColor=white" alt="XYFlow"/>
 </p>
 
 <p>
@@ -21,7 +23,7 @@
 
 <br/>
 
-[Features](#-features) · [The Verification Engine](#-the-verification-engine) · [Agent Swarm](#-the-agent-swarm) · [GTM Workflow](#-gtm-execution-workflow) · [Pages](#-pages) · [Quick Start](#-quick-start)
+[Features](#-features) · [The Verification Engine](#-the-verification-engine) · [Architecture & Data Flow](#-architecture--data-flow) · [Agent Swarm](#-the-agent-swarm) · [Project Structure](#-project-structure) · [Pages](#-pages) · [Quick Start](#-quick-start)
 
 </div>
 
@@ -53,35 +55,50 @@ It deploys a swarm of specialized AI agents that work in concert to:
 
 Instead of letting an LLM write a summary from its latent knowledge, CortexOS runs a **3-Tier Verification Gauntlet**:
 
-```mermaid
-flowchart LR
-    A[Web Scraper] -->|Raw HTML| B(Extractor LLM)
-    B -->|Claims & Quotes| C{Rust Verifier}
-    C -->|Exact Match| D[🟢 Confidence: 100%]
-    C -->|Normalized Match| E[🔵 Confidence: 92%]
-    C -->|Fuzzy LCS > 80%| F[🟡 Confidence: Computed]
-    C -->|Failed| G[❌ Dropped]
-    D --> H(Synthesizer LLM)
-    E --> H
-    F --> H
-    H -->|Verified Profile| I[✅ Trust Score]
+<div align="center">
+  <img src=".github/assets/verification-gauntlet.svg" alt="3-Tier Verification Gauntlet" width="100%" />
+</div>
 
-    style C fill:#1a1a2e,stroke:#FF5500,stroke-width:2px,color:#fff
-    style D fill:#003311,stroke:#00D084,color:#00D084
-    style E fill:#001a33,stroke:#00AEEF,color:#00AEEF
-    style F fill:#332200,stroke:#FFB020,color:#FFB020
-    style G fill:#330000,stroke:#F43F5E,color:#F43F5E
-    style H fill:#1a1a2e,stroke:#A855F7,color:#A855F7
-```
+<br/>
 
-- **Corroboration:** When independent sources confirm the same fact, the engine merges them into a single corroborated claim (e.g. *"Confirmed by 3 sources"*).
+- **The Gauntlet:** Claims extracted by the LLM are passed into a deterministic Rust engine which verifies them against the raw HTML of the source. It assigns a confidence tier based on the matching strictly: Exact Match (100%), Normalized Match (92%), and Fuzzy LCS (>80%). 
+- **Corroboration Engine:** O(N²) deduplication merges identical claims found across *independent sources* (e.g., Tech Stack Agent and Business Model Agent both find the same metric). The UI displays a striking `"Confirmed by N sources"` pill.
 - **The Trust Score:** Every generated profile is stamped with a deterministic Trust Score—the exact percentage of claims that were mathematically verified. 
+- **The Evidence Tab:** In the UI, click on any generated claim to see exactly where it came from, highlighted on the original source URL.
 
 <br/>
 
 ---
 
-## 🧠 Architecture & Agent Swarm
+## 🏗️ Architecture & Data Flow
+
+CortexOS operates on a high-performance Rust backend connected to a bleeding-edge React 19 frontend via Tauri's IPC bridge.
+
+<div align="center">
+  <img src=".github/assets/data-flow.svg" alt="CortexOS Data Flow and Architecture" width="100%" />
+</div>
+
+<br/>
+
+### The Technology Stack Deep-Dive
+
+**Frontend (Presentation & State)**
+- **Framework:** React 19 + Vite for instantaneous HMR and rendering.
+- **Styling:** Tailwind CSS v4 + Motion (Framer) for buttery-smooth micro-interactions, dark glassmorphism, and neon accents.
+- **State Management:** Zustand for global state (Flows, Selections, UI settings) + TanStack Query v5 for asynchronous data caching and optimistic UI updates.
+- **Complex UI:** `@xyflow/react` for the drag-and-drop Flow Builder canvas, `react-force-graph-2d` for the Memory Graph and Buying Committee visualization, and `recharts` for the pipeline and revenue charts.
+
+**Backend (Core Engine & IO)**
+- **Framework:** Tauri 2 (Rust) providing a lightweight, memory-safe, blazing-fast native application layer.
+- **Database:** Bundled `rusqlite` for local, private, zero-latency data persistence. No cloud database needed.
+- **Concurrency:** `tokio` for handling massive multi-threaded web scraping, API calls, and LLM streaming simultaneously.
+- **Intelligence Bridge:** Direct integrations with Google Gemini 2.5 Flash, Tavily (Search), Apollo (People), and Bombora (Intent Signals).
+
+<br/>
+
+---
+
+## 🤖 The Agent Swarm
 
 CortexOS deploys **8 autonomous agents**, each with specialized worker pools coordinated by a central orchestrator.
 
@@ -207,6 +224,44 @@ flowchart LR
 
 ---
 
+## 📂 Project Structure
+
+```bash
+CortexOS/
+├── .github/
+│   └── assets/                  # SVG assets, diagrams, and branding
+├── src-tauri/                   # Rust Backend (Tauri)
+│   ├── Cargo.toml               # Rust dependencies
+│   ├── build.rs                 # Tauri build script
+│   └── src/
+│       ├── main.rs              # App entry point
+│       ├── lib.rs               # Command registry and setup
+│       ├── agents/              # Autonomous agent logic (Researcher, Scorer, etc.)
+│       ├── commands/            # IPC commands exposed to React
+│       ├── core/                # Core engines (LLM, Tavily, Verification, Flow Executor)
+│       ├── db/                  # SQLite schema, queries, and state management
+│       ├── hive/                # Swarm orchestration and agent messaging
+│       └── prompts/             # System prompts and agent instructions
+├── src/                         # React Frontend
+│   ├── App.tsx                  # Routing definition
+│   ├── globals.css              # Tailwind configuration and design system tokens
+│   ├── components/              # UI Component Library
+│   │   ├── flow/                # XYFlow canvas and nodes
+│   │   ├── ui/                  # Reusable primitives (Buttons, Cards, TrustBadges)
+│   │   ├── layout/              # Sidebar, MainShell, Command Palette
+│   │   └── ...                  # Feature-specific components (Outreach, Scoring)
+│   ├── lib/                     # Utilities and State
+│   │   ├── ipc/                 # Event bridge and Tauri invoke() wrappers
+│   │   ├── store/               # Zustand state stores
+│   │   └── sync/                # TanStack query clients and optimisic updates
+│   └── pages/                   # Application Views (Dashboard, Companies, Signals, etc.)
+└── package.json                 # Node dependencies and scripts
+```
+
+<br/>
+
+---
+
 ## 🔥 Features
 
 ### 🏢 Verifiable Intelligence Pipeline
@@ -220,7 +275,7 @@ flowchart LR
 - **Relationship Strength Mapping** — Tracks depth of connection via a visual 0-100 heatbar.
 
 ### 🧠 Advanced Control & Automation
-- **Visual Flow Builder** — Drag-and-drop workflow canvas to compose custom agent pipelines.
+- **Visual Flow Builder** — Drag-and-drop workflow canvas to compose custom agent pipelines. Fully executable.
 - **Self-Learning ICP Optimizer** — Neural feedback loop that adjusts scoring weights based on won/lost deals.
 - **Intent Mesh** — Live SVG radar mapping signal density per account (funding, hiring, tech stack changes).
 - **Stream Terminal** — See the AI's internal thought process and HTTP requests streaming in real-time.
@@ -243,17 +298,6 @@ flowchart LR
 | `/icp` | ICP Optimizer | Self-learning feedback loop visualizer, emergent insights |
 | `/flow` | Flow Builder | Visual drag-and-drop workflow canvas (Fully Executable) |
 | `/settings` | Settings | LLM Keys, orchestration, email, CRM sync |
-
-<br/>
-
----
-
-## 💻 Tech Stack
-
-- **Frontend:** React 19, Vite, Tailwind CSS v4, Motion (Framer), Zustand, @xyflow/react
-- **Backend:** Rust, Tauri 2, SQLite
-- **Intelligence:** LLMs (Google Gemini 2.5 Flash), Web Search (Tavily), Custom Grounding Engine
-- **UI Architecture:** Custom Dark Glassmorphism, Radix Primitives
 
 <br/>
 
