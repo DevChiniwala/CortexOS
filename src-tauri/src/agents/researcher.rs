@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use crate::orchestration::agent::{Agent, AgentContext, LlmClient, Message};
+use crate::core::tavily::search_web;
 
 pub struct ResearcherAgent {
     llm: LlmClient,
@@ -22,6 +23,8 @@ impl Agent for ResearcherAgent {
     fn system_prompt(&self) -> String {
         r#"You are an expert B2B sales researcher. 
 Your objective is to identify the buying committee for a target company.
+You must base your extraction ONLY on the provided Verified Search Context. Do not invent names.
+If you cannot find a name for a role in the context, omit it or list it as "Unknown".
 You must output ONLY valid JSON in the following format:
 {
     "buying_committee": [
@@ -35,8 +38,21 @@ You must output ONLY valid JSON in the following format:
     }
 
     async fn execute(&self, context: &mut AgentContext, input: &str) -> Result<String, String> {
-        // Build the prompt context
-        let prompt = format!("Target Company Information:\n{}", input);
+        let first_line = input.lines().next().unwrap_or(input);
+        let search_query = format!("{} leadership team executive buying committee CEO VP", first_line);
+        
+        // Ground the LLM with live web data
+        let mut context_str = String::new();
+        if let Ok(results) = search_web(&search_query, 5).await {
+            for res in results {
+                context_str.push_str(&format!("Source: {}\nContent: {}\n\n", res.url, res.content));
+            }
+        }
+
+        let prompt = format!(
+            "Target Company Information:\n{}\n\nVerified Search Context (Extract committee ONLY from here):\n{}", 
+            input, context_str
+        );
 
         let messages = vec![
             Message {
@@ -44,9 +60,6 @@ You must output ONLY valid JSON in the following format:
                 content: prompt,
             }
         ];
-
-        // In a full implementation, we might perform a web search here before calling the LLM
-        // For now, we simulate the LLM call directly using the context we have
         
         // Execute LLM call
         let response = self.llm.completion(&self.system_prompt(), &messages).await?;

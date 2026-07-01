@@ -111,7 +111,7 @@ export function AgentCanvas() {
             return '#333'
           }}
           maskColor="rgba(0,0,0,0.7)"
-          className="bg-surface border border-line rounded-lg shadow-sm"
+          className="bg-surface border border-line rounded-lg shadow-sm !w-48 !h-32 !bottom-4 !right-4"
         />
         
         <Panel position="top-right" className="flex gap-2">

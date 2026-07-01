@@ -44,10 +44,10 @@ export function AgentNode({ data }: AgentNodeProps) {
 
   return (
     <div className={cn(
-      "px-4 py-3 shadow-xl rounded-xl border bg-surface min-w-[200px] transition-all hover:shadow-2xl hover:-translate-y-0.5",
+      "px-4 py-3 shadow-xl rounded-xl border bg-surface/90 backdrop-blur-sm min-w-[200px] transition-all hover:shadow-2xl hover:-translate-y-0.5",
       getBorderColor()
     )}>
-      <Handle type="target" position={Position.Left} className="w-3 h-3 bg-surface border-2 border-line" />
+      <Handle type="target" position={Position.Left} className="!w-3 !h-3 bg-surface border-2 border-line" />
       
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-3">
@@ -66,7 +66,7 @@ export function AgentNode({ data }: AgentNodeProps) {
         )}
       </div>
 
-      <Handle type="source" position={Position.Right} className={cn("w-3 h-3 border-2 border-surface", getBgColor())} />
+      <Handle type="source" position={Position.Right} className={cn("!w-3 !h-3 border-2 border-surface", getBgColor())} />
     </div>
   )
 }

@@ -7,8 +7,9 @@ import { MeetingCard } from "@/components/outreach/meeting-card"
 import { EmptyState } from "@/components/ui/empty-state"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { IconMail, IconMailOpened, IconMessageReply, IconCalendarEvent, IconSend, IconChevronRight, IconArrowLeft } from "@tabler/icons-react"
+import { IconMail, IconMailOpened, IconMessageReply, IconCalendarEvent, IconSend, IconChevronRight, IconArrowLeft, IconRobot } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+import { motion, AnimatePresence } from "motion/react"
 
 export default function Outreach() {
   const [selectedSequenceId, setSelectedSequenceId] = React.useState<string | null>(null)
@@ -127,21 +128,28 @@ export default function Outreach() {
           </div>
         </div>
 
-        {/* Right Column: Sequence Detail */}
         <div className={cn(
           "absolute inset-0 bg-bg lg:static lg:flex-1 flex flex-col overflow-y-auto z-10 transition-transform duration-300",
           selectedSequenceId ? "translate-x-0" : "translate-x-full lg:translate-x-0"
         )}>
-          {selectedSequence ? (
-            <div className="max-w-3xl mx-auto w-full p-8 space-y-8">
-              <div className="flex items-center gap-4 lg:hidden mb-4">
-                <Button variant="ghost" size="icon" onClick={() => setSelectedSequenceId(null)}>
-                  <IconArrowLeft className="w-5 h-5" />
-                </Button>
-                <span className="font-medium text-ink">Back to Sequences</span>
-              </div>
+          <AnimatePresence mode="wait">
+            {selectedSequence ? (
+              <motion.div 
+                key={selectedSequence.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+                className="max-w-3xl mx-auto w-full p-8 space-y-8"
+              >
+                <div className="flex items-center gap-4 lg:hidden mb-4">
+                  <Button variant="ghost" size="icon" onClick={() => setSelectedSequenceId(null)}>
+                    <IconArrowLeft className="w-5 h-5" />
+                  </Button>
+                  <span className="font-medium text-ink">Back to Sequences</span>
+                </div>
 
-              <div className="flex items-center justify-between border-b border-line pb-4">
+                <div className="flex items-center justify-between border-b border-line pb-4">
                 <div className="flex flex-col gap-1">
                   <h2 className="text-2xl font-display font-medium text-ink">{selectedSequence.contactName}</h2>
                   <div className="flex items-center gap-2 text-sm text-ink-3">
@@ -179,14 +187,23 @@ export default function Outreach() {
                 </div>
               </div>
 
-            </div>
-          ) : (
-            <div className="hidden lg:flex flex-col items-center justify-center h-full text-center p-8">
-              <IconMail className="w-12 h-12 text-line mb-4" />
-              <h3 className="text-lg font-medium text-ink">No Sequence Selected</h3>
-              <p className="text-ink-3 mt-2 max-w-sm">Select a sequence from the list to view the full outreach timeline, AI classifications, and meeting outcomes.</p>
-            </div>
-          )}
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="hidden lg:flex flex-col items-center justify-center h-full text-center p-8"
+              >
+                <EmptyState 
+                  icon={<IconRobot className="w-8 h-8" />}
+                  title="No Sequence Selected"
+                  description="Select a sequence from the list to view the full outreach timeline, AI classifications, and meeting outcomes."
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>

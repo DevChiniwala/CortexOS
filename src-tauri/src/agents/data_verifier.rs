@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use crate::orchestration::agent::{Agent, AgentContext, LlmClient, Message};
+use crate::core::tavily::search_web;
 
 pub struct DataVerifierAgent {
     llm: LlmClient,
@@ -36,7 +37,20 @@ If no corrections are needed, the 'corrections' object should be empty."#
     }
 
     async fn execute(&self, context: &mut AgentContext, input: &str) -> Result<String, String> {
-        let prompt = format!("CRM Record to Verify:\n{}", input);
+        let first_line = input.lines().next().unwrap_or(input);
+        let search_query = format!("{} latest news company details about contact", first_line);
+        
+        let mut context_str = String::new();
+        if let Ok(results) = search_web(&search_query, 5).await {
+            for res in results {
+                context_str.push_str(&format!("Source: {}\nContent: {}\n\n", res.url, res.content));
+            }
+        }
+
+        let prompt = format!(
+            "CRM Record to Verify:\n{}\n\nLive Web Data for Verification:\n{}", 
+            input, context_str
+        );
 
         let messages = vec![
             Message {
@@ -44,9 +58,6 @@ If no corrections are needed, the 'corrections' object should be empty."#
                 content: prompt,
             }
         ];
-
-        // Simulate scraping web data and comparing
-        // For now, it just asks the LLM to process the prompt
 
         let response = self.llm.completion(&self.system_prompt(), &messages).await?;
 

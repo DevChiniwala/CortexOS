@@ -4,7 +4,8 @@ import { useCompanies, useContacts, useCompanyMutations, useStream } from "@/lib
 import { Button } from "@/components/ui/button"
 
 import { StreamTerminal } from "@/components/stream/stream-terminal"
-import { IconArrowLeft, IconCheck, IconX, IconBrandLinkedin, IconWorld, IconMapPin, IconChartBar } from "@tabler/icons-react"
+import { IconArrowLeft, IconCheck, IconX, IconBrandLinkedin, IconWorld, IconMapPin, IconChartBar, IconTrendingUp } from "@tabler/icons-react"
+import { EmptyState } from "@/components/ui/empty-state"
 import { motion } from "motion/react"
 
 export default function CompanyDetail() {
@@ -219,11 +220,12 @@ export default function CompanyDetail() {
             )}
 
             {!company.score && activeTab === "score" && (
-              <div className="py-20 text-center">
-                <IconChartBar className="w-12 h-12 text-line mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-ink">No Score Data</h3>
-                <p className="text-ink-3 mt-2">Run the Deep Researcher agent to generate a score.</p>
-              </div>
+              <EmptyState 
+                icon={<IconTrendingUp className="w-8 h-8" />}
+                title="No Score Data"
+                description="Run the Deep Researcher agent to generate a heuristic score and view the requirement breakdown."
+                className="mt-8"
+              />
             )}
           </div>
         </div>

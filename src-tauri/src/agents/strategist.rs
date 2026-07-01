@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use crate::orchestration::agent::{Agent, AgentContext, LlmClient, Message};
+use crate::core::tavily::search_web;
 
 pub struct StrategistAgent {
     llm: LlmClient,
@@ -49,9 +50,19 @@ You must output ONLY valid JSON in the following format:
     }
 
     async fn execute(&self, context: &mut AgentContext, input: &str) -> Result<String, String> {
+        let first_line = input.lines().next().unwrap_or(input);
+        let search_query = format!("{} vs competitors reviews strengths weaknesses comparison", first_line);
+        
+        let mut context_str = String::new();
+        if let Ok(results) = search_web(&search_query, 5).await {
+            for res in results {
+                context_str.push_str(&format!("Source: {}\nContent: {}\n\n", res.url, res.content));
+            }
+        }
+
         let prompt = format!(
-            "Generate a competitive Battlecard based on the following information:\n{}",
-            input
+            "Generate a competitive Battlecard based on the following information:\n{}\n\nLive Web Competitive Data:\n{}",
+            input, context_str
         );
 
         let messages = vec![Message {

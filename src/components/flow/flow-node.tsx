@@ -39,14 +39,14 @@ export function CortexNode({ data, selected }: NodeProps<CortexNodeData>) {
 
   return (
     <div className={cn(
-      "relative flex items-start gap-3 p-4 rounded-xl border bg-surface/90 backdrop-blur-sm min-w-[250px] shadow-sm transition-all",
+      "relative flex items-start gap-3 p-4 rounded-xl border bg-surface/90 backdrop-blur-sm min-w-[250px] shadow-sm transition-all hover:shadow-xl hover:-translate-y-0.5",
       selected ? "border-primary ring-2 ring-primary/20" : "border-line hover:border-line-hover"
     )}>
       {/* Input Handle */}
       <Handle 
         type="target" 
         position={Position.Top} 
-        className="w-3 h-3 bg-surface border-2 border-line rounded-full !top-[-6px]" 
+        className="!w-3 !h-3 bg-surface border-2 border-line rounded-full !top-[-6px]" 
       />
 
       <div className={cn("shrink-0 w-10 h-10 rounded-lg flex items-center justify-center border", colorClasses)}>
@@ -64,7 +64,7 @@ export function CortexNode({ data, selected }: NodeProps<CortexNodeData>) {
       <Handle 
         type="source" 
         position={Position.Bottom} 
-        className="w-3 h-3 bg-surface border-2 border-primary rounded-full !bottom-[-6px]" 
+        className="!w-3 !h-3 bg-surface border-2 border-primary rounded-full !bottom-[-6px]" 
       />
     </div>
   )

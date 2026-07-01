@@ -2,6 +2,7 @@ import * as React from "react"
 import { NavLink } from "react-router-dom"
 import { IconBuilding, IconUsers, IconBrain, IconSettings, IconWaveSine, IconTerminal2, IconNetwork, IconHierarchy, IconSend, IconTarget, IconCircleCheck, IconPlus, IconPlugConnected, IconMessage, IconCurrencyDollar, IconTool, IconShoppingCart } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
+import { motion, AnimatePresence } from "motion/react"
 
 const MAIN_NAV = [
   { icon: IconTerminal2, label: "Dashboard", path: "/dashboard" },
@@ -48,29 +49,37 @@ export function Sidebar() {
           </svg>
         </button>
 
-        {isWorkspaceMenuOpen && (
-          <div className="absolute top-20 left-4 w-[248px] bg-surface border border-line rounded-xl shadow-lg p-2 z-50 flex flex-col gap-1">
-            <div className="px-2 py-1.5 text-xs font-semibold text-ink-3 uppercase tracking-wider">Your Workspaces</div>
-            <button className="flex items-center gap-3 w-full p-2 rounded-lg bg-surface-hover text-left">
-              <div className="w-6 h-6 rounded bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold text-[10px]">
-                GTM
-              </div>
-              <span className="text-sm font-medium text-ink">Acme Corp GTM</span>
-              <IconCircleCheck className="w-4 h-4 text-primary ml-auto" />
-            </button>
-            <button className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-surface-hover transition-colors text-left">
-              <div className="w-6 h-6 rounded bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-[10px]">
-                EU
-              </div>
-              <span className="text-sm font-medium text-ink-2">Acme Corp EMEA</span>
-            </button>
-            <div className="h-px bg-line my-1" />
-            <button className="flex items-center gap-2 w-full p-2 rounded-lg hover:bg-surface-hover transition-colors text-left text-sm font-medium text-ink-2">
-              <IconPlus className="w-4 h-4" />
-              Create Workspace
-            </button>
-          </div>
-        )}
+        <AnimatePresence>
+          {isWorkspaceMenuOpen && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+              className="absolute top-20 left-4 w-[248px] bg-surface border border-line rounded-xl shadow-xl shadow-black/5 p-2 z-50 flex flex-col gap-1 origin-top-left"
+            >
+              <div className="px-2 py-1.5 text-xs font-semibold text-ink-3 uppercase tracking-wider">Your Workspaces</div>
+              <button className="flex items-center gap-3 w-full p-2 rounded-lg bg-surface-hover text-left transition-colors">
+                <div className="w-6 h-6 rounded bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold text-[10px]">
+                  GTM
+                </div>
+                <span className="text-sm font-medium text-ink">Acme Corp GTM</span>
+                <IconCircleCheck className="w-4 h-4 text-primary ml-auto" />
+              </button>
+              <button className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-surface-hover transition-colors text-left group">
+                <div className="w-6 h-6 rounded bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-[10px] group-hover:scale-105 transition-transform">
+                  EU
+                </div>
+                <span className="text-sm font-medium text-ink-2 group-hover:text-ink transition-colors">Acme Corp EMEA</span>
+              </button>
+              <div className="h-px bg-line my-1" />
+              <button className="flex items-center gap-2 w-full p-2 rounded-lg hover:bg-surface-hover hover:text-ink transition-colors text-left text-sm font-medium text-ink-2">
+                <IconPlus className="w-4 h-4" />
+                Create Workspace
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className="flex-1 px-4 space-y-8">
