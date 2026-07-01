@@ -90,3 +90,32 @@ You must output ONLY valid JSON in the following format:
         Ok(output.to_string())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::HashMap;
+
+    #[tokio::test]
+    async fn test_researcher_real_run() {
+        dotenv::dotenv().ok();
+        let api_key = std::env::var("GEMINI_API_KEY").expect("GEMINI_API_KEY must be set");
+        let agent = ResearcherAgent::new(api_key, "gemini-2.5-flash".to_string());
+        
+        let mut context = AgentContext {
+            job_id: "test-job".to_string(),
+            working_dir: std::path::PathBuf::from("/tmp"),
+            memory: HashMap::new(),
+        };
+
+        // Test 1: Well-known company
+        println!("--- RUNNING DEEP RESEARCH ON: Vercel ---");
+        let output1 = agent.execute(&mut context, "Vercel").await.unwrap();
+        println!("{}", serde_json::to_string_pretty(&serde_json::from_str::<serde_json::Value>(&output1).unwrap()).unwrap());
+
+        // Test 2: Obscure/Recent company
+        println!("--- RUNNING DEEP RESEARCH ON: Supabase ---");
+        let output2 = agent.execute(&mut context, "Supabase").await.unwrap();
+        println!("{}", serde_json::to_string_pretty(&serde_json::from_str::<serde_json::Value>(&output2).unwrap()).unwrap());
+    }
+}

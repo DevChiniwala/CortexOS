@@ -37,19 +37,41 @@ If no corrections are needed, the 'corrections' object should be empty."#
     }
 
     async fn execute(&self, context: &mut AgentContext, input: &str) -> Result<String, String> {
-        let first_line = input.lines().next().unwrap_or(input);
+        use crate::core::llm::{extract_claims, verify_claim};
+
+        let first_line = input.lines().next().unwrap_or(input).to_string();
         let search_query = format!("{} latest news company details about contact", first_line);
         
-        let mut context_str = String::new();
-        if let Ok(results) = search_web(&search_query, 5).await {
-            for res in results {
-                context_str.push_str(&format!("Source: {}\nContent: {}\n\n", res.url, res.content));
+        let results = search_web(&search_query, 5).await.unwrap_or_default();
+        let mut verified_claims = Vec::new();
+
+        for res in results {
+            let raw = res.raw_content.clone().unwrap_or(res.content.clone());
+            if let Ok(claims) = extract_claims(&raw, &res.url, &first_line).await {
+                for claim in claims {
+                    let result = verify_claim(&claim, &raw);
+                    if result.passed {
+                        verified_claims.push((claim, result));
+                    }
+                }
             }
         }
 
+        let mut verified_context_str = String::new();
+        for (claim, result) in verified_claims {
+            verified_context_str.push_str(&format!(
+                "- Fact: {} (Confidence: {}, Source: {})\n",
+                claim.claim, result.confidence, claim.source_url
+            ));
+        }
+
+        if verified_context_str.is_empty() {
+            verified_context_str.push_str("No verified facts could be established from the web search.");
+        }
+
         let prompt = format!(
-            "CRM Record to Verify:\n{}\n\nLive Web Data for Verification:\n{}", 
-            input, context_str
+            "CRM Record to Verify:\n{}\n\nVerified Live Web Facts:\n{}", 
+            input, verified_context_str
         );
 
         let messages = vec![
@@ -64,5 +86,31 @@ If no corrections are needed, the 'corrections' object should be empty."#
         context.memory.insert("data_verifier_raw_output".to_string(), response.clone());
 
         Ok(response)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::HashMap;
+
+    #[tokio::test]
+    async fn test_data_verifier_real_run() {
+        dotenv::dotenv().ok();
+        let api_key = std::env::var("GEMINI_API_KEY").expect("GEMINI_API_KEY must be set");
+        let agent = DataVerifierAgent::new(api_key, "gemini-2.5-flash".to_string());
+        
+        let mut context = AgentContext {
+            job_id: "test-verifier-job".to_string(),
+            working_dir: std::path::PathBuf::from("/tmp"),
+            memory: HashMap::new(),
+        };
+
+        // Test CRM record with an obvious fake detail to force correction
+        let crm_input = "Company: Stripe\nCEO: Elon Musk\nHQ: Mars\nIndustry: Payment Processing";
+        
+        println!("--- RUNNING DATA VERIFIER ON STRIPE (Fake CEO/HQ in CRM) ---");
+        let output = agent.execute(&mut context, crm_input).await.unwrap();
+        println!("{}", serde_json::to_string_pretty(&serde_json::from_str::<serde_json::Value>(&output).unwrap()).unwrap());
     }
 }
