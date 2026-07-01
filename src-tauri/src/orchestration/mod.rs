@@ -106,9 +106,10 @@ pub fn start_orchestrator(app_handle: AppHandle) -> mpsc::Sender<String> {
                                         memory: HashMap::new(),
                                     };
 
-                                    // In a full app, this comes from the Settings table
-                                    let api_key = "dummy_key_for_now".to_string(); 
-                                    let model = job.model.clone().unwrap_or_else(|| "claude-3-opus-20240229".to_string());
+                                    // Fetch Gemini key from environment
+                                    dotenv::dotenv().ok();
+                                    let api_key = std::env::var("GEMINI_API_KEY").unwrap_or_default(); 
+                                    let model = job.model.clone().unwrap_or_else(|| "gemini-2.5-flash".to_string());
 
                                     let result = match job.job_type.as_str() {
                                         "research_company" | "research_person" => {
