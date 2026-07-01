@@ -230,6 +230,54 @@ pub async fn generate_embedding(text: &str) -> Result<Vec<f32>, Box<dyn std::err
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+pub struct PersonClaim {
+    pub name: String,
+    pub title: String,
+    pub quote: String,       // must contain BOTH name and title
+    pub source_url: String,
+}
+
+pub async fn extract_people(raw_content: &str, url: &str, company: &str) -> Result<Vec<PersonClaim>, Box<dyn std::error::Error + Send + Sync>> {
+    let user_prompt = format!(
+        "Extract every person mentioned by full name along with their job title at {}.\n\
+        Return JSON: {{\"people\": [{{\"name\": \"...\", \"title\": \"...\", \
+        \"quote\": \"verbatim text containing BOTH the name and title together\", \
+        \"source_url\": \"{}\"}}]}}.\n\
+        Only include people whose name AND title both appear explicitly in the text. \
+        Do not infer a title from context. If none found, return {{\"people\": []}}.\n\nTEXT:\n{}",
+        company, url, raw_content
+    );
+
+    let content = gemini_generate(
+        "gemini-2.5-flash",
+        "You are a JSON people/titles extractor. Return ONLY valid JSON.",
+        &user_prompt,
+        true,
+    ).await?;
+
+    #[derive(serde::Deserialize)]
+    struct PeopleResponse { people: Vec<PersonClaim> }
+
+    match serde_json::from_str::<PeopleResponse>(&content) {
+        Ok(res) => Ok(res.people),
+        Err(_) => match serde_json::from_str::<Vec<PersonClaim>>(&content) {
+            Ok(people) => Ok(people),
+            Err(_) => Ok(vec![]),
+        },
+    }
+}
+
+/// Reuses verify_claim's exact 3-tier gauntlet unchanged — just adapts the shape.
+pub fn verify_person(person: &PersonClaim, raw_content: &str) -> VerificationResult {
+    let as_claim = ExtractedClaim {
+        claim: format!("{} — {}", person.name, person.title),
+        quote: person.quote.clone(),
+        source_url: person.source_url.clone(),
+    };
+    verify_claim(&as_claim, raw_content)
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct ExtractedClaim {
     pub claim: String,
     pub quote: String,
