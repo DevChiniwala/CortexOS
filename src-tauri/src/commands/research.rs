@@ -219,14 +219,13 @@ pub async fn start_person_research(
 
     let prompt = custom_prompt.unwrap_or_else(|| {
         format!(
-            "Research the person \"{}\" for B2B sales outreach.\n\n\
+            "Synthesize a professional intelligence brief for \"{}\" strictly using the provided verified evidence.\n\n\
              Provide:\n\
              1. Professional background and career trajectory\n\
              2. Key responsibilities in their current role\n\
-             3. Recent LinkedIn activity and posts\n\
-             4. Potential conversation starters and pain points\n\
-             5. Communication style preferences\n\
-             6. Recommended personalized outreach approach\n\n\
+             3. Potential conversation starters based on verified facts\n\
+             4. Recommended personalized outreach approach\n\n\
+             DO NOT invent or hallucinate any details, especially social media activity.\n\
              Format as a person intelligence brief.",
             person_name
         )
@@ -353,7 +352,7 @@ pub async fn start_scoring(
         entity_label: lead_name.clone(),
         status: "running".to_string(),
         prompt: format!("Score {}", lead_name),
-        model: Some("gpt-4o".to_string()),
+        model: Some("gemini-2.5-flash".to_string()),
         working_dir: format!("/tmp/cortex/{}", job_id),
         output_path: None,
         exit_code: None,
@@ -434,7 +433,7 @@ pub async fn start_conversation_generation(
         entity_label: person_name.clone(),
         status: "running".to_string(),
         prompt: format!("Generate outreach for {}", person_name),
-        model: Some("gpt-4o".to_string()),
+        model: Some("gemini-2.5-flash".to_string()),
         working_dir: format!("/tmp/cortex/{}", job_id),
         output_path: None,
         exit_code: None,
