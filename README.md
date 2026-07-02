@@ -1,6 +1,5 @@
 <div align="center">
 
-<!-- Animated SVG Header -->
 <img src=".github/assets/header.svg" alt="CortexOS Header" width="800" height="200" />
 
 <br/>
@@ -20,10 +19,6 @@
   <strong>Every AI sales tool hallucinates. CortexOS doesn't.</strong><br/>
   <sub>A 100% grounded, verifiable AI GTM platform with zero hallucinated facts. Replace your SDR team with an autonomous swarm that actually tells the truth.</sub>
 </p>
-
-<br/>
-
-[Features](#-features) · [The Verification Engine](#-the-verification-engine) · [Architecture & Data Flow](#-architecture--data-flow) · [Agent Swarm](#-the-agent-swarm) · [Project Structure](#-project-structure) · [Pages](#-pages) · [Quick Start](#-quick-start)
 
 </div>
 
@@ -51,6 +46,21 @@ It deploys a swarm of specialized AI agents that work in concert to:
 
 ---
 
+## 🏗️ Architecture & Data Flow
+
+CortexOS operates on a high-performance Rust backend connected to a bleeding-edge React 19 frontend via Tauri's IPC bridge.
+
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/DevChiniwala/CortexOS/main/.github/assets/data-flow.svg">
+    <img alt="CortexOS Data Flow and Architecture" src="https://raw.githubusercontent.com/DevChiniwala/CortexOS/main/.github/assets/data-flow.svg">
+  </picture>
+</div>
+
+<br/>
+
+---
+
 ## 🛡️ The Verification Engine
 
 Instead of letting an LLM write a summary from its latent knowledge, CortexOS runs a **3-Tier Verification Gauntlet**:
@@ -73,38 +83,7 @@ Instead of letting an LLM write a summary from its latent knowledge, CortexOS ru
 
 ---
 
-## 🏗️ Architecture & Data Flow
-
-CortexOS operates on a high-performance Rust backend connected to a bleeding-edge React 19 frontend via Tauri's IPC bridge.
-
-<div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/DevChiniwala/CortexOS/main/.github/assets/data-flow.svg">
-    <img alt="CortexOS Data Flow and Architecture" src="https://raw.githubusercontent.com/DevChiniwala/CortexOS/main/.github/assets/data-flow.svg">
-  </picture>
-</div>
-
-<br/>
-
-### The Technology Stack Deep-Dive
-
-**Frontend (Presentation & State)**
-- **Framework:** React 19 + Vite for instantaneous HMR and rendering.
-- **Styling:** Tailwind CSS v4 + Motion (Framer) for buttery-smooth micro-interactions, dark glassmorphism, and neon accents.
-- **State Management:** Zustand for global state (Flows, Selections, UI settings) + TanStack Query v5 for asynchronous data caching and optimistic UI updates.
-- **Complex UI:** `@xyflow/react` for the drag-and-drop Flow Builder canvas, `react-force-graph-2d` for the Memory Graph and Buying Committee visualization, and `recharts` for the pipeline and revenue charts.
-
-**Backend (Core Engine & IO)**
-- **Framework:** Tauri 2 (Rust) providing a lightweight, memory-safe, blazing-fast native application layer.
-- **Database:** Bundled `rusqlite` for local, private, zero-latency data persistence. No cloud database needed.
-- **Concurrency:** `tokio` for handling massive multi-threaded web scraping, API calls, and LLM streaming simultaneously.
-- **Intelligence Bridge:** Direct integrations with Google Gemini 2.5 Flash, Tavily (Search), Apollo (People), and Bombora (Intent Signals).
-
-<br/>
-
----
-
-## 🤖 The Agent Swarm
+## 🤖 Agent Swarm
 
 CortexOS deploys **8 autonomous agents**, each with specialized worker pools coordinated by a central orchestrator.
 
@@ -114,8 +93,6 @@ CortexOS deploys **8 autonomous agents**, each with specialized worker pools coo
     <img alt="CortexOS Architecture" src="https://raw.githubusercontent.com/DevChiniwala/CortexOS/main/.github/assets/architecture.svg">
   </picture>
 </div>
-
-<br/>
 
 ```mermaid
 graph TD
@@ -192,6 +169,61 @@ graph TD
 
 ---
 
+## ✨ Features
+
+### 🏢 Verifiable Intelligence Pipeline
+- **Automated Research** — Multi-agent swarm (Tech Stack, Business Model, Pain Points, Triggers) extracts intelligence from raw sources.
+- **The Evidence Tab** — Every company profile surfaces the verbatim quotes, citations, and trust badges proving the facts.
+- **Multi-Source Corroboration** — Visually see when independent sources verify the same intel.
+
+### 🧠 Autonomous ICP Scoring
+- **Automated Tiers** — Evaluate accounts against strict constraints (must pass) and weighted demand signifiers (Tier 1, 2, 3).
+- **Self-Learning ICP Optimizer** — Neural feedback loop that adjusts scoring weights based on won/lost deals.
+
+### 👥 Persona Mapping & Messaging
+- **Buying Committee Visualization** — Auto-identifies `Champion`, `Economic Buyer`, `Blocker`, `End User`.
+- **Relationship Strength Mapping** — Tracks depth of connection via a visual 0-100 heatbar.
+- **Hyper-Personalization** — The Conversation Agent generates personalized outreach based *only* on verified facts and intent triggers.
+
+### 🔀 Orchestration Rules Engine
+- **Visual Flow Builder** — Drag-and-drop workflow canvas to compose custom agent pipelines using XYFlow. Fully executable.
+- **Intent Mesh** — Live SVG radar mapping signal density per account (funding, hiring, tech stack changes).
+
+### ⚡ Tauri Native App
+- **Rust Performance** — Uses Tauri v2 to run completely locally, interfacing with APIs quickly via `tokio` multi-threading.
+- **Zero-Latency Database** — Embedded SQLite store for instantaneous UI updates without cloud lag.
+
+<br/>
+
+---
+
+## 🚀 Web App Views
+
+*(Screenshots coming soon - Add your beautiful UI screenshots here to showcase the dashboard, pipeline, intent radar, and evidence tab!)*
+
+<br/>
+
+---
+
+## 📄 Pages
+
+| Route | Page | Description |
+|-------|------|-------------|
+| `/dashboard` | Command Center | KPI stat cards, sparklines, pipeline funnel, live activity feed |
+| `/companies` | Companies | Full pipeline table with scoring tiers, Kanban board toggle |
+| `/companies/:id` | Company Detail | Deep research profile, Evidence tab, Trust Score Ring, people mapped |
+| `/contacts` | Contacts | List view + Buying Committee visualization with Persona Badges |
+| `/signals` | Intent Mesh | Radar visualization + live signal feed with trigger actions |
+| `/outreach` | Outreach Command | Sequence timeline, reply cards, meeting tracking |
+| `/agents` | Agent Swarm | Deploy agents against targets, stream terminal viewer |
+| `/icp` | ICP Optimizer | Self-learning feedback loop visualizer, emergent insights |
+| `/flow` | Flow Builder | Visual drag-and-drop workflow canvas (Fully Executable) |
+| `/settings` | Settings | LLM Keys, orchestration, email, CRM sync |
+
+<br/>
+
+---
+
 ## 🔄 GTM Execution Workflow
 
 Assemble your pipelines visually using the **Cortex Flow Builder**, and execute them entirely autonomously.
@@ -228,6 +260,51 @@ flowchart LR
     style L fill:#1a2b22,stroke:#10B981,color:#10B981
     style M fill:#1a0033,stroke:#A855F7,color:#A855F7
 ```
+
+<br/>
+
+---
+
+## 💻 Tech Stack
+
+### Frontend
+- **React 19**
+- **Vite**
+- **Tailwind CSS v4**
+- **Zustand** (Global State)
+- **TanStack Query v5** (Data Sync & Cache)
+- **Motion (Framer)** (Animations)
+- **XYFlow / React** (Visual Builder)
+- **Recharts** (Data Visualization)
+- **D3 / Force-Graph** (Memory Graph)
+
+### Backend (Tauri Core)
+- **Rust**
+- **Tauri v2**
+- **Tokio** (Async Runtime)
+- **Rusqlite** (Local Database)
+
+### Intelligence APIs
+- **Google Gemini 2.5 Flash** (Extractor LLM)
+- **Tavily** (Search & HTML scraping)
+- **Apollo** (People Data)
+- **Bombora** (Intent Signals)
+
+<br/>
+
+---
+
+## 🗄️ Database
+
+CortexOS uses a local `SQLite` database embedded in the Tauri backend for zero-latency operations.
+
+| Table | Details |
+|-------|---------|
+| `companies` | Target accounts, ICP scores, firmographics, and Trust Score metrics |
+| `contacts` | Buying committee members, personas, and relationship strength |
+| `signals` | Intent signals (funding, hiring, tech stack changes) tied to companies |
+| `outreach` | Conversation sequences, generated copy, and reply status |
+| `settings` | API keys, LLM preferences, and orchestration configurations |
 
 <br/>
 
@@ -271,68 +348,20 @@ flowchart LR
 
 ---
 
-## 🔥 Features
+## 🗺️ Roadmap
 
-### 🏢 Verifiable Intelligence Pipeline
-- **Automated Research** — Multi-agent swarm (Tech Stack, Business Model, Pain Points, Triggers).
-- **The Evidence Tab** — Every company profile surfaces the verbatim quotes, citations, and trust badges proving the facts.
-- **Multi-Source Corroboration** — Visually see when independent sources verify the same intel.
-- **ICP Scoring** — Evaluate accounts against strict constraints (must pass) and weighted demand signifiers.
-
-### 👥 Persona Mapping
-- **Buying Committee Visualization** — Auto-identifies `Champion`, `Economic Buyer`, `Blocker`, `End User`.
-- **Relationship Strength Mapping** — Tracks depth of connection via a visual 0-100 heatbar.
-
-### 🧠 Advanced Control & Automation
-- **Visual Flow Builder** — Drag-and-drop workflow canvas to compose custom agent pipelines. Fully executable.
-- **Self-Learning ICP Optimizer** — Neural feedback loop that adjusts scoring weights based on won/lost deals.
-- **Intent Mesh** — Live SVG radar mapping signal density per account (funding, hiring, tech stack changes).
-- **Stream Terminal** — See the AI's internal thought process and HTTP requests streaming in real-time.
+- [x] Phase 1: Core Research Pipeline (Tavily + Extractors)
+- [x] Phase 2: React 19 + Tauri 2 Foundation
+- [x] Phase 3: The 3-Tier Verification Gauntlet (Rust Engine)
+- [x] Phase 4: Intent Signals & Demand Radar
+- [x] Phase 5: XYFlow Visual Builder
+- [ ] Phase 6: Automated Email Dispatch (SMTP/IMAP integrations)
+- [ ] Phase 7: HubSpot & Salesforce Bi-Directional Sync
+- [ ] Phase 8: Cloud-Hosted Orchestration (Vercel/AWS)
 
 <br/>
 
 ---
-
-## 📄 Pages
-
-| Route | Page | Description |
-|-------|------|-------------|
-| `/dashboard` | Command Center | KPI stat cards, sparklines, pipeline funnel, live activity feed |
-| `/companies` | Companies | Full pipeline table with scoring tiers, Kanban board toggle |
-| `/companies/:id` | Company Detail | Deep research profile, Evidence tab, Trust Score Ring, people mapped |
-| `/contacts` | Contacts | List view + Buying Committee visualization with Persona Badges |
-| `/signals` | Intent Mesh | Radar visualization + live signal feed with trigger actions |
-| `/outreach` | Outreach Command | Sequence timeline, reply cards, meeting tracking |
-| `/agents` | Agent Swarm | Deploy agents against targets, stream terminal viewer |
-| `/icp` | ICP Optimizer | Self-learning feedback loop visualizer, emergent insights |
-| `/flow` | Flow Builder | Visual drag-and-drop workflow canvas (Fully Executable) |
-| `/settings` | Settings | LLM Keys, orchestration, email, CRM sync |
-
-<br/>
-
----
-
-## 🚀 Quick Start
-
-Get CortexOS running locally in 4 commands:
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/yourusername/CortexOS.git
-cd CortexOS
-
-# 2. Install dependencies
-npm install
-
-# 3. Setup Environment Variables
-cp .env.example .env
-# Add your GEMINI_API_KEY and TAVILY_API_KEY to .env
-
-# 4. Start the development server
-npm run tauri dev
-```
-
-<br/>
 
 <div align="center">
   <img src=".github/assets/footer.svg" alt="CortexOS Footer" width="400" />
