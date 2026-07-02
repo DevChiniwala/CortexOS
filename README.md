@@ -56,7 +56,10 @@ It deploys a swarm of specialized AI agents that work in concert to:
 Instead of letting an LLM write a summary from its latent knowledge, CortexOS runs a **3-Tier Verification Gauntlet**:
 
 <div align="center">
-  <img src=".github/assets/verification-gauntlet.svg" alt="3-Tier Verification Gauntlet" width="100%" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/DevChiniwala/CortexOS/main/.github/assets/verification-gauntlet.svg">
+    <img alt="3-Tier Verification Gauntlet" src="https://raw.githubusercontent.com/DevChiniwala/CortexOS/main/.github/assets/verification-gauntlet.svg">
+  </picture>
 </div>
 
 <br/>
@@ -75,7 +78,10 @@ Instead of letting an LLM write a summary from its latent knowledge, CortexOS ru
 CortexOS operates on a high-performance Rust backend connected to a bleeding-edge React 19 frontend via Tauri's IPC bridge.
 
 <div align="center">
-  <img src=".github/assets/data-flow.svg" alt="CortexOS Data Flow and Architecture" width="100%" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/DevChiniwala/CortexOS/main/.github/assets/data-flow.svg">
+    <img alt="CortexOS Data Flow and Architecture" src="https://raw.githubusercontent.com/DevChiniwala/CortexOS/main/.github/assets/data-flow.svg">
+  </picture>
 </div>
 
 <br/>
@@ -103,7 +109,10 @@ CortexOS operates on a high-performance Rust backend connected to a bleeding-edg
 CortexOS deploys **8 autonomous agents**, each with specialized worker pools coordinated by a central orchestrator.
 
 <div align="center">
-  <img src=".github/assets/architecture.svg" alt="CortexOS Architecture" width="100%" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/DevChiniwala/CortexOS/main/.github/assets/architecture.svg">
+    <img alt="CortexOS Architecture" src="https://raw.githubusercontent.com/DevChiniwala/CortexOS/main/.github/assets/architecture.svg">
+  </picture>
 </div>
 
 <br/>
@@ -227,35 +236,35 @@ flowchart LR
 ## 📂 Project Structure
 
 ```bash
-CortexOS/
-├── .github/
-│   └── assets/                  # SVG assets, diagrams, and branding
-├── src-tauri/                   # Rust Backend (Tauri)
-│   ├── Cargo.toml               # Rust dependencies
-│   ├── build.rs                 # Tauri build script
-│   └── src/
-│       ├── main.rs              # App entry point
-│       ├── lib.rs               # Command registry and setup
-│       ├── agents/              # Autonomous agent logic (Researcher, Scorer, etc.)
-│       ├── commands/            # IPC commands exposed to React
-│       ├── core/                # Core engines (LLM, Tavily, Verification, Flow Executor)
-│       ├── db/                  # SQLite schema, queries, and state management
-│       ├── hive/                # Swarm orchestration and agent messaging
-│       └── prompts/             # System prompts and agent instructions
-├── src/                         # React Frontend
-│   ├── App.tsx                  # Routing definition
-│   ├── globals.css              # Tailwind configuration and design system tokens
-│   ├── components/              # UI Component Library
-│   │   ├── flow/                # XYFlow canvas and nodes
-│   │   ├── ui/                  # Reusable primitives (Buttons, Cards, TrustBadges)
-│   │   ├── layout/              # Sidebar, MainShell, Command Palette
-│   │   └── ...                  # Feature-specific components (Outreach, Scoring)
-│   ├── lib/                     # Utilities and State
-│   │   ├── ipc/                 # Event bridge and Tauri invoke() wrappers
-│   │   ├── store/               # Zustand state stores
-│   │   └── sync/                # TanStack query clients and optimisic updates
-│   └── pages/                   # Application Views (Dashboard, Companies, Signals, etc.)
-└── package.json                 # Node dependencies and scripts
+📂 CortexOS
+ ┣ 📂 .github
+ ┃ ┗ 📂 assets                  # SVG assets, diagrams, and branding
+ ┣ 📂 src-tauri                 # Rust Backend (Tauri)
+ ┃ ┣ 📄 Cargo.toml              # Rust dependencies
+ ┃ ┣ 📄 build.rs                # Tauri build script
+ ┃ ┗ 📂 src
+ ┃   ┣ 📄 main.rs               # App entry point
+ ┃   ┣ 📄 lib.rs                # Command registry and setup
+ ┃   ┣ 📂 agents                # Autonomous agent logic (Researcher, Scorer, etc.)
+ ┃   ┣ 📂 commands              # IPC commands exposed to React
+ ┃   ┣ 📂 core                  # Core engines (LLM, Tavily, Verification, Flow Executor)
+ ┃   ┣ 📂 db                    # SQLite schema, queries, and state management
+ ┃   ┣ 📂 hive                  # Swarm orchestration and agent messaging
+ ┃   ┗ 📂 prompts               # System prompts and agent instructions
+ ┣ 📂 src                       # React Frontend
+ ┃ ┣ 📄 App.tsx                 # Routing definition
+ ┃ ┣ 📄 globals.css             # Tailwind configuration and design system tokens
+ ┃ ┣ 📂 components              # UI Component Library
+ ┃ ┃ ┣ 📂 flow                  # XYFlow canvas and nodes
+ ┃ ┃ ┣ 📂 ui                    # Reusable primitives (Buttons, Cards, TrustBadges)
+ ┃ ┃ ┣ 📂 layout                # Sidebar, MainShell, Command Palette
+ ┃ ┃ ┗ 📂 ...                   # Feature-specific components (Outreach, Scoring)
+ ┃ ┣ 📂 lib                     # Utilities and State
+ ┃ ┃ ┣ 📂 ipc                   # Event bridge and Tauri invoke() wrappers
+ ┃ ┃ ┣ 📂 store                 # Zustand state stores
+ ┃ ┃ ┗ 📂 sync                  # TanStack query clients and optimisic updates
+ ┃ ┗ 📂 pages                   # Application Views (Dashboard, Companies, Signals, etc.)
+ ┗ 📄 package.json              # Node dependencies and scripts
 ```
 
 <br/>
