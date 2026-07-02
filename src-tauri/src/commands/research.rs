@@ -246,7 +246,7 @@ pub async fn start_person_research(
             tool_name: None,
         });
 
-        let results = crate::core::tavily::search(&search_query, 3).await.unwrap_or_default();
+        let results = crate::core::tavily::search_web(&search_query, 3).await.unwrap_or_default();
         let mut verified_evidence = Vec::new();
 
         for res in results {
