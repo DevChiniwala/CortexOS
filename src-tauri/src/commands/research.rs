@@ -247,31 +247,53 @@ pub async fn start_person_research(
         });
 
         let results = crate::core::tavily::search(&search_query, 3).await.unwrap_or_default();
-        let mut verified_claims = Vec::new();
+        let mut verified_evidence = Vec::new();
 
         for res in results {
             let raw = res.raw_content.clone().unwrap_or(res.content.clone());
-            // Extract people facts using the person's name as the context company to extract their specific roles
+            
+            // 1. Extract Name + Title
             if let Ok(people) = llm::extract_people(&raw, &res.url, &person_name_clone).await {
                 for person in people {
-                    // Only keep facts about the person we're actually researching
                     if person.name.to_lowercase().contains(&person_name_clone.to_lowercase()) {
                         let result = llm::verify_person(&person, &raw);
                         if result.passed {
-                            verified_claims.push((person, result));
+                            verified_evidence.push((
+                                format!("{} is {}", person.name, person.title),
+                                person.quote,
+                                person.source_url,
+                                result.match_type,
+                                result.confidence
+                            ));
                         }
+                    }
+                }
+            }
+            
+            // 2. Extract broader claims about their career trajectory and responsibilities
+            if let Ok(claims) = llm::extract_claims(&raw, &res.url, &person_name_clone).await {
+                for claim in claims {
+                    let result = llm::verify_claim(&claim, &raw);
+                    if result.passed {
+                        verified_evidence.push((
+                            claim.claim,
+                            claim.quote,
+                            claim.source_url,
+                            result.match_type,
+                            result.confidence
+                        ));
                     }
                 }
             }
         }
 
         let mut evidence_str = String::new();
-        for (i, (claim, result)) in verified_claims.iter().enumerate() {
-            evidence_str.push_str(&format!("[{}]: {} is {} \"{}\" (Source: {})\n", i + 1, claim.name, claim.title, claim.quote, claim.source_url));
+        for (i, (claim, quote, url, _, _)) in verified_evidence.iter().enumerate() {
+            evidence_str.push_str(&format!("[{}]: {} \"{}\" (Source: {})\n", i + 1, claim, quote, url));
         }
 
-        let grounded_prompt = if verified_claims.is_empty() {
-            prompt
+        let grounded_prompt = if verified_evidence.is_empty() {
+            format!("The system could not find any verified evidence for {}. Output a brief stating exactly that: 'No verified data available.' DO NOT guess or hallucinate any details about them.", person_name_clone)
         } else {
             format!(
                 "{} \n\nCRITICAL INSTRUCTION: You MUST use the verified facts below and include inline citations [1].\n\nVERIFIED EVIDENCE:\n{}",
@@ -282,15 +304,15 @@ pub async fn start_person_research(
         match llm::stream_research(app_clone.clone(), grounded_prompt).await {
             Ok(full_response) => {
                 let mut final_output = full_response;
-                if !verified_claims.is_empty() {
+                if !verified_evidence.is_empty() {
                     final_output.push_str("\n\n---\n### Verified Evidence & Citations\n");
-                    for (i, (claim, result)) in verified_claims.iter().enumerate() {
-                        let badge = if result.match_type == "fuzzy" {
-                            format!("Likely Match ({}%)", (result.confidence * 100.0) as u32)
+                    for (i, (_, quote, url, match_type, conf)) in verified_evidence.iter().enumerate() {
+                        let badge = if match_type == "fuzzy" {
+                            format!("Likely Match ({}%)", (conf * 100.0) as u32)
                         } else {
                             "✓ Verified".to_string()
                         };
-                        final_output.push_str(&format!("**[{}]** \"{}\" — [Source]({}) `{}`\n", i + 1, claim.quote, claim.source_url, badge));
+                        final_output.push_str(&format!("**[{}]** \"{}\" — [Source]({}) `{}`\n", i + 1, quote, url, badge));
                     }
                 }
 
